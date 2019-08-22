@@ -1,7 +1,8 @@
 import numpy as np
+from simparam import SimParam
 import time
 
-np.random.seed(13)
+
 
 
 def oneslotprocess(arrival_array, printit=False):
@@ -40,17 +41,19 @@ def oneslotprocess(arrival_array, printit=False):
     return arrival_array, success
 
 
+sim = SimParam()
+np.random.seed(sim.seed)
 active_array = np.zeros(0, dtype=int)
 total_arrivals = 0
 total_successes = 0
-for k in range(0, 100000):
-    packets_gen = np.random.poisson(0.347)
+for _ in range(0, sim.runs):
+    packets_gen = np.random.poisson(sim.lmbda)
     total_arrivals = total_arrivals + packets_gen
     new_packets = np.zeros(packets_gen, dtype=int)
     active_array = np.concatenate((active_array, new_packets))
     active_array, result = oneslotprocess(active_array, printit=False)
-    successes = total_successes + result
-print(total_successes/total_arrivals)
+    total_successes = total_successes + result
+print("Throughput = " + str(total_successes/total_arrivals))
 
 
 
