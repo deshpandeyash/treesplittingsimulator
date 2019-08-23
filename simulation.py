@@ -14,7 +14,7 @@ active_array = np.zeros(0, dtype=int)
 total_arrivals = 0
 total_successes = 0
 # Run simulation for the number of slots
-for _ in range(0, sim.runs):
+for slot_no in range(0, sim.runs):
     # Generate a packet according to poisson distribution
     packets_gen = np.random.poisson(sim.lmbda)
     # Keep track of total arrivals
