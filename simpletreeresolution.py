@@ -60,6 +60,7 @@ def oneslotprocess(arrival_array, printit=False):
         print("Error, unexpected array")
     return arrival_array, success
 
+
 # Load simulation parameters
 sim = SimParam()
 np.random.seed(sim.seed)
