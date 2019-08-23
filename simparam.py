@@ -7,7 +7,7 @@ class SimParam(object):
     def __init__(self):
 
         # current buffer spaces and minimal buffer spaces
-        self.lmbda = 0.374
+        self.lmbda = 0.36787944117
 
         # number of Runs
         self.runs = 10000
