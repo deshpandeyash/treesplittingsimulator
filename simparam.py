@@ -12,7 +12,7 @@ class SimParam(object):
         # number of Runs
         self.runs = 10000
         # set seed for random number generation
-        self.seed = 3092019
+        self.seed = 9
 
     def print_sim_config(self):
         """

@@ -3,6 +3,18 @@ from simparam import SimParam
 import time
 
 
+def binsplit(packet_array, branchprob):
+    """
+    performs a binary split with given branching probability, if the count is 0 , i,e the packets have collided
+    :param packet_array: the array of active packets with counts
+    :param branchprob: branching probability
+    :return: the updated array where the collided packets have drawn a 0 or 1 depending on the branching prob
+    """
+    # For collision, we must update the values in each packet
+    packet_array = np.where(packet_array == 0, np.random.binomial(1, branchprob, len(packet_array)), packet_array)
+    return packet_array
+
+
 def txprocess(arrival_array, printit=False):
     """
     this simulates the process in a slot, the array of active packets in a slot fed to it,
@@ -36,14 +48,12 @@ def txprocess(arrival_array, printit=False):
         arrival_array = arrival_array - 1
     # If Collision
     elif feedback == 2:
-        # For collision, we must update the values in each packet
-        for i in range(0, len(arrival_array)):
-            # For packets which collided, we have to make a tree selection again
-            if arrival_array[i] == 0:
-                arrival_array[i] = arrival_array[i] + np.random.binomial(1, 0.5)
-            # For other waiting packets, we just increase the count by 1
-            else:
-                arrival_array[i] = arrival_array[i] + 1
+        # increment the count for uncollided packets
+        arrival_array = np.where(arrival_array != 0, arrival_array + 1, arrival_array)
+        # Update the counts on the collided packets according to a binary split
+        arrival_array = binsplit(arrival_array, 0.5)
+
+
     # This is an error and means that the RX process did not change the feedback
     elif feedback == 9:
         print("Rx Process did not change give a Feedback")
@@ -52,7 +62,6 @@ def txprocess(arrival_array, printit=False):
         print(arrival_array)
 
     return arrival_array, success
-
 
 def rxprocess(active_packet_array, printit=False):
     """
