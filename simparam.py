@@ -14,6 +14,9 @@ class SimParam(object):
         # set seed for random number generation
         self.seed = 9
 
+        # set branching probabilty
+        self.branchprob = 0.5
+
     def print_sim_config(self):
         """
         Print a basic system configuration string.
