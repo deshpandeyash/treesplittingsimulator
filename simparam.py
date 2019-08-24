@@ -10,7 +10,7 @@ class SimParam(object):
         self.lmbda = 0.36787944117
 
         # number of Runs
-        self.runs = 100000
+        self.runs = 10000
         # set seed for random number generation
         self.seed = 8
 

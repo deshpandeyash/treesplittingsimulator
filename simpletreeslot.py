@@ -1,5 +1,6 @@
 import numpy as np
 from simparam import SimParam
+from packet import Packet
 
 
 class SimpleTreeSlot(object):
@@ -17,8 +18,9 @@ class SimpleTreeSlot(object):
         :return: the updated array where the collided packets have drawn a 0 or 1 depending on the branching prob
         """
         # For collision, we must update the values in each packet
-        packet_array = np.where(packet_array == 0, np.random.binomial(1, self.branchprob,
-                                                                      len(packet_array)), packet_array)
+        for j in packet_array:
+            if j.packet_count == 0:
+                j.packet_count = j.packet_count + np.random.binomial(1, self.branchprob)
         return packet_array
 
     def oneslotprocess(self, arrival_array, printit=False):
@@ -34,15 +36,16 @@ class SimpleTreeSlot(object):
         # this parameter is changed to 1 if the result from this slot is a success
         success = 0
         # Sort the array in ascending order
-        arrival_array = np.sort(arrival_array)
+        arrival_array.sort(key=lambda c : c.packet_count)
         if printit:
             print("Arrival Array Before Tx")
             print(arrival_array)
         # Get the feedback form the receiver
-        feedback = self.rxprocess(arrival_array, printit=False)
+        packet_count_array = [x.packet_count for x in arrival_array]
+        feedback = self.rxprocess(packet_count_array, printit=False)
         # Find out the packet count attributes for further statistics
-        self.no_active_packets = len(arrival_array)
-        self.no_waiting_packets = np.count_nonzero(arrival_array)
+        self.no_active_packets = len(packet_count_array)
+        self.no_waiting_packets = np.count_nonzero(packet_count_array)
         self.no_collided_packets = self.no_active_packets - self.no_waiting_packets
 
         if printit:
@@ -50,17 +53,21 @@ class SimpleTreeSlot(object):
         # If Success
         if feedback == 1:
             # On a success, all other packets reduce their count by 1 and we clear the transmitted packet
-            arrival_array = arrival_array - 1
-            arrival_array = np.delete(arrival_array, 0)
+            for j in arrival_array:
+                j.packet_count = j.packet_count - 1
+            #popper = arrival_array.pop(0)
             success = 1
         # If Idle
         elif feedback == 0:
             # On an idle slot, all packets reduce their count by 1
-            arrival_array = arrival_array - 1
+            for j in arrival_array:
+                j.packet_count = j.packet_count - 1
         # If Collision
         elif feedback == 2:
             # increment the count for uncollided packets
-            arrival_array = np.where(arrival_array != 0, arrival_array + 1, arrival_array)
+            for j in arrival_array:
+                if j.packet_count != 0:
+                    j.packet_count = j.packet_count + 1
             # Update the counts on the collided packets according to a binary split
             arrival_array = self.binsplit(arrival_array)
         # This is an error and means that the RX process did not change the feedback
