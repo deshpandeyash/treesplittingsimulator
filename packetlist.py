@@ -1,5 +1,5 @@
 import numpy as np
-
+from packet import Packet
 
 class PacketList(object):
     """
@@ -14,7 +14,7 @@ class PacketList(object):
         :return: list of all packets with the decremented packet_count
         """
         for j in packet_array:
-            j.packet_count = j.packet_count - 1
+            j.packet_count -= 1
         return packet_array
 
     def inc_uncollided_packet_count(self, packet_array):
@@ -25,7 +25,7 @@ class PacketList(object):
         """
         for j in packet_array:
             if j.packet_count != 0:
-                j.packet_count = j.packet_count + 1
+                j.packet_count += 1
         return packet_array
 
     def binsplit_uncollided_packet_count(self, packet_array, branchprob):
@@ -37,7 +37,7 @@ class PacketList(object):
         """
         for j in packet_array:
             if j.packet_count == 0:
-                j.packet_count = j.packet_count + np.random.binomial(1, branchprob)
+                j.packet_count += np.random.binomial(1, branchprob)
         return packet_array
 
     def sort_packet_array(self, packet_array):
@@ -51,4 +51,23 @@ class PacketList(object):
 
     def extract_packet_count(self, packet_array):
         return [x.packet_count for x in packet_array]
+
+    def add_packets(self, slot_no, packet_number, no_of_packets, packet_array):
+        for j in range(0, no_of_packets):
+            packet_array.append(Packet(slot_no, packet_number + j))
+        return packet_array
+
+    def remove_successful_packet(self, packet_array, slot_no):
+        pack = packet_array.pop(0)
+        pack.life_time = slot_no - pack.birth_time
+        return packet_array, pack
+
+    def update_transmissions(self, packet_array):
+        for j in packet_array:
+            if j.packet_count == 0:
+                j.transmissions += 1
+        return packet_array
+
+
+
 

@@ -7,6 +7,8 @@ class Packet(object):
         self.packetID = packet_number
         self.packet_count = 0
         self.birth_time = slot_number
+        self.life_time = 0
+        self.transmissions = 0
 
     def __cmp__(self, other):
         if self.packet_count < other.packet_count:

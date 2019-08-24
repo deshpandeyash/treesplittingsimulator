@@ -36,6 +36,8 @@ class SimpleTreeSlot(object):
         self.no_active_packets = len(packet_count_array)
         self.no_waiting_packets = np.count_nonzero(packet_count_array)
         self.no_collided_packets = self.no_active_packets - self.no_waiting_packets
+        # Update the number of transmissions in each packet
+        arrival_array = PacketList().update_transmissions(arrival_array)
 
         if printit:
             print("Feedback" + str(feedback))
