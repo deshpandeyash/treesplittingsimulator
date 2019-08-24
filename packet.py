@@ -1,8 +1,7 @@
-import numpy as np
-from simparam import SimParam
-
-
 class Packet(object):
+    """
+    This class is to define the functions of a packet and what its attributes should be, how it must be sorted
+    """
 
     def __init__(self, slot_number, packet_number):
         self.packetID = packet_number
