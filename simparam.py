@@ -1,3 +1,4 @@
+from math import e
 class SimParam(object):
 
     """
@@ -7,12 +8,12 @@ class SimParam(object):
     def __init__(self):
 
         # current buffer spaces and minimal buffer spaces
-        self.lmbda = 0.36787944117
+        self.lmbda = 1/e
 
         # number of Runs
         self.runs = 10000
         # set seed for random number generation
-        self.seed = 8
+        self.seed = 3092019
 
         # set branching probabilty
         self.branchprob = 0.5

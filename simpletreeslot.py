@@ -40,8 +40,9 @@ class SimpleTreeSlot(object):
         if printit:
             print("Arrival Array Before Tx")
             print(arrival_array)
-        # Get the feedback form the receiver
+        # Convert the array of Packet objects to just a list for easier and faster operation at transmitter
         packet_count_array = [x.packet_count for x in arrival_array]
+        # Get the feedback form the receiver
         feedback = self.rxprocess(packet_count_array, printit=False)
         # Find out the packet count attributes for further statistics
         self.no_active_packets = len(packet_count_array)
@@ -52,10 +53,9 @@ class SimpleTreeSlot(object):
             print("Feedback" + str(feedback))
         # If Success
         if feedback == 1:
-            # On a success, all other packets reduce their count by 1 and we clear the transmitted packet
+            # On a success, all other packets reduce their count by 1
             for j in arrival_array:
                 j.packet_count = j.packet_count - 1
-            #popper = arrival_array.pop(0)
             success = 1
         # If Idle
         elif feedback == 0:
