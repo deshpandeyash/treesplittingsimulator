@@ -2,8 +2,11 @@ import numpy as np
 from simulation import Simulation
 from matplotlib import pyplot
 
+# Create the simulation object
 sim = Simulation()
+# Seed for repeatability
 np.random.seed(sim.sim_param.seed)
+# Do the simulation and load the output in arrays
 total_arrivals, total_successes, delay_stat_array, tx_stat_array, arrival_stat_array = sim.do_simulation()
 # print throughput
 print("Throughput = " + str(total_successes / total_arrivals))

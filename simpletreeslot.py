@@ -1,15 +1,15 @@
 import numpy as np
-from simparam import SimParam
-from packetlist import PacketList
+import packetlist
 
 
 class SimpleTreeSlot(object):
 
-    def __init__(self):
+    def __init__(self, sim_param):
+        self.sim_param = sim_param
         self.no_collided_packets = 0
         self.no_active_packets = 0
         self.no_waiting_packets = 0
-        self.branchprob = SimParam().branchprob
+        self.branchprob = self.sim_param.branchprob
 
     def oneslotprocess(self, arrival_array, printit=False):
         """
@@ -24,12 +24,12 @@ class SimpleTreeSlot(object):
         # this parameter is changed to 1 if the result from this slot is a success
         success = 0
         # Sort the array in ascending order
-        arrival_array = PacketList().sort_packet_array(arrival_array)
+        arrival_array = packetlist.sort_packet_array(arrival_array)
         if printit:
             print("Arrival Array Before Tx")
             print(arrival_array)
         # Convert the array of Packet objects to just a list for easier and faster operation at transmitter
-        packet_count_array = PacketList().extract_packet_count(arrival_array)
+        packet_count_array = packetlist.extract_packet_count(arrival_array)
         # Get the feedback form the receiver
         feedback = self.rxprocess(packet_count_array, printit=False)
         # Find out the packet count attributes for further statistics
@@ -37,25 +37,25 @@ class SimpleTreeSlot(object):
         self.no_waiting_packets = np.count_nonzero(packet_count_array)
         self.no_collided_packets = self.no_active_packets - self.no_waiting_packets
         # Update the number of transmissions in each packet
-        arrival_array = PacketList().update_transmissions(arrival_array)
+        arrival_array = packetlist.update_transmissions(arrival_array)
 
         if printit:
             print("Feedback" + str(feedback))
         # If Success
         if feedback == 1:
             # On a success, all other packets reduce their count by 1
-            arrival_array = PacketList().dec_packet_count(arrival_array)
+            arrival_array = packetlist.dec_packet_count(arrival_array)
             success = 1
         # If Idle
         elif feedback == 0:
             # On an idle slot, all packets reduce their count by 1
-            arrival_array = PacketList().dec_packet_count(arrival_array)
+            arrival_array = packetlist.dec_packet_count(arrival_array)
         # If Collision
         elif feedback == 2:
             # increment the count for uncollided packets
-            arrival_array = PacketList().inc_uncollided_packet_count(arrival_array)
+            arrival_array = packetlist.inc_uncollided_packet_count(arrival_array)
             # Update the counts on the collided packets according to a binary split
-            arrival_array = PacketList().binsplit_uncollided_packet_count(arrival_array, SimParam().branchprob)
+            arrival_array = packetlist.binsplit_uncollided_packet_count(arrival_array, self.sim_param.branchprob)
         # This is an error and means that the RX process did not change the feedback
         elif feedback == 9:
             print("Rx Process did not change give a Feedback")
