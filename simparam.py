@@ -12,13 +12,16 @@ class SimParam(object):
         # current buffer spaces and minimal buffer spaces
         self.lmbda = 1/e
 
-        # number of Runs
-        self.runs = 10000
+        # number of slots to simulate
+        self.SIMTIME = 10000
         # set seed for random number generation
         self.seed = 3092019
 
         # set branching probabilty
         self.branchprob = 0.5
+
+        # No if runs in simstudy
+        self.RUNS = 100
 
     def print_sim_config(self):
         """
@@ -26,5 +29,6 @@ class SimParam(object):
         """
         print("simulaiton Parameters are: ")
         print("Arrival Rate, Lambda = " + str(self.lmbda))
-        print("No of runs = " + str(self.runs))
+        print("No of runs = " + str(self.SIMTIME))
         print("Random Number seed = " + str(self.seed))
+        print("Number of runs = " + str(self.RUNS))
