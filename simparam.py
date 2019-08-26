@@ -15,7 +15,7 @@ class SimParam(object):
         # number of slots to simulate
         self.SIMTIME = 10000
         # set seed for random number generation
-        self.seed = 3092019
+        self.seed = 7
 
         # set branching probabilty
         self.branchprob = 0.5

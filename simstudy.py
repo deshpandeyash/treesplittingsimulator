@@ -1,4 +1,3 @@
-import numpy as np
 from simulation import Simulation
 from matplotlib import pyplot
 
