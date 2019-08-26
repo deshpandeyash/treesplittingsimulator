@@ -1,7 +1,7 @@
 import packetlist
 
 
-class SimResult(object):
+class SimState(object):
 
     def __init__(self):
         # Arrays to see the distribution of arrivals and packet delays
@@ -25,8 +25,11 @@ class SimResult(object):
         # Keep track of total arrivals
         self.total_arrivals += packets_gen
         if result == 1:
+            # Update the total successes
             self.total_successes += 1
+            # remove the packet from active array
             active_array, successful_pack = packetlist.remove_successful_packet(active_array, slot_no)
+            # Load the features of the successfully transmitted packet for statistics
             self.delay_stat_array.append(successful_pack.life_time)
             self.tx_stat_array.append(successful_pack.transmissions)
         return active_array

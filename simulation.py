@@ -1,7 +1,7 @@
 import numpy as np
 from simparam import SimParam
 from simpletreeslot import SimpleTreeSlot
-from simresult import SimResult
+from simstate import SimState
 import packetlist
 
 
@@ -11,7 +11,7 @@ class Simulation(object):
         # Load simulation parameters
         self.sim_param = SimParam()
         # Load the variables for statistical simualtion
-        self.sim_result = SimResult()
+        self.sim_state = SimState()
         # Load the methods governing simple tree resolution in this
         self.simpletree = SimpleTreeSlot(self.sim_param)
         # Create an array of integers of which will contain all active nodes.
@@ -30,11 +30,11 @@ class Simulation(object):
             # Generate a packet according to poisson distribution
             packets_gen = np.random.poisson(self.sim_param.lmbda)
             # Add the number of packets to the active packet array
-            active_array = packetlist.add_packets(slot_no, self.sim_result.total_arrivals, packets_gen, self.active_array)
+            active_array = packetlist.add_packets(slot_no, self.sim_state.total_arrivals, packets_gen, self.active_array)
             # Simulate the processes that would happen in the tx and rx in one slot, update the active array accordingly
             self.active_array, result = self.simpletree.oneslotprocess(active_array, printit=False)
             # Keep track of successes
-            self.active_array = self.sim_result.update_metrics(self.active_array, packets_gen, slot_no, result)
+            self.active_array = self.sim_state.update_metrics(self.active_array, packets_gen, slot_no, result)
 
 
 
