@@ -29,20 +29,12 @@ class Simulation(object):
         for slot_no in self.slot_array:
             # Generate a packet according to poisson distribution
             packets_gen = np.random.poisson(self.sim_param.lmbda)
-            # Add the number of packets to statistical array for diagnosis
-            self.sim_result.arrival_stat_array.append(packets_gen)
             # Add the number of packets to the active packet array
             active_array = packetlist.add_packets(slot_no, self.sim_result.total_arrivals, packets_gen, self.active_array)
-            # Keep track of total arrivals
-            self.sim_result.total_arrivals += packets_gen
             # Simulate the processes that would happen in the tx and rx in one slot, update the active array accordingly
             self.active_array, result = self.simpletree.oneslotprocess(active_array, printit=False)
             # Keep track of successes
-            if result == 1:
-                self.sim_result.total_successes += 1
-                self.active_array, successful_pack = packetlist.remove_successful_packet(active_array, slot_no)
-                self.sim_result.delay_stat_array.append(successful_pack.life_time)
-                self.sim_result.tx_stat_array.append(successful_pack.transmissions)
+            self.active_array = self.sim_result.update_metrics(self.active_array, packets_gen, slot_no, result)
 
 
 
