@@ -21,11 +21,11 @@ def simulate_simple_tree_dynamic(sim, modified=False):
     # pyplot.show()
 
 
-def simulate_simple_tree_static(sim, modified=False):
+def simulate_simple_tree_static(sim, modified=False,unisplit=False):
     # Reset the simualtion
     sim.reset()
     # Perform simple tree which is static
-    sim.do_simulation_simple_tree_static(1000,modified=modified)
+    sim.do_simulation_simple_tree_static(1000, modified=modified,unisplit=unisplit)
     print("Throughput = " + str(sim.sim_result.throughput))
     print("Mean Packet Delay = " + str(sim.sim_result.mean_packet_delay))
     print("Max packet delay = " + str(sim.sim_result.max_packet_delay))
@@ -48,6 +48,6 @@ if __name__ == '__main__':
     #np.random.seed(sim.sim_param.seed)
     # Comment and uncomment the below methods as it suits
     # simulate_simple_tree_dynamic(sim,modified=False)
-    simulate_simple_tree_static(sim,modified=True)
+    simulate_simple_tree_static(sim, modified=True,unisplit=True)
 
 

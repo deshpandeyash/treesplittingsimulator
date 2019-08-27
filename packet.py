@@ -10,6 +10,7 @@ class Packet(object):
         self.life_time = 0
         self.transmissions = 0
 
+    # To better sort the array of packets
     def __cmp__(self, other):
         if self.packet_count < other.packet_count:
             return True

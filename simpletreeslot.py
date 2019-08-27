@@ -10,17 +10,17 @@ class SimpleTreeSlot(object):
         self.no_active_packets = 0
         self.no_waiting_packets = 0
 
-    def oneslotprocess(self, sim, modified=False):
+    def oneslotprocess(self, sim, modified=False, unisplit=False):
         """
-        this simulates the process in a slot, the array of active packets in a slot fed to it,
+        this simulates the process in a slot, the array of active packets is analyzed and then
         we transmit the packets which have count 0, and then wait for the feedback and update the count in the packets
         accordingly
-        :param arrival_array: the array of active packets in the system
-        :param printit: if printing needs to be done for diagnostics
-        :return: the updated array and if this process resulted in a success
-        """
+        :param sim: the simulation parameters
+        :param unisplit: if true then perform a uniform split
+        :param modified: if true the simulator will run the modified tree where we eliminate a deterministic collision
 
-        # this parameter is changed to 1 if the result from this slot is a success
+        """
+        # this parameter is changed to the result of the transmission feedback
         sim.result = 0
         # Sort the array in ascending order
         packetlist.sort_packet_array(sim)
@@ -43,6 +43,7 @@ class SimpleTreeSlot(object):
         elif feedback == 0:
             # On an idle slot, all packets reduce their count by 1
             packetlist.dec_packet_count(sim)
+            # If the modified tree algorithm is used, and previous result was a collision
             if modified and sim.sim_state.prev_result == 2:
                 # increment the count for uncollided packets
                 packetlist.inc_uncollided_packet_count(sim)
@@ -53,8 +54,12 @@ class SimpleTreeSlot(object):
         elif feedback == 2:
             # increment the count for uncollided packets
             packetlist.inc_uncollided_packet_count(sim)
-            # Update the counts on the collided packets according to a binary split
-            packetlist.binsplit_uncollided_packet_count(sim)
+            # If unisplit and if its the first collision
+            if unisplit and sim.sim_state.total_collisions == 0:
+                packetlist.unisplit_uncollided_packet_count(sim)
+            else:
+                # Update the counts on the collided packets according to a binary split
+                packetlist.binsplit_uncollided_packet_count(sim)
             sim.result = 2
         # This is an error and means that the RX process did not change the feedback
         elif feedback == 9:
@@ -63,11 +68,10 @@ class SimpleTreeSlot(object):
 
     def rxprocess(self, active_packet_array):
         """
-        depending on the active packet array length and the count in each of its packets, this process decides whether there
-        was in idle slot, collision or success after which it provides feedback,
+        depending on the active packet array length and the count in each of its packets, this process decides whether
+        there was in idle slot, collision or success after which it provides feedback,
 
         :param active_packet_array: the array that contains all the packets, this array is already sorted by the txprocess
-        :param printit: if the feedback must be printed
         :return: feedback , 0 = Idle; 1 = Success; 2 = collision; 9 = Error
         """
         # This parameter is initialized to a 9, to make sure it is changed by the process. i.e the feedback is one of
