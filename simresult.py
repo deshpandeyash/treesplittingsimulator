@@ -17,10 +17,10 @@ class SimResult(object):
         self.mean_no_tx = 0
         self.max_no_tx = 0
 
-    def get_result(self, sim_state, sim_time):
-        self.throughput = sim_state.total_successes / sim_time
-        self.mean_packet_delay = np.mean(sim_state.delay_stat_array)
-        self.max_packet_delay = max(sim_state.delay_stat_array)
-        self.mean_no_tx = np.mean(sim_state.tx_stat_array)
-        self.max_no_tx = max(sim_state.tx_stat_array)
+    def get_result(self, sim):
+        self.throughput = sim.sim_state.total_successes / sim.slot_no
+        self.mean_packet_delay = np.mean(sim.sim_state.delay_stat_array)
+        self.max_packet_delay = max(sim.sim_state.delay_stat_array)
+        self.mean_no_tx = np.mean(sim.sim_state.tx_stat_array)
+        self.max_no_tx = max(sim.sim_state.tx_stat_array)
 
