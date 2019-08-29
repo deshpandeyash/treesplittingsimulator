@@ -7,14 +7,15 @@ in the code above
 """
 
 
-def dec_packet_count(sim):
+def dec_packet_count(sim, count):
     """
     decrements the count in the packet_count of each packet in the packet array
     :param sim: the simulation object instance
+    :param count: the counts to decrement
 
     """
     for j in sim.active_array:
-        j.packet_count -= 1
+        j.packet_count -= count
 
 
 def inc_uncollided_packet_count(sim):
@@ -45,7 +46,7 @@ def unisplit_uncollided_packet_count(sim):
     """
     for j in sim.active_array:
         if j.packet_count == 0:
-            j.packet_count += np.random.randint(0, sim.simpletree.no_collided_packets)
+            j.packet_count += np.random.randint(0, sim.sictree.no_collided_packets)
 
 
 def sort_packet_array(sim):

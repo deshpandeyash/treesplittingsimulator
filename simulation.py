@@ -3,6 +3,7 @@ from simparam import SimParam
 from simpletreeslot import SimpleTreeSlot
 from simstate import SimState
 from simresult import SimResult
+from sic_treeslot import SICTreeSlot
 import packetlist
 
 
@@ -17,6 +18,7 @@ class Simulation(object):
         self.sim_result = SimResult()
         # Load the methods governing simple tree resolution in this
         self.simpletree = SimpleTreeSlot(self.sim_param)
+        self.sictree = SICTreeSlot(self.sim_param)
         # Create an array of integers of which will contain all active nodes.
         self.active_array = []
         self.slot_array = np.arange(0, self.sim_param.SIMTIME)
@@ -29,6 +31,7 @@ class Simulation(object):
         self.sim_state = SimState()
         self.sim_result = SimResult()
         self.simpletree = SimpleTreeSlot(self.sim_param)
+        self.sictree = SICTreeSlot(self.sim_param)
         self.active_array = []
         self.slot_array = np.arange(0, self.sim_param.SIMTIME)
         self.packets_gen = 0
@@ -67,3 +70,20 @@ class Simulation(object):
         # Update the results
         self.sim_result.get_result(self)
 
+    def do_simulation_sic_tree_static(self, collided_packets, modified=False, unisplit=False,sic=False):
+        # Load active array with the collided packets
+        self.packets_gen = collided_packets
+        packetlist.add_packets(self)
+        self.slot_no = 0
+        # Run the simulation as long as all packets are processed
+        while len(self.active_array) != 0:
+            # Simulate the processes that would happen in the tx and rx in one slot, update the active array accordingly
+            self.sictree.oneslotprocess(self, modified=modified,unisplit=unisplit,sic=sic)
+            # Update the simstate metric according to the result of the simulation
+            self.sim_state.update_metrics(self)
+            # Increment the slot
+            self.slot_no += 1
+        # total arrivals is just equal to collided packets and we just add it here
+        self.sim_state.total_arrivals = collided_packets
+        # Update the results
+        self.sim_result.get_result(self)
