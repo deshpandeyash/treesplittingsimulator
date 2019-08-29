@@ -13,7 +13,7 @@ def sic_process(active_packet_array):
     return resolved_packets
 
 
-class SICTreeSlot(object):
+class TreeSlot(object):
 
     def __init__(self, sim_param):
         self.sim_param = sim_param
@@ -39,7 +39,7 @@ class SICTreeSlot(object):
         # Convert the array of Packet objects to just a list for easier and faster operation at transmitter
         packet_count_array = packetlist.extract_packet_count(sim)
         # Get the feedback form the receiver
-        feedback, self.resolved_packets = self.sicrxprocess(packet_count_array,sic)
+        feedback, self.resolved_packets = self.rxprocess(packet_count_array,sic)
         # Find out the packet count attributes for further statistics
         self.no_active_packets = len(packet_count_array)
         self.no_waiting_packets = np.count_nonzero(packet_count_array)
@@ -78,7 +78,7 @@ class SICTreeSlot(object):
             print("Rx Process did not change give a Feedback")
         sim.sim_state.prev_result = sim.result
 
-    def sicrxprocess(self, active_packet_array,sic):
+    def rxprocess(self, active_packet_array,sic):
         """
         depending on the active packet array length and the count in each of its packets, this process decides whether
         there was in idle slot, collision or success after which it provides feedback,

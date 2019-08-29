@@ -46,7 +46,7 @@ def unisplit_uncollided_packet_count(sim):
     """
     for j in sim.active_array:
         if j.packet_count == 0:
-            j.packet_count += np.random.randint(0, sim.sictree.no_collided_packets)
+            j.packet_count += np.random.randint(0, sim.slot.no_collided_packets)
 
 
 def sort_packet_array(sim):

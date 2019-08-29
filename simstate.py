@@ -32,7 +32,7 @@ class SimState(object):
         self.total_arrivals += sim.packets_gen
         # If a success
         if sim.result == 1:
-            for _ in range(sim.sictree.resolved_packets):
+            for _ in range(sim.slot.resolved_packets):
                 # Update the total successes
                 self.total_successes += 1
                 # remove the packet from active array

@@ -9,6 +9,7 @@ class SimResult(object):
         self.max_packet_delay = 0
         self.mean_no_tx = 0
         self.max_no_tx = 0
+        self.succ_rate = 0
 
     def reset(self):
         self.throughput = 0
@@ -16,6 +17,7 @@ class SimResult(object):
         self.max_packet_delay = 0
         self.mean_no_tx = 0
         self.max_no_tx = 0
+        self.succ_rate = 0
 
     def get_result(self, sim):
         # Throughput is the number of successful packets divided by the total number of slots
@@ -28,4 +30,6 @@ class SimResult(object):
         self.mean_no_tx = np.mean(sim.sim_state.tx_stat_array)
         # Max of all the retransmissions of all successful packets
         self.max_no_tx = max(sim.sim_state.tx_stat_array)
+        # Total arrivals/total succeses
+        self.succ_rate = sim.sim_state.total_successes / sim.sim_state.total_arrivals
 
