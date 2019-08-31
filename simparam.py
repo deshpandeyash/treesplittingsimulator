@@ -13,7 +13,7 @@ class SimParam(object):
         self.lmbda = 0.34           #0.375
 
         # number of slots to simulate
-        self.SIMTIME = 100000
+        self.SIMTIME = 10000
         # set seed for random number generation
         self.seed = 7
 
@@ -21,7 +21,7 @@ class SimParam(object):
         self.branchprob = 0.5
 
         # No if runs in simstudy
-        self.RUNS = 100
+        self.RUNS = 1
 
     def print_sim_config(self):
         """

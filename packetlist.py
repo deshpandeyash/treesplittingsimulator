@@ -39,6 +39,7 @@ def binsplit_uncollided_packet_count(sim):
         if j.packet_count == 0:
             j.packet_count += np.random.binomial(1, sim.sim_param.branchprob)
 
+
 def unisplit_uncollided_packet_count(sim):
     """
     performs a uniform split where each packet chooses a random slot between 0 and the number of collided packets
@@ -58,7 +59,6 @@ def sort_packet_array(sim):
     sim.active_array.sort(key=lambda c: c.packet_count)
 
 
-
 def extract_packet_count(sim):
     """
 
@@ -76,6 +76,7 @@ def add_packets(sim):
     """
     for j in range(0, sim.packets_gen):
         sim.active_array.append(Packet(sim.slot_no, sim.sim_state.total_arrivals + j + 1))
+
 
 def remove_successful_packet(sim):
     """
