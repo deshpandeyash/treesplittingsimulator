@@ -23,11 +23,11 @@ def simulate_simple_tree_dynamic(sim, modified=False, unisplit=False,sic=False):
     # pyplot.show()
 
 
-def simulate_simple_tree_static(sim, modified=False,unisplit=False,sic=False):
+def simulate_simple_tree_static(sim, modified=False, unisplit=False, sic=False):
     # Reset the simualtion
     sim.reset()
     # Perform simple tree which is static
-    sim.do_simulation_simple_tree_static(1000, modified=modified,unisplit=unisplit,sic=sic)
+    sim.do_simulation_simple_tree_static(1000, modified=modified, unisplit=unisplit, sic=sic)
     print("Throughput = " + str(sim.sim_result.throughput))
     print("Mean Packet Delay = " + str(sim.sim_result.mean_packet_delay))
     print("Max packet delay = " + str(sim.sim_result.max_packet_delay))
@@ -48,7 +48,7 @@ def simulate_simple_tree_static_multpile_runs(sim, modified=False, unisplit=Fals
     pyplot.show()
 
 
-def simulate_simple_tree_dynamic_multiple_runs(sim,modified=False,unisplit=False,sic=False):
+def simulate_simple_tree_dynamic_multiple_runs(sim, modified=False, unisplit=False, sic=False):
     rate_array = np.arange(0.15, 0.75, 0.05)
     succ_rate = []
     delay = []
@@ -58,20 +58,20 @@ def simulate_simple_tree_dynamic_multiple_runs(sim,modified=False,unisplit=False
         for _ in range(sim.sim_param.RUNS):
             sim.reset()
             sim.sim_param.lmbda = p
-            sim.do_simulation_simple_tree_dynamic(modified=modified,unisplit=unisplit, sic=sic)
+            sim.do_simulation_simple_tree_dynamic(modified=modified, unisplit=unisplit, sic=sic)
             counter1.append(sim.sim_result.succ_rate)
             counter2.append(sim.sim_result.mean_packet_delay)
         succ_rate.append(np.mean(counter1))
         delay.append(np.mean(counter2))
     optimum_throughput = rate_array[delay.index(max(delay))]
     print("Optimum Throughput = " + str(optimum_throughput))
+    pyplot.subplot(121)
     pyplot.plot(rate_array, succ_rate, color='red')
     pyplot.xlabel('Arrival rate (packets/slot)')
     pyplot.ylabel('Success rate')
     pyplot.twinx()
     pyplot.plot(rate_array, delay, color='blue')
     pyplot.ylabel('Mean Packet Delay')
-    pyplot.show()
 
 
 if __name__ == '__main__':
@@ -82,6 +82,6 @@ if __name__ == '__main__':
     # Comment and uncomment the below methods as it suits
     # simulate_simple_tree_dynamic(sim,modified=False,unisplit=False, sic=False)
     # simulate_simple_tree_static(sim, modified=False, unisplit=False, sic=True)
-    # simulate_simple_tree_static_multpile_runs(sim, modified=False, unisplit=False)
+    # simulate_simple_tree_static_multpile_runs(sim, modified=True, unisplit=False, sic=False)
     simulate_simple_tree_dynamic_multiple_runs(sim, modified=True, unisplit=False, sic=False)
 

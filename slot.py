@@ -48,7 +48,7 @@ class TreeSlot(object):
         packetlist.update_transmissions(sim)
         # If Success
         if feedback == 1:
-            # On a success, all other packets reduce their count by 1
+            # On a success, all other packets reduce their count
             packetlist.dec_packet_count(sim, self.resolved_packets)
             sim.result = 1
         # If Idle
