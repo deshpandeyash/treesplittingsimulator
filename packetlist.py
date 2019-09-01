@@ -102,9 +102,11 @@ def remove_successful_packet(sim):
     :param sim: the simulation object instance
     :return: the successful packet
     """
+
     pack = sim.active_array.pop(0)
     pack.life_time = sim.slot_no - pack.birth_time
     return pack
+
 
 
 def update_transmissions(sim):

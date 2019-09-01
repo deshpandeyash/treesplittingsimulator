@@ -42,18 +42,20 @@ class TreeSlot(object):
         if feedback == 1:
             # On a success, all other packets reduce their count
             packetlist.dec_packet_count(sim, self.resolved_packets)
-            sim.result = 1
+            if sic:
+                packetlist.binsplit_uncollided_packet_count(sim)
+            sim.result = feedback
         # If Idle
         elif feedback == 0:
             # On an idle slot, all packets reduce their count by 1
             packetlist.dec_packet_count(sim, 1)
             # If the modified tree algorithm is used, and previous result was a collision
-            if modified and sim.sim_state.prev_result == 2:
+            if modified and (sim.sim_state.prev_result == 2 or sic):
                 # increment the count for uncollided packets
                 packetlist.inc_uncollided_packet_count(sim)
                 # Update the counts on the collided packets according to a binary split
                 packetlist.binsplit_uncollided_packet_count(sim)
-            sim.result = 0
+            sim.result = feedback
         # If Collision
         elif feedback == 2:
             # increment the count for uncollided packets
@@ -64,7 +66,7 @@ class TreeSlot(object):
             else:
                 # Update the counts on the collided packets according to a binary split
                 packetlist.binsplit_uncollided_packet_count(sim)
-            sim.result = 2
+            sim.result = feedback
         # This is an error and means that the RX process did not change the feedback
         elif feedback == 9:
             print("Rx Process did not change give a Feedback")
@@ -108,13 +110,14 @@ class TreeSlot(object):
         packetID.append(self.tx_packet_array[0].packetID)
         SIC_resolved_packets = 0
         go_on = True
-        while go_on:
+        while go_on and len(self.collided_array) > 0:
             last_coll = self.collided_array[-1]
             resolved_array = [x for x in last_coll if x not in packetID]
             if len(resolved_array) == 1:
                 del self.collided_array[-1]
-                packetID.append(resolved_array)
+                packetID.append(resolved_array[0])
                 SIC_resolved_packets += 1
             else:
+                self.collided_array = []
                 go_on = False
         return SIC_resolved_packets

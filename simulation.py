@@ -17,7 +17,6 @@ class Simulation(object):
         # Load the result parameters
         self.sim_result = SimResult()
         # Load the methods governing simple tree resolution in this
-        #self.simpletree = SimpleTreeSlot(self.sim_param)
         self.slot = TreeSlot(self.sim_param)
         # Create an array of integers of which will contain all active nodes.
         self.active_array = []
@@ -30,7 +29,6 @@ class Simulation(object):
         self.sim_param = SimParam()
         self.sim_state = SimState()
         self.sim_result = SimResult()
-        #self.simpletree = SimpleTreeSlot(self.sim_param)
         self.slot = TreeSlot(self.sim_param)
         self.active_array = []
         self.slot_array = np.arange(0, self.sim_param.SIMTIME)
