@@ -1,17 +1,6 @@
 import numpy as np
 import packetlist
 
-def sic_process(active_packet_array):
-    k = 1
-    resolved_packets = 1
-    while k == 1:
-        active_packet_array = np.delete(active_packet_array, 0)
-        active_packet_array -= 1
-        k = len(active_packet_array) - np.count_nonzero(active_packet_array)
-        if len(active_packet_array) > 0 and active_packet_array[0] == 0 and k == 1:
-            resolved_packets += 1
-    return resolved_packets
-
 
 class TreeSlot(object):
 
@@ -21,6 +10,9 @@ class TreeSlot(object):
         self.no_active_packets = 0
         self.no_waiting_packets = 0
         self.resolved_packets = 0
+        self.collided_array = []
+        self.tx_packet_array = []
+
 
     def oneslotprocess(self, sim, modified=False, unisplit=False, sic=False):
         """
@@ -37,15 +29,15 @@ class TreeSlot(object):
         # Sort the array in ascending order
         packetlist.sort_packet_array(sim)
         # Convert the array of Packet objects to just a list for easier and faster operation at transmitter
-        packet_count_array = packetlist.extract_packet_count(sim)
-        # Get the feedback form the receiver
-        feedback, self.resolved_packets = self.rxprocess(packet_count_array,sic)
+        self.tx_packet_array = packetlist.extract_tx_packets(sim)
         # Find out the packet count attributes for further statistics
-        self.no_active_packets = len(packet_count_array)
-        self.no_waiting_packets = np.count_nonzero(packet_count_array)
-        self.no_collided_packets = self.no_active_packets - self.no_waiting_packets
+        self.no_active_packets = len(sim.active_array)
+        self.no_collided_packets = len(self.tx_packet_array)
+        self.no_waiting_packets = self.no_active_packets - self.no_collided_packets
         # Update the number of transmissions in each packet
         packetlist.update_transmissions(sim)
+        # Get the feedback form the receiver
+        feedback, self.resolved_packets = self.rxprocess(sic)
         # If Success
         if feedback == 1:
             # On a success, all other packets reduce their count
@@ -78,7 +70,8 @@ class TreeSlot(object):
             print("Rx Process did not change give a Feedback")
         sim.sim_state.prev_result = sim.result
 
-    def rxprocess(self, active_packet_array,sic):
+
+    def rxprocess(self,sic):
         """
         depending on the active packet array length and the count in each of its packets, this process decides whether
         there was in idle slot, collision or success after which it provides feedback,
@@ -90,26 +83,38 @@ class TreeSlot(object):
         # the expected values
         feedback = 9
         resolved_packets = 0
-        active_packet_array = np.asarray(active_packet_array)
         # If the length of the array is 0 then there are no active packets, and no transmissions hence, IDLE
         # If the first element is not 0, it means that no one will transmit even when there are active packets, ie IDLE
-        if len(active_packet_array) == 0 or active_packet_array[0] != 0:
+        if len(self.tx_packet_array) == 0:
             feedback = 0
         # If array has just one element and it is 0 then its a success
-        elif len(active_packet_array) == 1 and active_packet_array[0] == 0:
+        elif len(self.tx_packet_array) == 1:
             feedback = 1
             resolved_packets = 1
-        # If the first element is 0 and the second element is not 0 then, we have no collision and a success
-        elif active_packet_array[0] == 0 and active_packet_array[1] != 0:
-            feedback = 1
             if sic:
-                resolved_packets = sic_process(active_packet_array)
-            else:
-                resolved_packets = 1
-        # If the first and second element ( at least) are 0 it means we have a collision
-        elif active_packet_array[0] == 0 and active_packet_array[1] == 0:
+                resolved_packets += self.sic_process()
+        elif len(self.tx_packet_array) > 1:
             feedback = 2
+            if sic:
+                self.collided_array.append(packetlist.extract_packet_id(self.tx_packet_array))
+
         # If anything else occurs, print immediately as its not expected.
         else:
             print("Error, unexpected array")
         return feedback, resolved_packets
+
+    def sic_process(self):
+        packetID = []
+        packetID.append(self.tx_packet_array[0].packetID)
+        SIC_resolved_packets = 0
+        go_on = True
+        while go_on:
+            last_coll = self.collided_array[-1]
+            resolved_array = [x for x in last_coll if x not in packetID]
+            if len(resolved_array) == 1:
+                del self.collided_array[-1]
+                packetID.append(resolved_array)
+                SIC_resolved_packets += 1
+            else:
+                go_on = False
+        return SIC_resolved_packets

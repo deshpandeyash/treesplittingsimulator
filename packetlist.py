@@ -67,7 +67,25 @@ def extract_packet_count(sim):
     """
     return [x.packet_count for x in sim.active_array]
 
+def extract_tx_packets(sim):
+    """
 
+    :param sim:
+    :return:
+    """
+    tx_packet_array = []
+    for j in sim.active_array:
+        if j.packet_count == 0:
+            tx_packet_array.append(j)
+    return tx_packet_array
+
+def extract_packet_id(tx_packet_array):
+    """
+
+    :param sim:
+    :return:
+    """
+    return [x.packetID for x in tx_packet_array]
 def add_packets(sim):
     """
     Packets are added to the active array, the attributes of the packet are the arrival slot and its own number
