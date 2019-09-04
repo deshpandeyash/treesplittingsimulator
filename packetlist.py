@@ -86,7 +86,9 @@ def extract_packet_id(tx_packet_array):
     :return:
     """
     return [x.packetID for x in tx_packet_array]
-def add_packets(sim):
+
+
+def add_packets_to_tree(sim):
     """
     Packets are added to the active array, the attributes of the packet are the arrival slot and its own number
     the number of packets are given by sim.packets_gen
@@ -94,6 +96,17 @@ def add_packets(sim):
     """
     for j in range(0, sim.packets_gen):
         sim.active_array.append(Packet(sim.slot_no, sim.sim_state.total_arrivals + j + 1))
+
+
+def add_packets_to_queue(sim):
+    """
+
+    :param sim:
+    :return:
+    """
+    for j in range(0, sim.packets_gen):
+        sim.queue_array.append(Packet(sim.slot_no, sim.sim_state.total_arrivals + len(sim.queue_array) + j + 1))
+
 
 
 def remove_successful_packet(sim):

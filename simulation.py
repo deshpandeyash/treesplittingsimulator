@@ -20,10 +20,12 @@ class Simulation(object):
         self.slot = TreeSlot(self.sim_param)
         # Create an array of integers of which will contain all active nodes.
         self.active_array = []
+        self.queue_array = []
         self.slot_array = np.arange(0, self.sim_param.SIMTIME)
         self.packets_gen = 0
         self.result = 0
         self.slot_no = 0
+        self.added_packets = 0
 
     def reset(self):
         self.sim_param = SimParam()
@@ -31,10 +33,12 @@ class Simulation(object):
         self.sim_result = SimResult()
         self.slot = TreeSlot(self.sim_param)
         self.active_array = []
+        self.queue_array = []
         self.slot_array = np.arange(0, self.sim_param.SIMTIME)
         self.packets_gen = 0
         self.result = 0
         self.slot_no = 0
+        self.added_packets = 0
 
     def do_simulation_simple_tree_dynamic(self, modified=False, unisplit=False,sic=False):
         # Run simulation for the number of slots
@@ -42,7 +46,7 @@ class Simulation(object):
             # Generate a packet according to poisson distribution
             self.packets_gen = np.random.poisson(self.sim_param.lmbda)
             # Add the number of packets to the active packet array
-            packetlist.add_packets(self)
+            packetlist.add_packets_to_tree(self)
             # Simulate the processes that would happen in the tx and rx in one slot, update the active array accordingly
             self.slot.oneslotprocess(self, modified=modified,unisplit=unisplit,sic=sic)
             # Update the metrics in sim_state depending on the result
@@ -53,7 +57,7 @@ class Simulation(object):
     def do_simulation_simple_tree_static(self, collided_packets, modified=False, unisplit=False,sic=False):
         # Load active array with the collided packets
         self.packets_gen = collided_packets
-        packetlist.add_packets(self)
+        packetlist.add_packets_to_tree(self)
         self.slot_no = 0
         # Run the simulation as long as all packets are processed
         while len(self.active_array) != 0:
@@ -68,4 +72,23 @@ class Simulation(object):
         # Update the results
         self.sim_result.get_result(self)
 
-
+    def do_simulation_gated_access(self, modified=False, unisplit=False,sic=False):
+        self.slot_no = 0
+        # Run simulation for the number of slots
+        while len(self.active_array) > 0 or self.slot_no < self.sim_param.SIMTIME:
+            self.slot_no += 1
+            # Generate a packet according to poisson distribution
+            self.packets_gen = np.random.poisson(self.sim_param.lmbda)
+            # Add the number of packets to the active packet array
+            if self.slot_no < self.sim_param.SIMTIME:
+                packetlist.add_packets_to_queue(self)
+            if len(self.active_array) == 0:
+                self.sim_state.total_collisions = 0
+                self.active_array = self.queue_array
+                self.queue_array = []
+            # Simulate the processes that would happen in the tx and rx in one slot, update the active array accordingly
+            self.slot.oneslotprocess(self, modified=modified, unisplit=unisplit, sic=sic)
+            # Update the metrics in sim_state depending on the result
+            self.sim_state.update_metrics(self)
+        # Update the results
+        self.sim_result.get_result(self)
