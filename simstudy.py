@@ -48,7 +48,8 @@ def simulate_simple_tree_static_multpile_runs(sim, modified=False, unisplit=Fals
     pyplot.show()
 
 
-def simulate_simple_tree_dynamic_multiple_runs(sim, modified=False, unisplit=False, sic=False):
+def simulate_simple_tree_dynamic_multiple_runs(modified=False, unisplit=False, sic=False):
+    sim = Simulation()
     rate_array = np.arange(0.20, 0.70, 0.05)
     succ_rate = []
     delay = []
@@ -74,7 +75,8 @@ def simulate_simple_tree_dynamic_multiple_runs(sim, modified=False, unisplit=Fal
     pyplot.show()
 
 
-def simulate_simple_tree_dynamic_multiple_runs_gated(sim, modified=False, unisplit=False, sic=False):
+def simulate_simple_tree_dynamic_multiple_runs_gated(modified=False, unisplit=False, sic=False):
+    sim = Simulation()
     rate_array = np.arange(0.20, 0.70, 0.05)
     delay = []
     for p in rate_array:
@@ -94,7 +96,7 @@ def simulate_simple_tree_dynamic_multiple_runs_gated(sim, modified=False, unispl
 
 if __name__ == '__main__':
     # Create the simulation object
-    sim = Simulation()
+    #sim = Simulation()
     # Seed for reproducibility
     #np.random.seed(sim.sim_param.seed)
     # Comment and uncomment the below methods as it suits
@@ -102,6 +104,6 @@ if __name__ == '__main__':
     # simulate_simple_tree_static(sim, modified=False, unisplit=False, sic=False)
     # simulate_simple_tree_static_multpile_runs(sim, modified=True, unisplit=False, sic=True)
     # simulate_simple_tree_dynamic_multiple_runs(sim, modified=True, unisplit=False, sic=True)
-    simulate_simple_tree_dynamic_multiple_runs_gated(sim, modified=False, unisplit=True, sic=False)
+    simulate_simple_tree_dynamic_multiple_runs_gated(modified=False, unisplit=False, sic=False)
 
 

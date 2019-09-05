@@ -1,6 +1,5 @@
 import numpy as np
 from simparam import SimParam
-#from simpletreeslot import SimpleTreeSlot
 from simstate import SimState
 from simresult import SimResult
 from slot import TreeSlot
