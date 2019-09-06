@@ -21,7 +21,7 @@ class SimParam(object):
         self.branchprob = 0.5
 
         # No if runs in simstudy
-        self.RUNS = 1
+        self.RUNS = 100
 
     def print_sim_config(self):
         """
