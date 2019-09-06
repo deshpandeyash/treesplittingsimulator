@@ -32,19 +32,22 @@ class SimState(object):
         self.total_arrivals += sim.packets_gen
         # If a success
         if sim.result == 1:
-            for i in range(sim.slot.resolved_packets):
-                if len(sim.active_array) > 0:
-                    if sim.active_array[0].packet_count < 0:
-                        # Update the total successes
-                        self.total_successes += 1
-                        # remove the packet from active array
-                        successful_pack = packetlist.remove_successful_packet(sim)
-                        # Load the features of the successfully transmitted packet for statistics
-                        self.delay_stat_array.append(successful_pack.life_time)
-                        self.tx_stat_array.append(successful_pack.transmissions)
-                        if successful_pack.packet_count >= 0:
-                            print("Error")
-                            print(successful_pack.packet_count)
+            packetlist.sort_packet_array(sim)
+            test_array = packetlist.extract_packet_count(sim)
+            go_on = True
+            while go_on:
+                if sim.active_array[0].packet_count < 0:
+                    # Update the total successes
+                    self.total_successes += 1
+                    # remove the packet from active array
+                    successful_pack = packetlist.remove_successful_packet(sim)
+                    # Load the features of the successfully transmitted packet for statistics
+                    self.delay_stat_array.append(successful_pack.life_time)
+                    self.tx_stat_array.append(successful_pack.transmissions)
+                    if len(sim.active_array) == 0:
+                        go_on = False
+                else:
+                    go_on = False
         # If an Idle slot
         if sim.result == 0:
             # Update parameters

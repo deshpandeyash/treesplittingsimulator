@@ -23,7 +23,8 @@ def simulate_simple_tree_dynamic(sim, modified=False, unisplit=False,sic=False):
     # pyplot.show()
 
 
-def simulate_simple_tree_static(sim, modified=False, unisplit=False, sic=False):
+def simulate_simple_tree_static(modified=False, unisplit=False, sic=False):
+    sim = Simulation()
     # Reset the simualtion
     sim.reset()
     # Perform simple tree which is static
@@ -36,12 +37,13 @@ def simulate_simple_tree_static(sim, modified=False, unisplit=False, sic=False):
     print("Succ Rate = " + str(sim.sim_result.succ_rate))
 
 
-def simulate_simple_tree_static_multpile_runs(sim, modified=False, unisplit=False,sic=False):
+def simulate_simple_tree_static_multpile_runs(modified=False, unisplit=False,sic=False):
+    sim = Simulation()
     throughput = []
     for _ in range(sim.sim_param.RUNS):
         # Reset the simulation
         sim.reset()
-        sim.do_simulation_simple_tree_static(5, modified=modified, unisplit=unisplit,sic=sic)
+        sim.do_simulation_simple_tree_static(1000, modified=modified, unisplit=unisplit,sic=sic)
         throughput.append(sim.sim_result.throughput)
     print("Mean Throughput is = " + str(np.mean(throughput)))
     pyplot.hist(throughput, density=True)
@@ -50,7 +52,7 @@ def simulate_simple_tree_static_multpile_runs(sim, modified=False, unisplit=Fals
 
 def simulate_simple_tree_dynamic_multiple_runs(modified=False, unisplit=False, sic=False):
     sim = Simulation()
-    rate_array = np.arange(0.20, 0.70, 0.05)
+    rate_array = np.arange(0.55, 0.90, 0.05)
     succ_rate = []
     delay = []
     for p in rate_array:
@@ -77,7 +79,7 @@ def simulate_simple_tree_dynamic_multiple_runs(modified=False, unisplit=False, s
 
 def simulate_simple_tree_dynamic_multiple_runs_gated(modified=False, unisplit=False, sic=False):
     sim = Simulation()
-    rate_array = np.arange(0.20, 0.70, 0.05)
+    rate_array = np.arange(0.55, 0.90, 0.05)
     delay = []
     for p in rate_array:
         counter = []
@@ -101,9 +103,9 @@ if __name__ == '__main__':
     #np.random.seed(sim.sim_param.seed)
     # Comment and uncomment the below methods as it suits
     # simulate_simple_tree_dynamic(sim,modified=False,unisplit=False, sic=False)
-    # simulate_simple_tree_static(sim, modified=False, unisplit=False, sic=False)
-    # simulate_simple_tree_static_multpile_runs(sim, modified=True, unisplit=False, sic=True)
-    # simulate_simple_tree_dynamic_multiple_runs(sim, modified=True, unisplit=False, sic=True)
-    simulate_simple_tree_dynamic_multiple_runs_gated(modified=False, unisplit=False, sic=False)
+    # simulate_simple_tree_static(modified=False, unisplit=False, sic=False)
+    # simulate_simple_tree_static_multpile_runs(modified=True, unisplit=False, sic=True)
+    # simulate_simple_tree_dynamic_multiple_runs(modified=True, unisplit=False, sic=True)
+    # simulate_simple_tree_dynamic_multiple_runs_gated(modified=True, unisplit=False, sic=True)
 
 

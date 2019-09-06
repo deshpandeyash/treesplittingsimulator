@@ -25,7 +25,7 @@ def inc_uncollided_packet_count(sim):
 
     """
     for j in sim.active_array:
-        if j.packet_count != 0:
+        if j.packet_count > 0 and j.packet_count != 0:
             j.packet_count += 1
 
 
@@ -105,7 +105,7 @@ def add_packets_to_queue(sim):
     :return:
     """
     for j in range(0, sim.packets_gen):
-        sim.queue_array.append(Packet(sim.slot_no, sim.sim_state.total_arrivals + len(sim.queue_array) + j + 1))
+        sim.queue_array.append(Packet(sim.slot_no, sim.sim_state.total_arrivals + j + 1))
 
 
 

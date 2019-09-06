@@ -46,6 +46,7 @@ class TreeSlot(object):
             # On a success, all other packets reduce their count
             packetlist.dec_packet_count(sim, self.resolved_packets)
             if sic:
+                packetlist.inc_uncollided_packet_count(sim)
                 packetlist.binsplit_uncollided_packet_count(sim)
             sim.result = feedback
         # If Idle
