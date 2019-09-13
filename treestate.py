@@ -26,6 +26,7 @@ class TreeState(object):
         if sim.result == 1:
             go_on = True
             while go_on:
+                # If the 0 th element of the active array is less than 0, it mans that packet is resolved, hence remove
                 if sim.active_array[0].packet_count < 0:
                     # Update the total successes
                     self.total_successes += 1

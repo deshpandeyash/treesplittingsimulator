@@ -10,6 +10,7 @@ class SimResult(object):
         self.mean_no_tx = 0
         self.max_no_tx = 0
         self.succ_rate = 0
+        self.no_trees = 0
 
     def reset(self):
         self.throughput = 0
@@ -18,6 +19,7 @@ class SimResult(object):
         self.mean_no_tx = 0
         self.max_no_tx = 0
         self.succ_rate = 0
+        self.no_trees = 0
 
     def get_result(self, sim):
         # Throughput is the number of successful packets divided by the total number of slots
@@ -32,4 +34,5 @@ class SimResult(object):
         self.max_no_tx = max(sim.sim_state.tx_stat_array)
         # Total arrivals/total succeses
         self.succ_rate = sum(sim.sim_state.successes_array) / sum(sim.sim_state.arrival_stat_array)
-
+        # Total no of trees resolved
+        self.no_trees = len(sim.sim_state.successes_array)

@@ -7,7 +7,7 @@ class SimParam(object):
     def __init__(self):
 
         # current buffer spaces and minimal buffer spaces
-        self.lmbda = 0.34       
+        self.lmbda = 0.34
 
         # number of slots to simulate
         self.SIMTIME = 10000

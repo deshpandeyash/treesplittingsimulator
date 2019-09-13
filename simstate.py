@@ -22,6 +22,7 @@ class SimState(object):
         self.slot_len_array = []
 
     def update_metrics(self, sim):
+        # Append all the parameters from tree state to the arrays in this class
         self.successes_array.append(sim.tree_state.total_successes)
         self.collision_array.append(sim.tree_state.total_collisions)
         self.inti_collision_array.append(sim.tree_state.init_collided)
