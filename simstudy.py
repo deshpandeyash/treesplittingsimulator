@@ -104,8 +104,8 @@ if __name__ == '__main__':
     # Comment and uncomment the below methods as it suits
     # simulate_simple_tree_dynamic(sim,modified=False,unisplit=False, sic=False)
     # simulate_simple_tree_static(modified=False, unisplit=False, sic=False)
-    # simulate_simple_tree_static_multpile_runs(modified=True, unisplit=False, sic=True)
+    simulate_simple_tree_static_multpile_runs(modified=True, unisplit=False, sic=False)
     # simulate_simple_tree_dynamic_multiple_runs(modified=True, unisplit=False, sic=True)
-    simulate_simple_tree_dynamic_multiple_runs_gated(modified=True, unisplit=False, sic=True)
+    # simulate_simple_tree_dynamic_multiple_runs_gated(modified=True, unisplit=False, sic=True)
 
 

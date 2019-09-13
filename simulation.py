@@ -3,6 +3,7 @@ from simparam import SimParam
 from simstate import SimState
 from simresult import SimResult
 from slot import TreeSlot
+from treestate import TreeState
 import packetlist
 
 
@@ -17,6 +18,8 @@ class Simulation(object):
         self.sim_result = SimResult()
         # Load the methods governing simple tree resolution in this
         self.slot = TreeSlot(self.sim_param)
+        # Load the parameters for single tree resolution
+
         # Create an array of integers of which will contain all active nodes.
         self.active_array = []
         self.queue_array = []
@@ -25,12 +28,14 @@ class Simulation(object):
         self.result = 0
         self.slot_no = 0
         self.added_packets = 0
+        self.tree_state = TreeState(self)
 
     def reset(self):
         self.sim_param = SimParam()
         self.sim_state = SimState()
         self.sim_result = SimResult()
         self.slot = TreeSlot(self.sim_param)
+
         self.active_array = []
         self.queue_array = []
         self.slot_array = np.arange(0, self.sim_param.SIMTIME)
@@ -38,6 +43,7 @@ class Simulation(object):
         self.result = 0
         self.slot_no = 0
         self.added_packets = 0
+        self.tree_state = TreeState(self)
 
     def do_simulation_simple_tree_dynamic(self, modified=False, unisplit=False,sic=False):
         # Run simulation for the number of slots
@@ -49,7 +55,7 @@ class Simulation(object):
             # Simulate the processes that would happen in the tx and rx in one slot, update the active array accordingly
             self.slot.oneslotprocess(self, modified=modified,unisplit=unisplit,sic=sic)
             # Update the metrics in sim_state depending on the result
-            self.sim_state.update_metrics(self)
+            self.tree_state.update_metrics(self)
         # Update the results
         self.sim_result.get_result(self)
 
@@ -63,7 +69,7 @@ class Simulation(object):
             # Simulate the processes that would happen in the tx and rx in one slot, update the active array accordingly
             self.slot.oneslotprocess(self, modified=modified,unisplit=unisplit,sic=sic)
             # Update the simstate metric according to the result of the simulation
-            self.sim_state.update_metrics(self)
+            self.tree_state.update_metrics(self)
             # Increment the slot
             self.slot_no += 1
         # total arrivals is just equal to collided packets and we just add it here
@@ -78,9 +84,10 @@ class Simulation(object):
             self.slot_no += 1
             # Generate a packet according to poisson distribution
             self.packets_gen = np.random.poisson(self.sim_param.lmbda)
-            # Add the number of packets to the active packet array
+            # Add the packet to the queue
             if self.slot_no < self.sim_param.SIMTIME:
                 packetlist.add_packets_to_queue(self)
+            # if the active array is empty i.e the tree is resolved, then transfer the queue to the tree
             if len(self.active_array) == 0:
                 self.sim_state.total_collisions = 0
                 self.active_array = self.queue_array
@@ -88,6 +95,6 @@ class Simulation(object):
             # Simulate the processes that would happen in the tx and rx in one slot, update the active array accordingly
             self.slot.oneslotprocess(self, modified=modified, unisplit=unisplit, sic=sic)
             # Update the metrics in sim_state depending on the result
-            self.sim_state.update_metrics(self)
+            self.tree_state.update_metrics(self)
         # Update the results
         self.sim_result.get_result(self)
