@@ -95,7 +95,7 @@ def add_packets_to_tree(sim):
     :param sim: the simulation object instance
     """
     for j in range(0, sim.packets_gen):
-        sim.active_array.append(Packet(sim.slot_no, sim.sim_state.total_arrivals + j + 1))
+        sim.active_array.append(Packet(sim.slot_no, sum(sim.sim_state.arrival_stat_array) + j + 1))
 
 
 def add_packets_to_queue(sim):
@@ -105,7 +105,7 @@ def add_packets_to_queue(sim):
     :return:
     """
     for j in range(0, sim.packets_gen):
-        sim.queue_array.append(Packet(sim.slot_no, sim.sim_state.total_arrivals + j + 1))
+        sim.queue_array.append(Packet(sim.slot_no, sum(sim.sim_state.arrival_stat_array) + j + 1))
 
 
 

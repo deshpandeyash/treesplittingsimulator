@@ -29,8 +29,6 @@ class TreeSlot(object):
         sim.result = 0
         # Sort the array in ascending order
         packetlist.sort_packet_array(sim)
-        count_array = packetlist.extract_packet_count(sim)
-        packetID_array = packetlist.extract_packet_id(sim.active_array)
         # Convert the array of Packet objects to just a list for easier and faster operation at transmitter
         self.tx_packet_array = packetlist.extract_tx_packets(sim)
         # Find out the packet count attributes for further statistics
@@ -54,7 +52,7 @@ class TreeSlot(object):
             # On an idle slot, all packets reduce their count by 1
             packetlist.dec_packet_count(sim, 1)
             # If the modified tree algorithm is used, and previous result was a collision
-            if (modified and sim.sim_state.prev_result == 2) or sic:
+            if (modified and sim.tree_state.prev_result == 2) or sic:
                 # increment the count for uncollided packets
                 packetlist.inc_uncollided_packet_count(sim)
                 # Update the counts on the collided packets according to a binary split
@@ -65,7 +63,7 @@ class TreeSlot(object):
             # increment the count for uncollided packets
             packetlist.inc_uncollided_packet_count(sim)
             # If unisplit and if its the first collision
-            if unisplit and sim.sim_state.total_collisions == 0:
+            if unisplit and sim.tree_state.total_collisions == 0:
                 packetlist.unisplit_uncollided_packet_count(sim)
             else:
                 # Update the counts on the collided packets according to a binary split
@@ -75,7 +73,7 @@ class TreeSlot(object):
         elif feedback == 9:
             print("Rx Process did not change give a Feedback")
         self.result_array.append(sim.result)
-        sim.sim_state.prev_result = sim.result
+        sim.tree_state.prev_result = sim.result
 
 
     def rxprocess(self,sic):

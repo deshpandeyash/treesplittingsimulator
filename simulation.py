@@ -47,22 +47,25 @@ class Simulation(object):
 
     def do_simulation_simple_tree_dynamic(self, modified=False, unisplit=False,sic=False):
         # Run simulation for the number of slots
+        self.tree_state.reset(self)
         for self.slot_no in self.slot_array:
             # Generate a packet according to poisson distribution
             self.packets_gen = np.random.poisson(self.sim_param.lmbda)
             # Add the number of packets to the active packet array
             packetlist.add_packets_to_tree(self)
             # Simulate the processes that would happen in the tx and rx in one slot, update the active array accordingly
-            self.slot.oneslotprocess(self, modified=modified,unisplit=unisplit,sic=sic)
+            self.slot.oneslotprocess(self, modified=modified, unisplit=unisplit, sic=sic)
             # Update the metrics in sim_state depending on the result
             self.tree_state.update_metrics(self)
         # Update the results
+        self.sim_state.update_metrics(self)
         self.sim_result.get_result(self)
 
     def do_simulation_simple_tree_static(self, collided_packets, modified=False, unisplit=False,sic=False):
         # Load active array with the collided packets
         self.packets_gen = collided_packets
         packetlist.add_packets_to_tree(self)
+        self.tree_state.reset(self)
         self.slot_no = 0
         # Run the simulation as long as all packets are processed
         while len(self.active_array) != 0:
@@ -72,8 +75,8 @@ class Simulation(object):
             self.tree_state.update_metrics(self)
             # Increment the slot
             self.slot_no += 1
-        # total arrivals is just equal to collided packets and we just add it here
-        self.sim_state.total_arrivals = collided_packets
+        # update the metrics from a tree to the simulation state
+        self.sim_state.update_metrics(self)
         # Update the results
         self.sim_result.get_result(self)
 
@@ -89,9 +92,10 @@ class Simulation(object):
                 packetlist.add_packets_to_queue(self)
             # if the active array is empty i.e the tree is resolved, then transfer the queue to the tree
             if len(self.active_array) == 0:
-                self.sim_state.total_collisions = 0
+                self.sim_state.update_metrics(self)
                 self.active_array = self.queue_array
                 self.queue_array = []
+                self.tree_state.reset(self)
             # Simulate the processes that would happen in the tx and rx in one slot, update the active array accordingly
             self.slot.oneslotprocess(self, modified=modified, unisplit=unisplit, sic=sic)
             # Update the metrics in sim_state depending on the result
