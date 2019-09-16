@@ -29,15 +29,29 @@ def inc_uncollided_packet_count(sim):
             j.packet_count += 1
 
 
-def binsplit_uncollided_packet_count(sim):
-    """
-    performs a binary split with given branching probability, if the count is 0 , i,e the packets have collided
-    :param sim: the simulation object instance
+# def binsplit_uncollided_packet_count(sim):
+#     """
+#     performs a binary split with given branching probability, if the count is 0 , i,e the packets have collided
+#     :param sim: the simulation object instance
+#
+#     """
+#     for j in sim.active_array:
+#         if j.packet_count == 0:
+#             j.packet_count += np.random.binomial(1, sim.sim_param.branchprob)
 
+
+def split_uncollided_packet_count(sim):
     """
+    performs a uniform split where each packet chooses a random slot between 0 and the number of collided packets
+    :param sim: the simulation object instance
+    """
+
     for j in sim.active_array:
         if j.packet_count == 0:
-            j.packet_count += np.random.binomial(1, sim.sim_param.branchprob)
+            if sim.sim_param.SPLIT == 2:
+                j.packet_count += np.random.binomial(1, sim.sim_param.branchprob)
+            else:
+                j.packet_count += np.random.randint(sim.sim_param.SPLIT)
 
 
 def unisplit_uncollided_packet_count(sim):
@@ -67,6 +81,7 @@ def extract_packet_count(sim):
     """
     return [x.packet_count for x in sim.active_array]
 
+
 def extract_tx_packets(sim):
     """
 
@@ -78,6 +93,7 @@ def extract_tx_packets(sim):
         if j.packet_count == 0:
             tx_packet_array.append(j)
     return tx_packet_array
+
 
 def extract_packet_id(tx_packet_array):
     """
@@ -108,7 +124,6 @@ def add_packets_to_queue(sim):
         sim.queue_array.append(Packet(sim.slot_no, sum(sim.sim_state.arrival_stat_array) + j + 1))
 
 
-
 def remove_successful_packet(sim):
     """
     The index 0 is removed from the active array and the removed packet is returned
@@ -119,7 +134,6 @@ def remove_successful_packet(sim):
     pack = sim.active_array.pop(0)
     pack.life_time = sim.slot_no - pack.birth_time
     return pack
-
 
 
 def update_transmissions(sim):

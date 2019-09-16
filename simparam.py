@@ -20,6 +20,9 @@ class SimParam(object):
         # No if runs in simstudy
         self.RUNS = 100
 
+        # The branching split
+        self.SPLIT = 2
+
     def print_sim_config(self):
         """
         Print a basic system configuration string.

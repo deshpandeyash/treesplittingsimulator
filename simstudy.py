@@ -100,7 +100,7 @@ if __name__ == '__main__':
     # Create the simulation object
     #sim = Simulation()
     # Seed for reproducibility
-    np.random.seed(7)
+    #np.random.seed(7)
     # Comment and uncomment the below methods as it suits
     # simulate_simple_tree_dynamic(sim,modified=False,unisplit=False, sic=False)
     # simulate_simple_tree_static(modified=False, unisplit=False, sic=False)

@@ -32,6 +32,7 @@ class TreeSlot(object):
         # Convert the array of Packet objects to just a list for easier and faster operation at transmitter
         self.tx_packet_array = packetlist.extract_tx_packets(sim)
         # Find out the packet count attributes for further statistics
+        test_array = packetlist.extract_packet_count(sim)
         self.no_active_packets = len(sim.active_array)
         self.no_collided_packets = len(self.tx_packet_array)
         self.no_waiting_packets = self.no_active_packets - self.no_collided_packets
@@ -45,7 +46,7 @@ class TreeSlot(object):
             packetlist.dec_packet_count(sim, self.resolved_packets)
             if sic:
                 packetlist.inc_uncollided_packet_count(sim)
-                packetlist.binsplit_uncollided_packet_count(sim)
+                packetlist.split_uncollided_packet_count(sim)
             sim.result = feedback
         # If Idle
         elif feedback == 0:
@@ -56,7 +57,7 @@ class TreeSlot(object):
                 # increment the count for uncollided packets
                 packetlist.inc_uncollided_packet_count(sim)
                 # Update the counts on the collided packets according to a binary split
-                packetlist.binsplit_uncollided_packet_count(sim)
+                packetlist.split_uncollided_packet_count(sim)
             sim.result = feedback
         # If Collision
         elif feedback == 2:
@@ -67,7 +68,7 @@ class TreeSlot(object):
                 packetlist.unisplit_uncollided_packet_count(sim)
             else:
                 # Update the counts on the collided packets according to a binary split
-                packetlist.binsplit_uncollided_packet_count(sim)
+                packetlist.split_uncollided_packet_count(sim)
             sim.result = feedback
         # This is an error and means that the RX process did not change the feedback
         elif feedback == 9:
@@ -75,8 +76,7 @@ class TreeSlot(object):
         self.result_array.append(sim.result)
         sim.tree_state.prev_result = sim.result
 
-
-    def rxprocess(self,sic):
+    def rxprocess(self, sic):
         """
         depending on the active packet array length and the count in each of its packets, this process decides whether
         there was in idle slot, collision or success after which it provides feedback,
@@ -111,20 +111,20 @@ class TreeSlot(object):
     def sic_process(self):
         single_packet = self.tx_packet_array[0].packetID
         self.packetID.append(single_packet)
-        SIC_resolved_packets = 0
+        sic_resolved_packets = 0
         go_on = True
         while go_on and len(self.collided_array) > 0:
             last_coll = self.collided_array[-1]
             resolved_array = [x for x in last_coll if x not in self.packetID]
             if len(resolved_array) == 0:
                 del self.collided_array[-1]
-                SIC_resolved_packets += 1
+                sic_resolved_packets += 1
             elif len(resolved_array) == 1:
                 del self.collided_array[-1]
                 self.packetID.append(resolved_array[0])
-                SIC_resolved_packets += 1
+                sic_resolved_packets += 1
             else:
                 del self.collided_array[-1]
                 self.collided_array.append(resolved_array)
                 go_on = False
-        return SIC_resolved_packets
+        return sic_resolved_packets
