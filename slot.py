@@ -1,4 +1,3 @@
-import numpy as np
 import packetlist
 
 class TreeSlot(object):
@@ -15,7 +14,7 @@ class TreeSlot(object):
         self.result_array = []
 
 
-    def oneslotprocess(self, sim, modified=False, unisplit=False, sic=False):
+    def oneslotprocess(self, sim, modified=False, unisplit=False, sic=False,multipacket=False):
         """
         this simulates the process in a slot, the array of active packets is analyzed and then
         we transmit the packets which have count 0, and then wait for the feedback and update the count in the packets
@@ -38,7 +37,7 @@ class TreeSlot(object):
         # Update the number of transmissions in each packet
         packetlist.update_transmissions(sim)
         # Get the feedback form the receiver
-        feedback, self.resolved_packets = self.rxprocess(sic)
+        feedback, self.resolved_packets = self.rxprocess(sic,multipacket)
         # If Success
         if feedback == 1:
             # On a success, all other packets reduce their count
@@ -78,7 +77,7 @@ class TreeSlot(object):
         self.result_array.append(sim.result)
         sim.tree_state.prev_result = sim.result
 
-    def rxprocess(self, sic):
+    def rxprocess(self, sic, multipacket):
         """
         depending on the active packet array length and the count in each of its packets, this process decides whether
         there was in idle slot, collision or success after which it provides feedback,
@@ -90,25 +89,43 @@ class TreeSlot(object):
         # the expected values
         feedback = 9
         resolved_packets = 0
-        # If the length of the array is 0 then there are no active packets, and no transmissions hence, IDLE
-        # If the first element is not 0, it means that no one will transmit even when there are active packets, ie IDLE
-        if len(self.tx_packet_array) == 0:
-            feedback = 0
-        # If array has just one element and it is 0 then its a success
-        elif len(self.tx_packet_array) == 1:
-            feedback = 1
-            resolved_packets = 1
-            if sic:
-                resolved_packets += self.sic_process()
-        elif len(self.tx_packet_array) > 1:
-            feedback = 2
-            if sic:
-                # Save the collision packet IDs
-                self.collided_array.append(packetlist.extract_packet_id(self.tx_packet_array))
-
-        # If anything else occurs, print immediately as its not expected.
+        if multipacket:
+            # If the length of the array is 0 then there are no active packets, and no transmissions hence, IDLE
+            # If the first element is not 0, it means that no one will transmit even when there are active packets, ie IDLE
+            if len(self.tx_packet_array) == 0:
+                feedback = 0
+            # If array has just one element and it is 0 then its a success
+            elif len(self.tx_packet_array) == 4:
+                feedback = 1
+                resolved_packets = 4
+                resolved_packets += self.multipacket_sic_process()
+            elif len(self.tx_packet_array) > 1:
+                feedback = 2
+                if sic:
+                    # Save the collision packet IDs
+                    self.collided_array.append(packetlist.extract_packet_id(self.tx_packet_array))
+            # If anything else occurs, print immediately as its not expected.
+            else:
+                print("Error, unexpected array")
         else:
-            print("Error, unexpected array")
+            # If the length of the array is 0 then there are no active packets, and no transmissions hence, IDLE
+            # If the first element is not 0, it means that no one will transmit even when there are active packets, ie IDLE
+            if len(self.tx_packet_array) == 0:
+                feedback = 0
+            # If array has just one element and it is 0 then its a success
+            elif len(self.tx_packet_array) == 1:
+                feedback = 1
+                resolved_packets = 1
+                if sic:
+                    resolved_packets += self.sic_process()
+            elif len(self.tx_packet_array) > 1:
+                feedback = 2
+                if sic:
+                    # Save the collision packet IDs
+                    self.collided_array.append(packetlist.extract_packet_id(self.tx_packet_array))
+        # If anything else occurs, print immediately as its not expected.
+            else:
+                print("Error, unexpected array")
         return feedback, resolved_packets
 
     def sic_process(self):
@@ -144,3 +161,6 @@ class TreeSlot(object):
                 self.collided_array.append(resolved_array)
                 go_on = False
         return sic_resolved_packets
+
+    def multipacket_sic_process(self):
+        return 1

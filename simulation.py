@@ -61,7 +61,7 @@ class Simulation(object):
         self.sim_state.update_metrics(self)
         self.sim_result.get_result(self)
 
-    def do_simulation_simple_tree_static(self, collided_packets, modified=False, unisplit=False,sic=False):
+    def do_simulation_simple_tree_static(self, collided_packets, modified=False, unisplit=False,sic=False,multipacket=True):
         # Load active array with the collided packets
         self.packets_gen = collided_packets
         packetlist.add_packets_to_tree(self)
@@ -69,7 +69,7 @@ class Simulation(object):
         # Run the simulation as long as all packets are processed
         while len(self.active_array) != 0:
             # Simulate the processes that would happen in the tx and rx in one slot, update the active array accordingly
-            self.slot.oneslotprocess(self, modified=modified,unisplit=unisplit,sic=sic)
+            self.slot.oneslotprocess(self, modified=modified,unisplit=unisplit,sic=sic,multipacket=multipacket)
             # Update the simstate metric according to the result of the simulation
             self.tree_state.update_metrics(self)
             # Increment the slot

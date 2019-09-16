@@ -37,13 +37,13 @@ def simulate_simple_tree_static(modified=False, unisplit=False, sic=False):
     print("Succ Rate = " + str(sim.sim_result.succ_rate))
 
 
-def simulate_simple_tree_static_multpile_runs(modified=False, unisplit=False,sic=False):
+def simulate_simple_tree_static_multpile_runs(modified=False, unisplit=False,sic=False,multipacket=True):
     sim = Simulation()
     throughput = []
     for _ in range(sim.sim_param.RUNS):
         # Reset the simulation
         sim.reset()
-        sim.do_simulation_simple_tree_static(1000, modified=modified, unisplit=unisplit,sic=sic)
+        sim.do_simulation_simple_tree_static(1000, modified=modified, unisplit=unisplit,sic=sic,multipacket=multipacket)
         throughput.append(sim.sim_result.throughput)
     print("Mean Throughput is = " + str(np.mean(throughput)))
     pyplot.hist(throughput, density=True)
@@ -104,7 +104,7 @@ if __name__ == '__main__':
     # Comment and uncomment the below methods as it suits
     # simulate_simple_tree_dynamic(sim,modified=False,unisplit=False, sic=False)
     # simulate_simple_tree_static(modified=False, unisplit=False, sic=False)
-    simulate_simple_tree_static_multpile_runs(modified=True, unisplit=False, sic=True)
+    simulate_simple_tree_static_multpile_runs(modified=True, unisplit=False, sic=True, multipacket=True)
     # simulate_simple_tree_dynamic_multiple_runs(modified=True, unisplit=False, sic=False)
     # simulate_simple_tree_dynamic_multiple_runs_gated(modified=True, unisplit=False, sic=True)
 
