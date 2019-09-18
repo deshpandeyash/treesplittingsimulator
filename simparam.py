@@ -21,9 +21,9 @@ class SimParam(object):
         self.RUNS = 100
 
         # The branching split
-        self.SPLIT = 2
+        self.SPLIT = 3
 
-        self.K = 2
+        self.K = 1
 
     def print_sim_config(self):
         """

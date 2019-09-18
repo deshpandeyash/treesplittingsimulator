@@ -61,7 +61,7 @@ class Simulation(object):
         self.sim_state.update_metrics(self)
         self.sim_result.get_result(self)
 
-    def do_simulation_simple_tree_static(self, collided_packets, modified=False, unisplit=False,sic=False,multipacket=True):
+    def do_simulation_simple_tree_static(self, collided_packets, modified=False, unisplit=False,sic=False,multipacket=False):
         # Load active array with the collided packets
         self.packets_gen = collided_packets
         packetlist.add_packets_to_tree(self)
@@ -79,7 +79,7 @@ class Simulation(object):
         # Update the results
         self.sim_result.get_result(self)
 
-    def do_simulation_gated_access(self, modified=False, unisplit=False, sic=False):
+    def do_simulation_gated_access(self, modified=False, unisplit=False, sic=False,multipacket=True):
         # Run simulation for the number of slots
         while len(self.active_array) > 0 or self.slot_no < self.sim_param.SIMTIME:
             self.slot_no += 1
@@ -99,7 +99,7 @@ class Simulation(object):
                 # Reset all the parameters as we start a new tree
                 self.tree_state.reset(self)
             # Simulate the processes that would happen in the tx and rx in one slot, update the active array accordingly
-            self.slot.oneslotprocess(self, modified=modified, unisplit=unisplit, sic=sic)
+            self.slot.oneslotprocess(self, modified=modified, unisplit=unisplit, sic=sic, multipacket=multipacket)
             # Update the metrics in sim_state depending on the result
             self.tree_state.update_metrics(self)
         # Update the results

@@ -18,7 +18,7 @@ def dec_packet_count(sim, count):
         j.packet_count -= count
 
 
-def inc_uncollided_packet_count(sim):
+def inc_uncollided_packet_count(sim, count):
     """
     decrements the count in the packet_count of each uncollided packet in the packet array
     :param sim: the simulation object instance
@@ -26,7 +26,7 @@ def inc_uncollided_packet_count(sim):
     """
     for j in sim.active_array:
         if j.packet_count > 0 and j.packet_count != 0:
-            j.packet_count += 1
+            j.packet_count += count
 
 
 # def binsplit_uncollided_packet_count(sim):

@@ -13,7 +13,7 @@ class TreeSlot(object):
         self.packetID = []
         self.result_array = []
 
-    def oneslotprocess(self, sim, modified=False, unisplit=False, sic=False,multipacket=False):
+    def oneslotprocess(self, sim, modified=False, unisplit=False, sic=False, multipacket=False):
         """
         this simulates the process in a slot, the array of active packets is analyzed and then
         we transmit the packets which have count 0, and then wait for the feedback and update the count in the packets
@@ -46,7 +46,7 @@ class TreeSlot(object):
             # If SIC process is used, then
             if sic:
                 # We increment the count of the uncollided packets
-                packetlist.inc_uncollided_packet_count(sim)
+                packetlist.inc_uncollided_packet_count(sim, 1)
                 # And split the packets which might collide in the next slot
                 packetlist.split_uncollided_packet_count(sim)
             sim.result = feedback
@@ -57,19 +57,19 @@ class TreeSlot(object):
             # If the modified tree algorithm is used, and previous result was a collision
             if (modified and sim.tree_state.prev_result == 2) or sic:
                 # increment the count for uncollided packets
-                packetlist.inc_uncollided_packet_count(sim)
+                packetlist.inc_uncollided_packet_count(sim, sim.sim_param.SPLIT)
                 # Update the counts on the collided packets according to a binary split
                 packetlist.split_uncollided_packet_count(sim)
             sim.result = feedback
         # If Collision
         elif feedback == 2:
             # increment the count for uncollided packets
-            packetlist.inc_uncollided_packet_count(sim)
+            packetlist.inc_uncollided_packet_count(sim, sim.sim_param.SPLIT - 1)
             # If unisplit and if its the first collision
             if unisplit and sim.tree_state.total_collisions == 0:
                 packetlist.unisplit_uncollided_packet_count(sim)
             else:
-                # Update the counts on the collided packets according to a binary split
+                # Update the counts on the collided packets according to a Q-ary split
                 packetlist.split_uncollided_packet_count(sim)
             sim.result = feedback
         # This is an error and means that the RX process did not change the feedback
@@ -163,7 +163,7 @@ class TreeSlot(object):
                 go_on = False
         return sic_resolved_packets
 
-    def multipacket_sic_process(self,K):
+    def multipacket_sic_process(self, K):
         # The single packet that is decoded, we take its ID
         single_packet = packetlist.extract_packet_id(self.tx_packet_array)
         # Append this ID to the array of already Decoded IDs
