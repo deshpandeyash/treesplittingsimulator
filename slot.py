@@ -13,7 +13,6 @@ class TreeSlot(object):
         self.packetID = []
         self.result_array = []
 
-
     def oneslotprocess(self, sim, modified=False, unisplit=False, sic=False,multipacket=False):
         """
         this simulates the process in a slot, the array of active packets is analyzed and then
@@ -29,6 +28,8 @@ class TreeSlot(object):
         # Sort the array in ascending order
         packetlist.sort_packet_array(sim)
         # Convert the array of Packet objects to just a list for easier and faster operation at transmitter
+        test_array = packetlist.extract_packet_id(sim.active_array)
+        count_array = packetlist.extract_packet_count(sim)
         self.tx_packet_array = packetlist.extract_tx_packets(sim)
         # Find out the packet count attributes for further statistics
         self.no_active_packets = len(sim.active_array)
@@ -37,7 +38,7 @@ class TreeSlot(object):
         # Update the number of transmissions in each packet
         packetlist.update_transmissions(sim)
         # Get the feedback form the receiver
-        feedback, self.resolved_packets = self.rxprocess(sic,multipacket)
+        feedback, self.resolved_packets = self.rxprocess(sic, multipacket, sim.sim_param.K)
         # If Success
         if feedback == 1:
             # On a success, all other packets reduce their count
@@ -77,7 +78,7 @@ class TreeSlot(object):
         self.result_array.append(sim.result)
         sim.tree_state.prev_result = sim.result
 
-    def rxprocess(self, sic, multipacket):
+    def rxprocess(self, sic, multipacket, K):
         """
         depending on the active packet array length and the count in each of its packets, this process decides whether
         there was in idle slot, collision or success after which it provides feedback,
@@ -95,11 +96,11 @@ class TreeSlot(object):
             if len(self.tx_packet_array) == 0:
                 feedback = 0
             # If array has just one element and it is 0 then its a success
-            elif len(self.tx_packet_array) == 4:
+            elif len(self.tx_packet_array) <= K:
                 feedback = 1
-                resolved_packets = 4
-                resolved_packets += self.multipacket_sic_process()
-            elif len(self.tx_packet_array) > 1:
+                resolved_packets = 1
+                resolved_packets += self.multipacket_sic_process(K)
+            elif len(self.tx_packet_array) > K:
                 feedback = 2
                 if sic:
                     # Save the collision packet IDs
@@ -162,5 +163,36 @@ class TreeSlot(object):
                 go_on = False
         return sic_resolved_packets
 
-    def multipacket_sic_process(self):
-        return 1
+    def multipacket_sic_process(self,K):
+        # The single packet that is decoded, we take its ID
+        single_packet = packetlist.extract_packet_id(self.tx_packet_array)
+        # Append this ID to the array of already Decoded IDs
+        self.packetID.extend(single_packet)
+        sic_resolved_packets = 0
+        go_on = True
+        # While we can succesively Decode the packets from previous collisons
+        while go_on and len(self.collided_array) > 0:
+            # Load the last collison
+            last_coll = self.collided_array[-1]
+            # Remove all the pacet IDS that have been resolved
+            resolved_array = [x for x in last_coll if x not in self.packetID]
+            # If no packet remains, it means its a left IDLE slot
+            if len(resolved_array) == 0:
+                # Delete this collision
+                del self.collided_array[-1]
+                # Increment the feedback
+                sic_resolved_packets += 1
+            # If only one packet remains, this can be resolved too
+            elif len(resolved_array) <= K:
+                # Delete this collision
+                del self.collided_array[-1]
+                # Add the resolved packet to the packet IDS tht have already been resolved
+                self.packetID.extend(resolved_array)
+                sic_resolved_packets += 1
+            # This collision cannot be resolved
+            else:
+                # We still remove only the resolved packets from the last collision, and stop the SIC process
+                del self.collided_array[-1]
+                self.collided_array.append(resolved_array)
+                go_on = False
+        return sic_resolved_packets

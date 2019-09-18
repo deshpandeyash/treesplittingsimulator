@@ -23,6 +23,8 @@ class SimParam(object):
         # The branching split
         self.SPLIT = 2
 
+        self.K = 2
+
     def print_sim_config(self):
         """
         Print a basic system configuration string.
