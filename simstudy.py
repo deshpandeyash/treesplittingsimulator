@@ -43,7 +43,7 @@ def simulate_simple_tree_static_multpile_runs(modified=False, unisplit=False,sic
     for _ in range(sim.sim_param.RUNS):
         # Reset the simulation
         sim.reset()
-        sim.do_simulation_simple_tree_static(1000, modified=modified, unisplit=unisplit,sic=sic,multipacket=multipacket)
+        sim.do_simulation_simple_tree_static(1000, modified=modified, unisplit=unisplit,sic=sic)
         throughput.append(sim.sim_result.throughput)
     print("Mean Throughput is = " + str(np.mean(throughput)))
     pyplot.hist(throughput, density=True)
@@ -77,16 +77,16 @@ def simulate_simple_tree_dynamic_multiple_runs(modified=False, unisplit=False, s
     pyplot.show()
 
 
-def simulate_simple_tree_dynamic_multiple_runs_gated(modified=False, unisplit=False, sic=False,multipacket=True):
+def simulate_simple_tree_dynamic_multiple_runs_gated(modified=False, unisplit=False, sic=False):
     sim = Simulation()
-    rate_array = np.arange(0.20, 0.50, 0.05)
+    rate_array = np.arange(0.90, 1.40, 0.05)
     delay = []
     for p in rate_array:
         counter = []
         for _ in range(sim.sim_param.RUNS):
             sim.reset()
             sim.sim_param.lmbda = p
-            sim.do_simulation_gated_access(modified=modified, unisplit=unisplit, sic=sic,multipacket=multipacket)
+            sim.do_simulation_gated_access(modified=modified, unisplit=unisplit, sic=sic)
             counter.append(sim.sim_result.mean_packet_delay)
         delay.append(np.mean(counter))
     pyplot.plot(rate_array, delay, color='blue')
@@ -104,8 +104,8 @@ if __name__ == '__main__':
     # Comment and uncomment the below methods as it suits
     # simulate_simple_tree_dynamic(sim,modified=False,unisplit=False, sic=False)
     # simulate_simple_tree_static(modified=False, unisplit=False, sic=False)
-    simulate_simple_tree_static_multpile_runs(modified=True, unisplit=False, sic=False, multipacket=False)
+    simulate_simple_tree_static_multpile_runs(modified=True, unisplit=False, sic=True)
     # simulate_simple_tree_dynamic_multiple_runs(modified=True, unisplit=False, sic=False)
-    # simulate_simple_tree_dynamic_multiple_runs_gated(modified=False, unisplit=False, sic=False, multipacket=False)
+    # simulate_simple_tree_dynamic_multiple_runs_gated(modified=True, unisplit=False, sic=True)
 
 
