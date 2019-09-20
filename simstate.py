@@ -10,6 +10,7 @@ class SimState(object):
         self.inti_collision_array = []
         self.idle_array = []
         self.slot_len_array = []
+        self.result_array = []
 
     def reset(self):
         self.delay_stat_array = []
@@ -20,6 +21,7 @@ class SimState(object):
         self.inti_collision_array = []
         self.idle_array = []
         self.slot_len_array = []
+        self.result_array = []
 
     def update_metrics(self, sim):
         # Append all the parameters from tree state to the arrays in this class

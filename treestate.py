@@ -11,6 +11,7 @@ class TreeState(object):
         self.total_idles = 0
         self.prev_result = 0
         self.last_slot = 0
+        self.prev_prev_result = 0
 
     def reset(self, sim):
         self.first_slot = sim.slot_no
@@ -19,6 +20,7 @@ class TreeState(object):
         self.total_successes = 0
         self.total_idles = 0
         self.prev_result = 0
+        self.prev_prev_result = 0
 
     def update_metrics(self, sim):
         # Add the number of packets to statistical array for diagnosis

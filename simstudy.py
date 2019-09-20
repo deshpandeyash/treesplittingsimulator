@@ -43,7 +43,7 @@ def simulate_simple_tree_static_multpile_runs(modified=False, unisplit=False,sic
     for _ in range(sim.sim_param.RUNS):
         # Reset the simulation
         sim.reset()
-        sim.do_simulation_simple_tree_static(10, modified=modified, unisplit=unisplit,sic=sic,multipacket=multipacket)
+        sim.do_simulation_simple_tree_static(1000, modified=modified, unisplit=unisplit,sic=sic,multipacket=multipacket)
         throughput.append(sim.sim_result.throughput)
     print("Mean Throughput is = " + str(np.mean(throughput)))
     pyplot.hist(throughput, density=True)

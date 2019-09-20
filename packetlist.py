@@ -20,12 +20,22 @@ def dec_packet_count(sim, count):
 
 def inc_uncollided_packet_count(sim, count):
     """
-    decrements the count in the packet_count of each uncollided packet in the packet array
+    increments the count in the packet_count of each uncollided packet in the packet array
     :param sim: the simulation object instance
 
     """
     for j in sim.active_array:
-        if j.packet_count > 0 and j.packet_count != 0:
+        if j.packet_count > 0:
+            j.packet_count += count
+
+def inc_uncolliding_packet_count(sim, count):
+    """
+    increments the count in the packet_count of each uncolliding packet in the packet array
+    :param sim: the simulation object instance
+
+    """
+    for j in sim.active_array:
+        if j.packet_count > 1:
             j.packet_count += count
 
 
@@ -52,6 +62,19 @@ def split_uncollided_packet_count(sim):
                 j.packet_count += np.random.binomial(1, sim.sim_param.branchprob)
             else:
                 j.packet_count += np.random.randint(sim.sim_param.SPLIT)
+
+def split_colliding_packet_count(sim):
+    """
+    performs a uniform split where each packet chooses a random slot between 0 and the number of collided packets
+    :param sim: the simulation object instance
+    """
+
+    for j in sim.active_array:
+        if j.packet_count == 1:
+            if sim.sim_param.SPLIT == 2:
+                j.packet_count = 0 + np.random.binomial(1, sim.sim_param.branchprob)
+            else:
+                j.packet_count = 0 + np.random.randint(sim.sim_param.SPLIT)
 
 
 def unisplit_uncollided_packet_count(sim):
