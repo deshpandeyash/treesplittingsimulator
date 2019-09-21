@@ -6,25 +6,19 @@ class TreeState(object):
     def __init__(self, sim):
         self.first_slot = sim.slot_no
         self.init_collided = len(sim.active_array)
-        self.total_collisions = 0
         self.total_successes = 0
-        self.total_idles = 0
-        self.prev_result = 0
         self.last_slot = 0
-        self.prev_prev_result = 0
         self.result_array = []
 
     def reset(self, sim):
         self.first_slot = sim.slot_no
         self.init_collided = len(sim.active_array)
-        self.total_collisions = 0
         self.total_successes = 0
-        self.total_idles = 0
-        self.prev_result = 0
-        self.prev_prev_result = 0
         self.result_array = []
+        self.last_slot = 0
 
     def update_metrics(self, sim):
+        # Update the result of the slot in the result array
         self.result_array.append(sim.result)
         # Add the number of packets to statistical array for diagnosis
         sim.sim_state.arrival_stat_array.append(sim.packets_gen)
@@ -44,12 +38,3 @@ class TreeState(object):
                         go_on = False
                 else:
                     go_on = False
-        # If an Idle slot
-        if sim.result == 0:
-            # Update parameters
-            self.total_idles += 1
-        # If a collision
-        if sim.result == 2:
-            # Update parameters
-            self.total_collisions += 1
-

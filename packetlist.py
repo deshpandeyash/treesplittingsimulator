@@ -28,26 +28,17 @@ def inc_uncollided_packet_count(sim, count):
         if j.packet_count > 0:
             j.packet_count += count
 
+
 def inc_uncolliding_packet_count(sim, count):
     """
     increments the count in the packet_count of each uncolliding packet in the packet array
+    useful when modified trees are implemented
     :param sim: the simulation object instance
 
     """
     for j in sim.active_array:
         if j.packet_count > 1:
             j.packet_count += count
-
-
-# def binsplit_uncollided_packet_count(sim):
-#     """
-#     performs a binary split with given branching probability, if the count is 0 , i,e the packets have collided
-#     :param sim: the simulation object instance
-#
-#     """
-#     for j in sim.active_array:
-#         if j.packet_count == 0:
-#             j.packet_count += np.random.binomial(1, sim.sim_param.branchprob)
 
 
 def split_uncollided_packet_count(sim):
@@ -66,6 +57,7 @@ def split_uncollided_packet_count(sim):
 def split_colliding_packet_count(sim):
     """
     performs a uniform split where each packet chooses a random slot between 0 and the number of collided packets
+    This is used when modified trees are to be implemented where we avoid a deterministic collision
     :param sim: the simulation object instance
     """
 
@@ -108,8 +100,8 @@ def extract_packet_count(sim):
 def extract_tx_packets(sim):
     """
 
-    :param sim:
-    :return:
+    :param sim: The simulation object instance
+    :return: list of packets which are about to transmit, i.e whose count is 0
     """
     tx_packet_array = []
     for j in sim.active_array:
@@ -120,9 +112,9 @@ def extract_tx_packets(sim):
 
 def extract_packet_id(tx_packet_array):
     """
-
-    :param sim:
-    :return:
+    extracts the packet IDs from a given input array
+    :param tx_packet_array: the input array
+    :return: a list of the packet IDs form the given input array
     """
     return [x.packetID for x in tx_packet_array]
 
@@ -130,7 +122,7 @@ def extract_packet_id(tx_packet_array):
 def add_packets_to_tree(sim):
     """
     Packets are added to the active array, the attributes of the packet are the arrival slot and its own number
-    the number of packets are given by sim.packets_gen
+
     :param sim: the simulation object instance
     """
     for j in range(0, sim.packets_gen):
@@ -139,6 +131,8 @@ def add_packets_to_tree(sim):
 
 def add_packets_to_queue(sim):
     """
+    Packets are added to the queue because an ongoing resolution during gated access simulation.
+    The attributes of the packet are the arrival slot and its own number,
 
     :param sim:
     :return:

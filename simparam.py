@@ -18,11 +18,12 @@ class SimParam(object):
         self.branchprob = 0.5
 
         # No if runs in simstudy
-        self.RUNS = 100
+        self.RUNS = 1
 
         # The branching split
         self.SPLIT = 2
 
+        # The nomber of packets that can be resolved in a multipacekt reception system in one slot.
         self.K = 2
 
     def print_sim_config(self):
