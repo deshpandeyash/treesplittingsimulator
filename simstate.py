@@ -1,4 +1,7 @@
 class SimState(object):
+    """
+    This class has all the arrays where the results must be appended to when a particular tree is resolved.
+    """
 
     def __init__(self):
         # Arrays to see the distribution of arrivals and packet delays

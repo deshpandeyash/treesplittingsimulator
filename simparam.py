@@ -23,8 +23,18 @@ class SimParam(object):
         # The branching split
         self.SPLIT = 2
 
-        # The nomber of packets that can be resolved in a multipacekt reception system in one slot.
+        # The number of packets that can be resolved in a multipacekt reception system in one slot.
         self.K = 1
+
+        # The type of Resolution Algorithm
+        self.modified = True
+        self.unisplit = False
+        self.sic = False
+
+        # The start, stop and step size of the arrival rate when we sweep through arrival rate
+        self.start = 0.20
+        self.stop = 0.60
+        self.step = 0.05
 
     def print_sim_config(self):
         """

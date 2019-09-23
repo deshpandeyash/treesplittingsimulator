@@ -4,11 +4,10 @@
     <list default="true" id="f762528b-3f0e-4ee4-a1e3-737e12756752" name="Default Changelist" comment="Dynamic Simlation now stable, different approach to SIC now starting">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/simparam.py" beforeDir="false" afterPath="$PROJECT_DIR$/simparam.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/simresult.py" beforeDir="false" afterPath="$PROJECT_DIR$/simresult.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/simstate.py" beforeDir="false" afterPath="$PROJECT_DIR$/simstate.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/simstudy.py" beforeDir="false" afterPath="$PROJECT_DIR$/simstudy.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/simulation.py" beforeDir="false" afterPath="$PROJECT_DIR$/simulation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/treestate.py" beforeDir="false" afterPath="$PROJECT_DIR$/treestate.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/slot.py" beforeDir="false" afterPath="$PROJECT_DIR$/slot.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -263,18 +262,9 @@
       <workItem from="1569098040656" duration="52000" />
       <workItem from="1569098202924" duration="60000" />
       <workItem from="1569098585701" duration="3063000" />
-      <workItem from="1569233899182" duration="7008000" />
+      <workItem from="1569233899182" duration="11501000" />
     </task>
     <servers />
-  </component>
-  <component name="TodoView">
-    <todo-panel id="selected-file">
-      <is-autoscroll-to-source value="true" />
-    </todo-panel>
-    <todo-panel id="all">
-      <are-packages-shown value="true" />
-      <is-autoscroll-to-source value="true" />
-    </todo-panel>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
@@ -306,7 +296,7 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/multipacket_tree_resolution$simpletreeresolution.coverage" NAME="simpletreeresolution Coverage Results" MODIFIED="1566596434480" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/multipacket_tree_resolution$SIQTAtest.coverage" NAME="SIQTAtest Coverage Results" MODIFIED="1567254757671" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/multipacket_tree_resolution$simstudy.coverage" NAME="simstudy Coverage Results" MODIFIED="1569245986745" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/multipacket_tree_resolution$simstudy.coverage" NAME="simstudy Coverage Results" MODIFIED="1569256986452" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/multipacket_tree_resolution$simulation.coverage" NAME="simulation Coverage Results" MODIFIED="1566688880003" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/multipacket_tree_resolution$packet_function_test.coverage" NAME="packet_function_test Coverage Results" MODIFIED="1566665350096" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
