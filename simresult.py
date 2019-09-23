@@ -11,6 +11,8 @@ class SimResult(object):
         self.max_no_tx = 0
         self.succ_rate = 0
         self.no_trees = 0
+        self.idle_rate = 0
+        self.collision_rate = 0
 
     def reset(self):
         self.throughput = 0
@@ -20,10 +22,16 @@ class SimResult(object):
         self.max_no_tx = 0
         self.succ_rate = 0
         self.no_trees = 0
+        self.idle_rate = 0
+        self.collision_rate = 0
 
     def get_result(self, sim):
-        # Throughput is the number of successful packets divided by the total number of slots
-        self.throughput = sum(sim.sim_state.successes_array) / sim.slot_no
+        # Throughput is the number of successful packets divided by the total number of slots, used for single tree
+        self.throughput = np.mean(sim.sim_state.throughput_array)
+        # Idle rate
+        self.idle_rate = np.mean(sim.sim_state.idle_array)
+        # Collision Rate
+        self.collision_rate = np.mean(sim.sim_state.collision_array)
         # Mean of the delays of all successful packets
         self.mean_packet_delay = np.mean(sim.sim_state.delay_stat_array)
         # Max of the delay

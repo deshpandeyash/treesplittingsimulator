@@ -18,6 +18,12 @@ class TreeState(object):
         self.last_slot = 0
 
     def update_metrics(self, sim):
+        """
+        Here we update the results of a the ongoing tree and remove successful packets, update results
+        in the simulation state according to the the packets statistics
+
+        :param sim: the simulation object instance
+        """
         # Update the result of the slot in the result array
         self.result_array.append(sim.result)
         # Add the number of packets to statistical array for diagnosis

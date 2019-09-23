@@ -18,8 +18,6 @@ class Simulation(object):
         self.sim_result = SimResult()
         # Load the methods governing simple tree resolution in this
         self.slot = TreeSlot(self.sim_param)
-        # Load the parameters for single tree resolution
-
         # Create an array of integers of which will contain all active nodes.
         self.active_array = []
         self.queue_array = []
@@ -28,6 +26,7 @@ class Simulation(object):
         self.result = 0
         self.slot_no = 0
         self.added_packets = 0
+        # Load the parameters for single tree resolution
         self.tree_state = TreeState(self)
 
     def reset(self):
@@ -35,7 +34,6 @@ class Simulation(object):
         self.sim_state = SimState()
         self.sim_result = SimResult()
         self.slot = TreeSlot(self.sim_param)
-
         self.active_array = []
         self.queue_array = []
         self.slot_array = np.arange(0, self.sim_param.SIMTIME)
@@ -69,7 +67,7 @@ class Simulation(object):
         # Run the simulation as long as all packets are processed
         while len(self.active_array) != 0:
             # Simulate the processes that would happen in the tx and rx in one slot, update the active array accordingly
-            self.slot.oneslotprocess(self, modified=modified,unisplit=unisplit, sic=sic)
+            self.slot.oneslotprocess(self, modified=modified, unisplit=unisplit, sic=sic)
             # Update the simstate metric according to the result of the simulation
             self.tree_state.update_metrics(self)
             # Increment the slot
@@ -80,7 +78,7 @@ class Simulation(object):
         self.sim_result.get_result(self)
 
     def do_simulation_gated_access(self, modified=False, unisplit=False, sic=False):
-        # Run simulation for the number of slots
+        # Run the simulation where we at least simulate for the simtime and then wait for the last tree to be resolved.
         while len(self.active_array) > 0 or self.slot_no < self.sim_param.SIMTIME:
             self.slot_no += 1
             # Generate a packet according to poisson distribution
