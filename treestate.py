@@ -1,16 +1,15 @@
 import packetlist
+from branchnode import BranchNode
 
 
 class TreeState(object):
-
     def __init__(self, sim):
         self.first_slot = sim.slot_no
         self.init_collided = len(sim.active_array)
         self.total_successes = 0
         self.last_slot = 0
         self.result_array = []
-        self.branch_array = []
-        self.branch_status = ''
+        self.branch_node = BranchNode()
 
     def reset(self, sim):
         self.first_slot = sim.slot_no
@@ -18,8 +17,7 @@ class TreeState(object):
         self.total_successes = 0
         self.result_array = []
         self.last_slot = 0
-        self.branch_array = []
-        self.branch_status = ''
+        self.branch_node.reset()
 
     def update_metrics(self, sim):
         """
@@ -33,7 +31,7 @@ class TreeState(object):
         # Add the number of packets to statistical array for diagnosis
         sim.sim_state.arrival_stat_array.append(sim.packets_gen)
         if sim.result == 1:
-            self.branch_status = self.branch_status + str(sim.sim_param.SPLIT - 1)
+            self.branch_node.next_leaf()
             go_on = True
             while go_on:
                 # If the 0 th element of the active array is less than 0, it mans that packet is resolved, hence remove
@@ -49,12 +47,11 @@ class TreeState(object):
                         go_on = False
                 else:
                     go_on = False
-        else:
-            if self.branch_status[-1] == '0':
-                self.branch_status = self.branch_status[:-1]
-            last_branch = self.branch_status[-1]
-            self.branch_status = self.branch_status[:-1]
-            self.branch_status = self.branch_status + str(int(last_branch) - 1)
+        elif sim.result == 0:
+            self.branch_node.next_leaf()
+        elif sim.result == 2:
+            self.branch_node.split(sim.sim_param.SPLIT)
+        self.branch_node.update_array()
 
 
 

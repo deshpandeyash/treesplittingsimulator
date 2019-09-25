@@ -18,7 +18,7 @@ class SimParam(object):
         self.branchprob = 0.5
 
         # No if runs in simstudy
-        self.RUNS = 100
+        self.RUNS = 1
 
         # The branching split
         self.SPLIT = 2
@@ -27,7 +27,7 @@ class SimParam(object):
         self.K = 1
 
         # The type of Resolution Algorithm
-        self.modified = True
+        self.modified = False
         self.unisplit = False
         self.sic = False
 
