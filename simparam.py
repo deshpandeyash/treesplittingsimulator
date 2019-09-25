@@ -27,7 +27,7 @@ class SimParam(object):
         self.K = 1
 
         # The type of Resolution Algorithm
-        self.modified = False
+        self.modified = True
         self.unisplit = False
         self.sic = False
 

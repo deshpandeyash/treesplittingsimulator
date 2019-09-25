@@ -49,6 +49,8 @@ class TreeState(object):
                     go_on = False
         elif sim.result == 0:
             self.branch_node.next_leaf()
+            if sim.slot.def_collision:
+                self.branch_node.split(sim.sim_param.SPLIT)
         elif sim.result == 2:
             self.branch_node.split(sim.sim_param.SPLIT)
         self.branch_node.update_array()

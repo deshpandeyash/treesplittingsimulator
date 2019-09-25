@@ -13,6 +13,7 @@ class TreeSlot(object):
         self.tx_packet_array = []
         self.packetID = []
         self.result_array = []
+        self.def_collision = False
 
 
     def oneslotprocess(self, sim):
@@ -55,14 +56,14 @@ class TreeSlot(object):
         # If Idle
         elif feedback == 0:
             # If the modified tree algorithm is used, and previous result was a collision
-            def_collision = False
+            self.def_collision = False
             if sim.sim_param.modified and len(sim.tree_state.result_array) >= (sim.sim_param.SPLIT - 1):
                 if sim.tree_state.result_array[-(sim.sim_param.SPLIT-1)] == 2:
-                    def_collision = True
+                    self.def_collision = True
                 for k in range(1, sim.sim_param.SPLIT-1):
                     if sim.tree_state.result_array[-k] != 0:
-                        def_collision = False
-            if def_collision or sim.sim_param.sic:
+                        self.def_collision = False
+            if self.def_collision or sim.sim_param.sic:
                 # increment the count for uncollided packets
                 packetlist.inc_uncolliding_packet_count(sim, sim.sim_param.SPLIT - 2)
                 # Update the counts on the collided packets according to a binary split
