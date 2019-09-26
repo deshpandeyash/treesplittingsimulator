@@ -7,12 +7,15 @@ def simulate_tree_branching():
     sim = Simulation()
     sim.reset()
     sim.do_simulation_simple_tree_static(5)
-    print(sim.tree_state.branch_node.branch_array)
+    print("Results were: ")
     print(sim.tree_state.result_array)
+    print("Tree Progression was: ")
+    print(sim.tree_state.branch_node.branch_array[:-1])
     print("Mean Throughput is = " + str(sim.sim_result.throughput))
+    print("The Depth of the tree is: " + str(sim.sim_result.mean_tree_depth))
 
 
-def simulate_simple_tree_static_multpile_runs():
+def simulate_simple_tree_static_multiple_runs():
     sim = Simulation()
     throughput = []
     for _ in range(sim.sim_param.RUNS):
@@ -75,8 +78,8 @@ if __name__ == '__main__':
     # Seed for reproducibility
     # np.random.seed(7)
     # Comment and uncomment the below methods as it suits
-    # simulate_tree_branching()
-    simulate_simple_tree_static_multpile_runs()
+    simulate_tree_branching()
+    # simulate_simple_tree_static_multiple_runs()
     # simulate_simple_tree_dynamic_multiple_runs()
     # simulate_simple_tree_dynamic_multiple_runs_gated()
 
