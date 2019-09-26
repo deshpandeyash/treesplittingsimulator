@@ -55,14 +55,18 @@ class TreeSlot(object):
             sim.result = feedback
         # If Idle
         elif feedback == 0:
-            # If the modified tree algorithm is used, and previous result was a collision
+            # To identify if the next slot after this idle slot is a definite collision, Modified tree Tree
             self.def_collision = False
-            if sim.sim_param.modified and len(sim.tree_state.result_array) >= (sim.sim_param.SPLIT - 1):
-                if sim.tree_state.result_array[-(sim.sim_param.SPLIT-1)] == 2:
+            # If modified anf the Simple Tree Result Array has enough elements
+            if sim.sim_param.modified and len(sim.tree_state.ST_result_array) >= (sim.sim_param.SPLIT - 1):
+                # If the Q-1th result was a collision
+                if sim.tree_state.ST_result_array[-(sim.sim_param.SPLIT-1)] == 2:
                     self.def_collision = True
+                # And subsequent slots were not idle, then it NOT a definite collision, so we set the flag down again.
                 for k in range(1, sim.sim_param.SPLIT-1):
-                    if sim.tree_state.result_array[-k] != 0:
+                    if sim.tree_state.ST_result_array[-k] != 0:
                         self.def_collision = False
+            # If the modified tree algorithm is used, and we have a definite collision
             if self.def_collision or sim.sim_param.sic:
                 # increment the count for uncollided packets
                 packetlist.inc_uncolliding_packet_count(sim, sim.sim_param.SPLIT - 2)
