@@ -3,6 +3,15 @@ from matplotlib import pyplot
 import numpy as np
 
 
+def simulate_tree_branching():
+    sim = Simulation()
+    sim.reset()
+    sim.do_simulation_simple_tree_static(5)
+    print(sim.tree_state.branch_node.branch_array)
+    print(sim.tree_state.result_array)
+    print("Mean Throughput is = " + str(sim.sim_result.throughput))
+
+
 def simulate_simple_tree_static_multpile_runs():
     sim = Simulation()
     throughput = []
@@ -66,6 +75,7 @@ if __name__ == '__main__':
     # Seed for reproducibility
     # np.random.seed(7)
     # Comment and uncomment the below methods as it suits
+    # simulate_tree_branching()
     simulate_simple_tree_static_multpile_runs()
     # simulate_simple_tree_dynamic_multiple_runs()
     # simulate_simple_tree_dynamic_multiple_runs_gated()

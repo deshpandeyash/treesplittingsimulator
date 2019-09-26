@@ -15,7 +15,7 @@ class SimParam(object):
         self.seed = 7
 
         # set branching probabilty
-        self.branchprob = 0.5
+        self.branchprob = 0.582
 
         # No if runs in simstudy
         self.RUNS = 100
