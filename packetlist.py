@@ -50,12 +50,15 @@ def split_uncollided_packet_count(sim):
     for j in sim.active_array:
         if j.packet_count == 0:
             if sim.sim_param.SPLIT == 2:
-                j.packet_count += np.random.binomial(1, sim.sim_param.branchprob)
+                if sim.sim_param.biased_split:
+                    j.packet_count += np.random.binomial(1, sim.sim_param.branchprob)
+                else:
+                    j.packet_count += np.random.binomial(1, 0.5)
             else:
                 if sim.sim_param.biased_split:
-                    j.packet_count = 0 + np.random.choice(sim.sim_param.SPLIT, 1, p=sim.sim_param.branch_biased)
+                    j.packet_count += np.random.choice(sim.sim_param.SPLIT, 1, p=sim.sim_param.branch_biased)
                 else:
-                    j.packet_count = 0 + np.random.randint(sim.sim_param.SPLIT)
+                    j.packet_count += np.random.randint(sim.sim_param.SPLIT)
 
 def split_colliding_packet_count(sim):
     """
@@ -67,7 +70,10 @@ def split_colliding_packet_count(sim):
     for j in sim.active_array:
         if j.packet_count == 1:
             if sim.sim_param.SPLIT == 2:
-                j.packet_count = 0 + np.random.binomial(1, sim.sim_param.branchprob)
+                if sim.sim_param.biased_split:
+                    j.packet_count = 0 + np.random.binomial(1, sim.sim_param.branchprob)
+                else:
+                    j.packet_count = 0 + np.random.binomial(1, 0.5)
             else:
                 if sim.sim_param.biased_split:
                     j.packet_count = 0 + np.random.choice(sim.sim_param.SPLIT, 1, p=sim.sim_param.branch_biased)

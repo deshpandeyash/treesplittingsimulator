@@ -34,7 +34,16 @@ class TreeState(object):
         # Add the number of packets to statistical array for diagnosis
         sim.sim_state.arrival_stat_array.append(sim.packets_gen)
         if sim.result == 1:
-            self.branch_node.next_leaf()
+            if sim.sim_param.sic:
+                if sim.slot.resolved_packets > 1:
+                    for _ in range(sim.slot.resolved_packets - 1):
+                        self.branch_node.next_leaf()
+                        self.branch_node.split(sim.sim_param.SPLIT)
+                else:
+                    self.branch_node.next_leaf()
+                    self.branch_node.split(sim.sim_param.SPLIT)
+            else:
+                self.branch_node.next_leaf()
             go_on = True
             while go_on:
                 # If the 0 th element of the active array is less than 0, it mans that packet is resolved, hence remove
@@ -52,7 +61,7 @@ class TreeState(object):
                     go_on = False
         elif sim.result == 0:
             self.branch_node.next_leaf()
-            if sim.slot.def_collision:
+            if sim.slot.def_collision or sim.sim_param.sic:
                 self.branch_node.split(sim.sim_param.SPLIT)
                 self.ST_result_array.append(2)
         elif sim.result == 2:

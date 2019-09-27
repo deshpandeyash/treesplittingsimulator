@@ -20,7 +20,7 @@ class Simulation(object):
         # Load the result parameters
         self.sim_result = SimResult()
         # Load the methods governing simple tree resolution in this
-        self.slot = TreeSlot(self.sim_param)
+        self.slot = TreeSlot()
         # Create an array of integers of which will contain all active nodes.
         self.active_array = []
         # For gated access, the arrived packets are put into a queue
@@ -38,7 +38,7 @@ class Simulation(object):
         self.sim_param = SimParam()
         self.sim_state = SimState()
         self.sim_result = SimResult()
-        self.slot = TreeSlot(self)
+        self.slot = TreeSlot()
         self.active_array = []
         self.queue_array = []
         self.packets_gen = 0

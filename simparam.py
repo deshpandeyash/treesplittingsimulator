@@ -15,28 +15,26 @@ class SimParam(object):
         # set seed for random number generation
         self.seed = 7
 
-        # The branching split
-        self.SPLIT = 3
-
+        # The branching split i,e Q
+        self.SPLIT = 2
+        self.biased_split = False
         # set branching probability for binary split
-        self.branchprob = 0.582
+        self.branchprob = 0.5
 
         # Set branching probability for a split
         self.branch_biased = np.full(self.SPLIT, (1 - self.branchprob)/(self.SPLIT - 1))
         self.branch_biased[0] = self.branchprob
 
-        # No if runs in simstudy
-        self.RUNS = 100
-
-        self.biased_split = False
-
         # The number of packets that can be resolved in a multipacekt reception system in one slot.
         self.K = 1
+
+        # No if runs in simstudy
+        self.RUNS = 100
 
         # The type of Resolution Algorithm
         self.modified = True
         self.unisplit = False
-        self.sic = False
+        self.sic = True
 
         # The start, stop and step size of the arrival rate when we sweep through arrival rate
         self.start = 0.20

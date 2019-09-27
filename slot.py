@@ -3,8 +3,7 @@ import packetlist
 
 class TreeSlot(object):
 
-    def __init__(self, sim_param):
-        self.sim_param = sim_param
+    def __init__(self):
         self.no_collided_packets = 0
         self.no_active_packets = 0
         self.no_waiting_packets = 0
@@ -14,7 +13,6 @@ class TreeSlot(object):
         self.packetID = []
         self.result_array = []
         self.def_collision = False
-
 
     def oneslotprocess(self, sim):
         """
