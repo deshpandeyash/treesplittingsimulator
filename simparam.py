@@ -1,3 +1,4 @@
+import numpy as np
 class SimParam(object):
 
     """
@@ -14,14 +15,20 @@ class SimParam(object):
         # set seed for random number generation
         self.seed = 7
 
-        # set branching probabilty
+        # The branching split
+        self.SPLIT = 3
+
+        # set branching probability for binary split
         self.branchprob = 0.582
+
+        # Set branching probability for a split
+        self.branch_biased = np.full(self.SPLIT, (1 - self.branchprob)/(self.SPLIT - 1))
+        self.branch_biased[0] = self.branchprob
 
         # No if runs in simstudy
         self.RUNS = 100
 
-        # The branching split
-        self.SPLIT = 2
+        self.biased_split = False
 
         # The number of packets that can be resolved in a multipacekt reception system in one slot.
         self.K = 1
