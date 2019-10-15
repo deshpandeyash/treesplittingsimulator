@@ -36,3 +36,28 @@ class BranchNode(object):
     def update_array(self):
         # Update the array to keep track of the tree
         self.branch_array.append(self.branch_status)
+
+    def update_leaf(self, sim):
+        if sim.result == 1:
+            # If SIC is used
+            if sim.sim_param.sic:
+                if sim.slot.resolved_packets > 1:
+                    for _ in range(sim.slot.resolved_packets - 1):
+                        self.next_leaf()
+                    self.split(sim.sim_param.SPLIT)
+                else:
+                    self.next_leaf()
+                    self.split(sim.sim_param.SPLIT)
+            # If not SIC, only one success is registered, so we find the next node
+            else:
+                self.next_leaf()
+        elif sim.result == 0:
+            # On an idle, we find the next leaf
+            self.next_leaf()
+            # If its a definite collision, we also update the next leaf as if it was a collision
+            if sim.slot.def_collision or sim.sim_param.sic:
+                self.split(sim.sim_param.SPLIT)
+        elif sim.result == 2:
+            # On a collision split the tree
+            self.split(sim.sim_param.SPLIT)
+        self.update_array()

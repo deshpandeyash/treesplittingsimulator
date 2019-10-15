@@ -32,9 +32,9 @@ class SimParam(object):
         self.RUNS = 100
 
         # The type of Resolution Algorithm
-        self.modified = True
+        self.modified = False
         self.unisplit = False
-        self.sic = True
+        self.sic = False
 
         # The start, stop and step size of the arrival rate when we sweep through arrival rate
         self.start = 0.20
