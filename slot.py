@@ -50,9 +50,22 @@ class TreeSlot(object):
                 packetlist.inc_uncollided_packet_count(sim, 1)
                 # And split the packets which might collide in the next slot
                 packetlist.split_uncollided_packet_count(sim)
+                # Here we update the node of the of the tree according to the result,
+                if sim.slot.resolved_packets > 1:
+                    for _ in range(sim.slot.resolved_packets - 1):
+                        sim.branch_node.next_leaf()
+                    sim.branch_node.split(sim.sim_param.SPLIT)
+                else:
+                    sim.branch_node.next_leaf()
+                    sim.branch_node.split(sim.sim_param.SPLIT)
+            # If not SIC, only one success is registered, so we find the next node
+            else:
+                sim.branch_node.next_leaf()
             sim.result = feedback
         # If Idle
         elif feedback == 0:
+            # On an idle, we find the next leaf
+            sim.branch_node.next_leaf()
             # To identify if the next slot after this idle slot is a definite collision, Modified tree Tree
             self.def_collision = False
             # If modified anf the Simple Tree Result Array has enough elements
@@ -70,6 +83,8 @@ class TreeSlot(object):
                 packetlist.inc_uncolliding_packet_count(sim, sim.sim_param.SPLIT - 2)
                 # Update the counts on the collided packets according to a binary split
                 packetlist.split_colliding_packet_count(sim)
+                # Then split the tree
+                sim.branch_node.split(sim.sim_param.SPLIT)
             else:
                 # if modified tree algorithm is not used,  On an idle slot, all packets reduce their count by 1
                 packetlist.dec_packet_count(sim, 1)
@@ -81,13 +96,18 @@ class TreeSlot(object):
             # If unisplit and if its the first collision
             if sim.sim_param.unisplit and sim.tree_state.total_collisions == 0:
                 packetlist.unisplit_uncollided_packet_count(sim)
+                # Split the tree with no of collided packets
+                sim.branch_node.split(self.no_collided_packets)
             else:
                 # Update the counts on the collided packets according to a Q-ary split
                 packetlist.split_uncollided_packet_count(sim)
+                # On a collision split the tree
+                sim.branch_node.split(sim.sim_param.SPLIT)
             sim.result = feedback
         # This is an error and means that the RX process did not change the feedback
         elif feedback == 9:
             print("Rx Process did not change give a Feedback")
+        sim.branch_node.update_array()
 
     def rxprocess(self, sic, K):
         """

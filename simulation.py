@@ -4,6 +4,7 @@ from simstate import SimState
 from simresult import SimResult
 from slot import TreeSlot
 from treestate import TreeState
+from branchnode import BranchNode
 import packetlist
 
 
@@ -19,8 +20,10 @@ class Simulation(object):
         self.sim_state = SimState()
         # Load the result parameters
         self.sim_result = SimResult()
-        # Load the methods governing simple tree resolution in this
+        # Load the class which perfomrs all the methods governing a simple slot
         self.slot = TreeSlot()
+        # Load the branch node which keeps track of a tree
+        self.branch_node = BranchNode()
         # Create an array of integers of which will contain all active nodes.
         self.active_array = []
         # For gated access, the arrived packets are put into a queue
@@ -45,6 +48,7 @@ class Simulation(object):
         self.result = 0
         self.slot_no = 0
         self.tree_state = TreeState(self)
+        self.branch_node.reset()
 
     def do_simulation_simple_tree_dynamic(self):
         """
@@ -112,6 +116,8 @@ class Simulation(object):
                 self.queue_array = []
                 # Reset all the parameters as we start a new tree
                 self.tree_state.reset(self)
+                # Reset the branches of the tree
+                self.branch_node.reset()
             # Simulate the processes that would happen in the tx and rx in one slot, update the active array accordingly
             self.slot.oneslotprocess(self)
             # Update the metrics in sim_state depending on the result

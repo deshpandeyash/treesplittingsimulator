@@ -12,7 +12,6 @@ class TreeState(object):
         # IF it was a simple tree, this would have been a result array. Its useful when we have to look for definite
         # collisions
         self.ST_result_array = []
-        self.branch_node = BranchNode()
 
     def reset(self, sim):
         self.first_slot = sim.slot_no
@@ -21,7 +20,6 @@ class TreeState(object):
         self.result_array = []
         self.ST_result_array = []
         self.last_slot = 0
-        self.branch_node.reset()
 
     def update_metrics(self, sim):
         """
@@ -57,7 +55,7 @@ class TreeState(object):
             if sim.slot.def_collision or sim.sim_param.sic:
                 # And update the simple tree result as a collision
                 self.ST_result_array.append(2)
-        self.branch_node.update_leaf(sim)
+
 
 
 
