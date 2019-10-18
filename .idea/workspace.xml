@@ -274,7 +274,9 @@
       <workItem from="1571149160269" duration="3239000" />
       <workItem from="1571225735631" duration="4386000" />
       <workItem from="1571232360709" duration="1329000" />
-      <workItem from="1571247676295" duration="5731000" />
+      <workItem from="1571247676295" duration="8622000" />
+      <workItem from="1571304634923" duration="12335000" />
+      <workItem from="1571391183213" duration="634000" />
     </task>
     <servers />
   </component>
@@ -304,13 +306,33 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/slot.py</url>
-          <line>33</line>
+          <line>35</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/slot.py</url>
-          <line>118</line>
-          <option name="timeStamp" value="4" />
+          <line>181</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/slot.py</url>
+          <line>163</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/slot.py</url>
+          <line>124</line>
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/slot.py</url>
+          <line>175</line>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/slot.py</url>
+          <line>183</line>
+          <option name="timeStamp" value="14" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -324,13 +346,15 @@
     <watches-manager>
       <configuration name="PythonConfigurationType">
         <watch expression="packetID_array" language="Python" />
+        <watch expression="test_array" />
+        <watch expression="test_array" />
       </configuration>
     </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/multipacket_tree_resolution$simpletreeresolution.coverage" NAME="simpletreeresolution Coverage Results" MODIFIED="1566596434480" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/multipacket_tree_resolution$SIQTAtest.coverage" NAME="SIQTAtest Coverage Results" MODIFIED="1567254757671" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/multipacket_tree_resolution$simstudy.coverage" NAME="simstudy Coverage Results" MODIFIED="1571254218083" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/multipacket_tree_resolution$simstudy.coverage" NAME="simstudy Coverage Results" MODIFIED="1571391763394" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/multipacket_tree_resolution$simulation.coverage" NAME="simulation Coverage Results" MODIFIED="1566688880003" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/multipacket_tree_resolution$packet_function_test.coverage" NAME="packet_function_test Coverage Results" MODIFIED="1566665350096" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>

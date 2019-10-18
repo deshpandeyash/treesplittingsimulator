@@ -23,7 +23,7 @@ def simulate_simple_tree_static_multiple_runs():
     for _ in range(sim.sim_param.RUNS):
         # Reset the simulation
         sim.reset()
-        sim.do_simulation_simple_tree_static(10)
+        sim.do_simulation_simple_tree_static(1000)
         throughput.append(sim.sim_result.throughput)
     print("Mean Throughput is = " + str(np.mean(throughput)))
     pyplot.hist(throughput, density=True)
