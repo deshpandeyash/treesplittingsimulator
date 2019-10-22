@@ -29,7 +29,7 @@ class SimParam(object):
         self.K = 1
 
         # No if runs in simstudy
-        self.RUNS = 100
+        self.RUNS = 1
 
         # The type of Resolution Algorithm
         self.modified = True

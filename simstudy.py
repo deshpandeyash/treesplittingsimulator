@@ -2,7 +2,7 @@ from simulation import Simulation
 from matplotlib import pyplot
 import numpy as np
 import time
-
+from theoretical_plots import TheoreticalPlots
 
 def simulate_tree_branching():
     sim = Simulation()
@@ -84,8 +84,10 @@ if __name__ == '__main__':
     # np.random.seed(7)
     # Comment and uncomment the below methods as it suits
     # simulate_tree_branching()
-    simulate_simple_tree_static_multiple_runs()
-    # simulate_simple_tree_dynamic_multiple_runs()
+    #simulate_simple_tree_static_multiple_runs()
+    #simulate_simple_tree_dynamic_multiple_runs()
     # simulate_simple_tree_dynamic_multiple_runs_gated()
+    print(TheoreticalPlots().sicta())
+    print(TheoreticalPlots().qarysic())
 
 
