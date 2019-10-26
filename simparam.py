@@ -16,7 +16,7 @@ class SimParam(object):
         self.seed = 7
 
         # The branching split i,e Q
-        self.SPLIT = 2
+        self.SPLIT = 3
         self.biased_split = False
         # set branching probability for binary split
         self.branchprob = 0.5
@@ -29,7 +29,7 @@ class SimParam(object):
         self.K = 1
 
         # No if runs in simstudy
-        self.RUNS = 1
+        self.RUNS = 100
 
         # The type of Resolution Algorithm
         self.modified = True

@@ -149,10 +149,10 @@ class TreeSlot(object):
         while go_on and len(self.collided_array) > 0:
             # Load the last collison
             last_coll = self.collided_array[-1]
-            # Remove all the pacet IDS that have been resolved
+            # Remove all the packet IDS that have been resolved
             resolved_array = [x for x in last_coll if x not in self.packetID]
-            # If no packet remains, it means its a left IDLE slots
-            if len(resolved_array) == 0:
+            # If only K or less packet remain, these can be resolved
+            if len(resolved_array) <= sim.sim_param.K:
                 last_node = sim.branch_node.branch_status
                 sim.branch_node.branch_status = self.collided_node_array[-1]
                 diff_node = last_node[len(sim.branch_node.branch_status):]
@@ -160,18 +160,7 @@ class TreeSlot(object):
                 # Delete this collision
                 del self.collided_array[-1]
                 del self.collided_node_array[-1]
-                # Increment the feedback
-                sic_resolved_packets += red_count
-            # If only K packet remains, this can be resolved too
-            elif len(resolved_array) <= sim.sim_param.K:
-                last_node = sim.branch_node.branch_status
-                sim.branch_node.branch_status = self.collided_node_array[-1]
-                diff_node = last_node[len(sim.branch_node.branch_status):]
-                red_count = sum(int(digit) for digit in diff_node)
-                # Delete this collision
-                del self.collided_array[-1]
-                del self.collided_node_array[-1]
-                # Add the resolved packet to the packet IDS tht have already been resolved
+                # Add the resolved packet to the packet IDS tht have already been resolved id
                 self.packetID.extend(resolved_array)
                 sic_resolved_packets += red_count
             # This collision cannot be resolved

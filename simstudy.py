@@ -28,6 +28,8 @@ def simulate_simple_tree_static_multiple_runs():
     print("Mean Throughput is = " + str(np.mean(throughput)))
     pyplot.hist(throughput, density=True)
     pyplot.show()
+    print("Theoretical Output Should be: ")
+    print(TheoreticalPlots().qarysic())
     end = time.time()
     print("Time for simulation: ")
     print(end-start)
@@ -84,10 +86,10 @@ if __name__ == '__main__':
     # np.random.seed(7)
     # Comment and uncomment the below methods as it suits
     # simulate_tree_branching()
-    #simulate_simple_tree_static_multiple_runs()
+    simulate_simple_tree_static_multiple_runs()
     #simulate_simple_tree_dynamic_multiple_runs()
     # simulate_simple_tree_dynamic_multiple_runs_gated()
-    print(TheoreticalPlots().sicta())
-    print(TheoreticalPlots().qarysic())
+    #print(TheoreticalPlots().qarysic())
+
 
 
