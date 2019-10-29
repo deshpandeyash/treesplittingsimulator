@@ -22,9 +22,8 @@ class TheoreticalPlots(object):
         throughput = n/ln
         return throughput
 
-    def qarysic(self):
+    def qarysic(self, n):
         param = SimParam()
-        n = 10
         pj = 0
         if not param.biased_split:
             pj = 1/param.SPLIT
@@ -41,9 +40,7 @@ class TheoreticalPlots(object):
             ln += comb(n, i, exact=True)*l
         ln = 1 + ln
         throughput = n/ln
-        return throughput
-
-
+        return throughput/t
 
 
 

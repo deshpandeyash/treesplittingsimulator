@@ -3,6 +3,11 @@ from matplotlib import pyplot
 import numpy as np
 import time
 from theoretical_plots import TheoreticalPlots
+from scipy.optimize import curve_fit
+
+
+def func(x, a, b, c):
+    return a * np.exp(-b * x) + c
 
 def simulate_tree_branching():
     sim = Simulation()
@@ -35,26 +40,37 @@ def simulate_simple_tree_static_multiple_runs():
     print(end-start)
 
 
-def simulate_sic_oscillations(n_start, n_stop):
+def simulate_sic_oscillations(n_stop, k):
     start = time.time()
     sim = Simulation()
     throughput_array = []
-    user_array = range(n_start, n_stop)
+    user_array = np.arange(k+1, n_stop)
     for n in user_array:
         throughput = []
         for _ in range(sim.sim_param.RUNS):
             # Reset the simulation
             sim.reset()
+            sim.sim_param.K = k
             sim.do_simulation_simple_tree_static(n)
-            throughput.append(sim.sim_result.throughput)
+            throughput.append(sim.sim_result.throughput/sim.sim_param.K)
         throughput_array.append(np.mean(throughput))
-    pyplot.plot(user_array, throughput_array)
+    theoretical_out = TheoreticalPlots().qarysic(40)
+    #popt, pcov = curve_fit(func, user_array, throughput_array)
+    #fit = np.polyfit(np.asarray(user_array), np.log(throughput_array), 1)
+    #y = np.exp(fit[1]) * np.exp(fit[0] * user_array)
+    #print(fit)
+    pyplot.plot(user_array, throughput_array,  'b-', label='data')
+    pyplot.hlines(theoretical_out, sim.sim_param.K, n_stop, colors='green', label='Steady State')
+    #pyplot.plot(user_array, func(user_array, *popt), 'r-', label = 'fit: a=%5.3f, b=%5.3f, c=%5.3f' % tuple(popt))
+    #pyplot.plot(user_array, y, 'r-', label='fit')
+    pyplot.legend()
     pyplot.show()
     print("Theoretical Output Should be: ")
-    print(TheoreticalPlots().qarysic())
+    print(theoretical_out)
     end = time.time()
     print("Time for simulation: ")
     print(end-start)
+
 
 
 
@@ -109,11 +125,13 @@ if __name__ == '__main__':
     # np.random.seed(7)
     # Comment and uncomment the below methods as it suits
     # simulate_tree_branching()
-    #simulate_simple_tree_static_multiple_runs()
-    simulate_sic_oscillations(3,100)
+    # simulate_simple_tree_static_multiple_runs()
+    simulate_sic_oscillations(100, 4)
     #simulate_simple_tree_dynamic_multiple_runs()
     # simulate_simple_tree_dynamic_multiple_runs_gated()
     #print(TheoreticalPlots().qarysic())
+
+
 
 
 
