@@ -82,12 +82,12 @@ class Simulation(object):
         self.tree_state.reset(self)
         # Run the simulation as long as all packets are processed
         while len(self.active_array) != 0:
+            # Increment the slot
+            self.slot_no += 1
             # Simulate the processes that would happen in the tx and rx in one slot, update the active array accordingly
             self.slot.oneslotprocess(self)
             # Update the simstate metric according to the result of the simulation
             self.tree_state.update_metrics(self)
-            # Increment the slot
-            self.slot_no += 1
         # update the metrics from a tree to the simulation state
         self.sim_state.update_metrics(self)
         # Update the results

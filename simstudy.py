@@ -3,6 +3,7 @@ from matplotlib import pyplot
 import numpy as np
 import time
 from theoretical_plots import TheoreticalPlots
+from simparam import SimParam
 from scipy.optimize import curve_fit
 
 
@@ -34,7 +35,7 @@ def simulate_simple_tree_static_multiple_runs():
     pyplot.hist(throughput, density=True)
     pyplot.show()
     print("Theoretical Output Should be: ")
-    print(TheoreticalPlots().qarysic())
+    print(TheoreticalPlots().qarysic(40))
     end = time.time()
     print("Time for simulation: ")
     print(end-start)
@@ -55,6 +56,7 @@ def simulate_sic_oscillations(n_stop, k):
             throughput.append(sim.sim_result.throughput/sim.sim_param.K)
         throughput_array.append(np.mean(throughput))
     theoretical_out = TheoreticalPlots().qarysic(40)
+    theoretical_out = 0.6931
     #popt, pcov = curve_fit(func, user_array, throughput_array)
     #fit = np.polyfit(np.asarray(user_array), np.log(throughput_array), 1)
     #y = np.exp(fit[1]) * np.exp(fit[0] * user_array)
@@ -119,17 +121,34 @@ def simulate_simple_tree_dynamic_multiple_runs_gated():
     pyplot.grid()
     pyplot.show()
 
+def do_theoretical_iter():
+    param = SimParam()
+    users = range(param.K, 30)
+    theoretical = []
+    for n in users:
+        output = TheoreticalPlots().qarysic(n)
+        theoretical.append(output)
+        # print(output)
+    pyplot.plot(users, theoretical)
+    pyplot.hlines(0.6931, param.K - 2, 45)
+    pyplot.show()
+    # print(TheoreticalPlots().mycomb(4,2))
+
+
 
 if __name__ == '__main__':
     # Seed for reproducibility
     # np.random.seed(7)
     # Comment and uncomment the below methods as it suits
     # simulate_tree_branching()
-    # simulate_simple_tree_static_multiple_runs()
-    simulate_sic_oscillations(100, 4)
+    #simulate_simple_tree_static_multiple_runs()
+    simulate_sic_oscillations(100, 1)
     #simulate_simple_tree_dynamic_multiple_runs()
     # simulate_simple_tree_dynamic_multiple_runs_gated()
-    #print(TheoreticalPlots().qarysic())
+    # do_theoretical_iter()
+
+
+
 
 
 

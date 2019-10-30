@@ -70,6 +70,8 @@ class TreeSlot(object):
                 for k in range(1, sim.sim_param.SPLIT-1):
                     if sim.tree_state.ST_result_array[-k] != 0:
                         self.def_collision = False
+                if sim.sim_param.sic:
+                    self.def_collision = False
             if sim.sim_param.sic and sim.branch_node.branch_status[-1] == '0':
                 self.def_collision = True
             # If the modified tree algorithm is used, and we have a definite collision
