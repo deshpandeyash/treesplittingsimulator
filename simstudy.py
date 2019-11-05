@@ -36,12 +36,12 @@ def simulate_simple_tree_static_multiple_runs():
             print("Error total successes not equal to total users")
     print("Mean Throughput is = " + str(np.mean(throughput)))
     pyplot.hist(throughput, density=True)
-    pyplot.show()
     print("Theoretical Output Should be: ")
     print(TheoreticalPlots().qarysic(10))
     end = time.time()
     print("Time for simulation: ")
     print(end-start)
+    pyplot.show()
 
 
 def simulate_sic_oscillations(n_stop, k):
@@ -69,12 +69,12 @@ def simulate_sic_oscillations(n_stop, k):
     #pyplot.plot(user_array, func(user_array, *popt), 'r-', label = 'fit: a=%5.3f, b=%5.3f, c=%5.3f' % tuple(popt))
     #pyplot.plot(user_array, y, 'r-', label='fit')
     pyplot.legend()
-    pyplot.show()
     print("Theoretical Output Should be: ")
     print(theoretical_out)
     end = time.time()
     print("Time for simulation: ")
     print(end-start)
+    pyplot.show()
 
 
 
