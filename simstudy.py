@@ -1,9 +1,29 @@
 from simulation import Simulation
 from matplotlib import pyplot
 import numpy as np
+import time
+from theoretical_plots import TheoreticalPlots
+from simparam import SimParam
+from scipy.optimize import curve_fit
 
 
-def simulate_simple_tree_static_multpile_runs():
+def func(x, a, b, c):
+    return a * np.exp(-b * x) + c
+
+def simulate_tree_branching():
+    sim = Simulation()
+    sim.reset()
+    sim.do_simulation_simple_tree_static(10)
+    print("Results were: ")
+    print(sim.tree_state.result_array)
+    print("Tree Progression was: ")
+    print(sim.branch_node.branch_array[:-1])
+    print("Mean Throughput is = " + str(sim.sim_result.throughput))
+    print("The Depth of the tree is: " + str(sim.sim_result.mean_tree_depth))
+
+
+def simulate_simple_tree_static_multiple_runs():
+    start = time.time()
     sim = Simulation()
     throughput = []
     for _ in range(sim.sim_param.RUNS):
@@ -14,6 +34,46 @@ def simulate_simple_tree_static_multpile_runs():
     print("Mean Throughput is = " + str(np.mean(throughput)))
     pyplot.hist(throughput, density=True)
     pyplot.show()
+    print("Theoretical Output Should be: ")
+    print(TheoreticalPlots().qarysic(40))
+    end = time.time()
+    print("Time for simulation: ")
+    print(end-start)
+
+
+def simulate_sic_oscillations(n_stop, k):
+    start = time.time()
+    sim = Simulation()
+    throughput_array = []
+    user_array = np.arange(k+1, n_stop)
+    for n in user_array:
+        throughput = []
+        for _ in range(sim.sim_param.RUNS):
+            # Reset the simulation
+            sim.reset()
+            sim.sim_param.K = k
+            sim.do_simulation_simple_tree_static(n)
+            throughput.append(sim.sim_result.throughput/sim.sim_param.K)
+        throughput_array.append(np.mean(throughput))
+    theoretical_out = TheoreticalPlots().qarysic(40)
+    theoretical_out = 0.6931
+    #popt, pcov = curve_fit(func, user_array, throughput_array)
+    #fit = np.polyfit(np.asarray(user_array), np.log(throughput_array), 1)
+    #y = np.exp(fit[1]) * np.exp(fit[0] * user_array)
+    #print(fit)
+    pyplot.plot(user_array, throughput_array,  'b-', label='data')
+    pyplot.hlines(theoretical_out, sim.sim_param.K, n_stop, colors='green', label='Steady State')
+    #pyplot.plot(user_array, func(user_array, *popt), 'r-', label = 'fit: a=%5.3f, b=%5.3f, c=%5.3f' % tuple(popt))
+    #pyplot.plot(user_array, y, 'r-', label='fit')
+    pyplot.legend()
+    pyplot.show()
+    print("Theoretical Output Should be: ")
+    print(theoretical_out)
+    end = time.time()
+    print("Time for simulation: ")
+    print(end-start)
+
+
 
 
 def simulate_simple_tree_dynamic_multiple_runs():
@@ -61,13 +121,36 @@ def simulate_simple_tree_dynamic_multiple_runs_gated():
     pyplot.grid()
     pyplot.show()
 
+def do_theoretical_iter():
+    param = SimParam()
+    users = range(param.K, 30)
+    theoretical = []
+    for n in users:
+        output = TheoreticalPlots().qarysic(n)
+        theoretical.append(output)
+        # print(output)
+    pyplot.plot(users, theoretical)
+    pyplot.hlines(0.6931, param.K - 2, 45)
+    pyplot.show()
+    # print(TheoreticalPlots().mycomb(4,2))
+
+
 
 if __name__ == '__main__':
     # Seed for reproducibility
     # np.random.seed(7)
     # Comment and uncomment the below methods as it suits
-    simulate_simple_tree_static_multpile_runs()
-    # simulate_simple_tree_dynamic_multiple_runs()
+    simulate_tree_branching()
+    #simulate_simple_tree_static_multiple_runs()
+    #simulate_sic_oscillations(100, 1)
+    #simulate_simple_tree_dynamic_multiple_runs()
     # simulate_simple_tree_dynamic_multiple_runs_gated()
+    # do_theoretical_iter()
+
+
+
+
+
+
 
 
