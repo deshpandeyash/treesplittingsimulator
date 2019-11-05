@@ -22,18 +22,20 @@ def inc_uncollided_packet_count(sim, count):
     """
     increments the count in the packet_count of each uncollided packet in the packet array
     :param sim: the simulation object instance
+    :param count: decrement by this count
 
     """
     for j in sim.active_array:
         if j.packet_count > 0:
             j.packet_count += count
 
-
+# Not used for now
 def inc_uncolliding_packet_count(sim, count):
     """
     increments the count in the packet_count of each uncolliding packet in the packet array
     useful when modified trees are implemented
     :param sim: the simulation object instance
+    :param count: the count by which to increment
 
     """
     for j in sim.active_array:
@@ -46,19 +48,21 @@ def split_uncollided_packet_count(sim):
     performs a uniform split where each packet chooses a random slot between 0 and the number of collided packets
     :param sim: the simulation object instance
     """
-
     for j in sim.active_array:
         if j.packet_count == 0:
             if sim.sim_param.SPLIT == 2:
                 if sim.sim_param.biased_split:
-                    j.packet_count += np.random.binomial(1, sim.sim_param.branchprob)
+                    drawn_count = np.random.binomial(1, sim.sim_param.branchprob)
                 else:
-                    j.packet_count += np.random.binomial(1, 0.5)
+                    drawn_count = np.random.binomial(1, 0.5)
             else:
                 if sim.sim_param.biased_split:
-                    j.packet_count += np.random.choice(sim.sim_param.SPLIT, 1, p=sim.sim_param.branch_biased)
+                    drawn_count = np.random.choice(sim.sim_param.SPLIT, 1, p=sim.sim_param.branch_biased)
                 else:
-                    j.packet_count += np.random.randint(sim.sim_param.SPLIT)
+                    drawn_count = np.random.randint(sim.sim_param.SPLIT)
+            j.packet_count += drawn_count
+            j.selected_branch = str(sim.sim_param.SPLIT - 1 - drawn_count)
+
 
 def split_colliding_packet_count(sim):
     """
@@ -162,6 +166,9 @@ def remove_successful_packet(sim):
 
     pack = sim.active_array.pop(0)
     pack.life_time = sim.slot_no - pack.birth_time
+    if not sim.sim_param.sic:
+        if pack.selected_branch != sim.branch_node.success_branch:
+            print("Error success branch different from selected branch at split")
     return pack
 
 

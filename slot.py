@@ -123,6 +123,7 @@ class TreeSlot(object):
         # If array has K or less than K elements
         elif len(self.tx_packet_array) <= sim.sim_param.K:
             feedback = 1
+            sim.branch_node.success_branch = sim.branch_node.branch_status[-1]
             if sim.sim_param.sic:
                 resolved_packets = self.sic_process(sim)
             # If not SIC, only one success is registered, so we find the next node

@@ -9,14 +9,16 @@ class BranchNode(object):
         self.branch_array = []
         # Keeps the current node you are on
         self.branch_status = ''
+        self.success_branch = ''
 
     def reset(self):
         self.branch_array = []
         self.branch_status = ''
+        self.success_branch = ''
 
-    def split(self, Q):
+    def split(self, q):
         # A split will split the node to Q branches,  the branch to the rightmost ( Q-1 )th branch
-        self.branch_status = self.branch_status + str(Q - 1)
+        self.branch_status = self.branch_status + str(q - 1)
 
     def next_leaf(self):
         """

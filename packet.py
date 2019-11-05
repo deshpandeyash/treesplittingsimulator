@@ -9,6 +9,7 @@ class Packet(object):
         self.birth_time = slot_number
         self.life_time = 0
         self.transmissions = 0
+        self.selected_branch = ''
 
     # To better sort the array of packets
     def __cmp__(self, other):

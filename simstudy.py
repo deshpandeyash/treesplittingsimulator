@@ -13,7 +13,7 @@ def func(x, a, b, c):
 def simulate_tree_branching():
     sim = Simulation()
     sim.reset()
-    sim.do_simulation_simple_tree_static(10)
+    sim.do_simulation_simple_tree_static(5)
     print("Results were: ")
     print(sim.tree_state.result_array)
     print("Tree Progression was: ")
@@ -26,16 +26,19 @@ def simulate_simple_tree_static_multiple_runs():
     start = time.time()
     sim = Simulation()
     throughput = []
+    users = 10
     for _ in range(sim.sim_param.RUNS):
         # Reset the simulation
         sim.reset()
-        sim.do_simulation_simple_tree_static(1000)
+        sim.do_simulation_simple_tree_static(users)
         throughput.append(sim.sim_result.throughput)
+        if sim.tree_state.total_successes != users:
+            print("Error total successes not equal to total users")
     print("Mean Throughput is = " + str(np.mean(throughput)))
     pyplot.hist(throughput, density=True)
     pyplot.show()
     print("Theoretical Output Should be: ")
-    print(TheoreticalPlots().qarysic(40))
+    print(TheoreticalPlots().qarysic(10))
     end = time.time()
     print("Time for simulation: ")
     print(end-start)
@@ -123,14 +126,14 @@ def simulate_simple_tree_dynamic_multiple_runs_gated():
 
 def do_theoretical_iter():
     param = SimParam()
-    users = range(param.K, 30)
+    users = range(param.K, 12)
     theoretical = []
     for n in users:
         output = TheoreticalPlots().qarysic(n)
         theoretical.append(output)
         # print(output)
     pyplot.plot(users, theoretical)
-    pyplot.hlines(0.6931, param.K - 2, 45)
+    pyplot.hlines(0.35, param.K - 2, 12)
     pyplot.show()
     # print(TheoreticalPlots().mycomb(4,2))
 
@@ -140,12 +143,12 @@ if __name__ == '__main__':
     # Seed for reproducibility
     # np.random.seed(7)
     # Comment and uncomment the below methods as it suits
-    simulate_tree_branching()
-    #simulate_simple_tree_static_multiple_runs()
+    #simulate_tree_branching()
+    simulate_simple_tree_static_multiple_runs()
     #simulate_sic_oscillations(100, 1)
     #simulate_simple_tree_dynamic_multiple_runs()
     # simulate_simple_tree_dynamic_multiple_runs_gated()
-    # do_theoretical_iter()
+    do_theoretical_iter()
 
 
 
