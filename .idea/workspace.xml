@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f762528b-3f0e-4ee4-a1e3-737e12756752" name="Default Changelist" comment="Dynamic Simlation now stable, different approach to SIC now starting">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/simparam.py" beforeDir="false" afterPath="$PROJECT_DIR$/simparam.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/simstudy.py" beforeDir="false" afterPath="$PROJECT_DIR$/simstudy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/slot.py" beforeDir="false" afterPath="$PROJECT_DIR$/slot.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/treestate.py" beforeDir="false" afterPath="$PROJECT_DIR$/treestate.py" afterDir="false" />
-    </list>
+    <list default="true" id="f762528b-3f0e-4ee4-a1e3-737e12756752" name="Default Changelist" comment="Dynamic Simlation now stable, different approach to SIC now starting" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -266,6 +260,7 @@
       <workItem from="1569419834062" duration="5515000" />
       <workItem from="1569441901764" duration="2702000" />
       <workItem from="1569498970905" duration="2126000" />
+      <workItem from="1572961856950" duration="76000" />
     </task>
     <servers />
   </component>
