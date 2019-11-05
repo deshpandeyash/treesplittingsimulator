@@ -13,7 +13,7 @@ def func(x, a, b, c):
 def simulate_tree_branching():
     sim = Simulation()
     sim.reset()
-    sim.do_simulation_simple_tree_static(5)
+    sim.do_simulation_simple_tree_static(10)
     print("Results were: ")
     print(sim.tree_state.result_array)
     print("Tree Progression was: ")
@@ -140,9 +140,9 @@ if __name__ == '__main__':
     # Seed for reproducibility
     # np.random.seed(7)
     # Comment and uncomment the below methods as it suits
-    # simulate_tree_branching()
+    simulate_tree_branching()
     #simulate_simple_tree_static_multiple_runs()
-    simulate_sic_oscillations(100, 1)
+    #simulate_sic_oscillations(100, 1)
     #simulate_simple_tree_dynamic_multiple_runs()
     # simulate_simple_tree_dynamic_multiple_runs_gated()
     # do_theoretical_iter()
