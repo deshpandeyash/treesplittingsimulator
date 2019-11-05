@@ -13,6 +13,7 @@ class SimResult(object):
         self.no_trees = 0
         self.idle_rate = 0
         self.collision_rate = 0
+        self.mean_tree_depth = 0
 
     def reset(self):
         self.throughput = 0
@@ -24,6 +25,7 @@ class SimResult(object):
         self.no_trees = 0
         self.idle_rate = 0
         self.collision_rate = 0
+        self.mean_tree_depth = 0
 
     def get_result(self, sim):
         # Throughput is the number of successful packets divided by the total number of slots, used for single tree
@@ -44,3 +46,5 @@ class SimResult(object):
         self.succ_rate = sum(sim.sim_state.successes_array) / sum(sim.sim_state.arrival_stat_array)
         # Total no of trees resolved
         self.no_trees = len(sim.sim_state.successes_array)
+        # Average tree depth is the mean of the tree depth array in simstate
+        self.mean_tree_depth = np.mean(sim.sim_state.tree_depth_array)
