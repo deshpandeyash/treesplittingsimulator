@@ -12,6 +12,18 @@ class TheoreticalPlots(object):
             out = out*(n-i)/(k-i)
         return out
 
+    def simpletreerecursive(self, n):
+        if n <= 1:
+            return 1
+        else:
+            k = 0
+            for i in range(0, n):
+                k += (self.mycomb(n, i)*(2**(-n)))*self.simpletreerecursive(i)
+            return (1+2*k)/(1-(2**(-n+1)))
+
+    def simpletree(self, n):
+        return n/self.simpletreerecursive(n)
+
     def sicta(self):
         n = 45
         pj = 0.5

@@ -4,7 +4,7 @@ import numpy as np
 import time
 from theoretical_plots import TheoreticalPlots
 from simparam import SimParam
-from scipy.optimize import curve_fit
+from scipy.stats import skew
 
 
 def func(x, a, b, c):
@@ -34,14 +34,14 @@ def simulate_simple_tree_static_multiple_runs():
         throughput.append(sim.sim_result.throughput)
         if sim.tree_state.total_successes != users:
             print("Error total successes not equal to total users")
-    print("Mean Throughput is = " + str(np.mean(throughput)))
+    print("Skewness in throughput distribution is :" + str(skew(np.asarray(throughput))))
+    print("Mean Throughput:  " + str(np.mean(throughput)))
     pyplot.hist(throughput, density=True)
     pyplot.show()
-    print("Theoretical Output Should be: ")
-    print(TheoreticalPlots().qarysic(10))
+    print("Theoretical Throughput: " + str(TheoreticalPlots().qarysic(users)))
     end = time.time()
-    print("Time for simulation: ")
-    print(end-start)
+    print("Time for simulation: " + str(end-start))
+
 
 
 def simulate_sic_oscillations(n_stop, k):
@@ -129,7 +129,8 @@ def do_theoretical_iter():
     users = range(param.K, 12)
     theoretical = []
     for n in users:
-        output = TheoreticalPlots().qarysic(n)
+        #output = TheoreticalPlots().qarysic(n)
+        output = TheoreticalPlots().simpletree(n)
         theoretical.append(output)
         # print(output)
     pyplot.plot(users, theoretical)
@@ -148,7 +149,9 @@ if __name__ == '__main__':
     #simulate_sic_oscillations(100, 1)
     #simulate_simple_tree_dynamic_multiple_runs()
     # simulate_simple_tree_dynamic_multiple_runs_gated()
-    do_theoretical_iter()
+    #do_theoretical_iter()
+
+
 
 
 
