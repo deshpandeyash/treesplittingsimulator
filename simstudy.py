@@ -37,20 +37,16 @@ def simulate_simple_tree_static_multiple_runs():
     print("Skewness in throughput distribution is :" + str(skew(np.asarray(throughput))))
     print("Mean Throughput:  " + str(np.mean(throughput)))
     pyplot.hist(throughput, density=True)
-<<<<<<< HEAD
     pyplot.show()
     print("Theoretical Throughput: " + str(TheoreticalPlots().qarysic(users)))
     end = time.time()
     print("Time for simulation: " + str(end-start))
-
-=======
     print("Theoretical Output Should be: ")
     print(TheoreticalPlots().qarysic(10))
     end = time.time()
     print("Time for simulation: ")
     print(end-start)
     pyplot.show()
->>>>>>> b348c152b01ee9dd4771eaed7668472bb0618c37
 
 
 def simulate_sic_oscillations(n_stop, k):
