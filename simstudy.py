@@ -143,6 +143,18 @@ def do_theoretical_iter():
     pyplot.show()
     # print(TheoreticalPlots().mycomb(4,2))
 
+def print_theoretical_result():
+    start = time.time()
+    theoretical = TheoreticalPlots()
+    users = 10
+    # Equation 16 or 32- Q ary with/without SIC with multipacket k
+    print(theoretical.qarysic(users))
+    # Equation 30 from SICTA paper
+    print(theoretical.sicta(users))
+    # Simple Tree from Massey Paper (recursive) Equation no- 3.13
+    print(theoretical.simpletree(users))
+    # Equation 41 or 45 - Q ary with/without SIC with multipacket K but recursive
+    print(theoretical.recquary(users))
 
 
 if __name__ == '__main__':
@@ -150,14 +162,12 @@ if __name__ == '__main__':
     # np.random.seed(7)
     # Comment and uncomment the below methods as it suits
     #simulate_tree_branching()
-    simulate_simple_tree_static_multiple_runs()
+    #simulate_simple_tree_static_multiple_runs()
     #simulate_sic_oscillations(100, 1)
     #simulate_simple_tree_dynamic_multiple_runs()
     # simulate_simple_tree_dynamic_multiple_runs_gated()
     #do_theoretical_iter()
-
-
-
+    print_theoretical_result()
 
 
 

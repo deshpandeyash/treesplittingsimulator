@@ -24,9 +24,9 @@ class TheoreticalPlots(object):
     def simpletree(self, n):
         return n/self.simpletreerecursive(n)
 
-    def sicta(self):
-        n = 45
-        pj = 0.5
+    def sicta(self, n):
+        param = SimParam()
+        pj = param.branchprob
         ln = 0
         for i in range(2, n + 1):
             ln += (comb(n, i, exact=True)*((i-1)*((-1)**i)))/(1-(pj**i)-((1-pj)**i))
@@ -36,7 +36,7 @@ class TheoreticalPlots(object):
 
     def qarysic(self, n):
         param = SimParam()
-        pj = 0.5
+        pj = param.branchprob
         if not param.biased_split:
             pj = 1/param.SPLIT
         ln = 0
@@ -59,6 +59,24 @@ class TheoreticalPlots(object):
 
     def recquary(self, n):
         param = SimParam()
+        pj = 0.5
+        if not param.biased_split:
+            pj = 1/param.SPLIT
+        d = param.SPLIT
+        return n / self.recquaryrecursive(n, pj, d)
+
+    def recquaryrecursive(self, n, pj, d):
+        if n <= 1:
+            return 1
+        else:
+            ln = 0
+            for j in range(1, d + 1):
+                l = 0
+                for nj in range(j, n):
+                    l += self.mycomb(n, nj)*(pj**nj)*((1-pj)**(n-nj))*self.recquaryrecursive(nj, pj, d)
+                ln += l
+            ln = ln / ((1-(pj**n))-((d-1)*(((1-pj)/(d-1))**n)))
+            return ln
 
 
 
