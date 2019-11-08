@@ -26,7 +26,7 @@ def simulate_simple_tree_static_multiple_runs():
     start = time.time()
     sim = Simulation()
     throughput = []
-    users = 10
+    users = 3
     for _ in range(sim.sim_param.RUNS):
         # Reset the simulation
         sim.reset()
@@ -39,13 +39,9 @@ def simulate_simple_tree_static_multiple_runs():
     pyplot.hist(throughput, density=True)
     pyplot.show()
     print("Theoretical Throughput: " + str(TheoreticalPlots().qarysic(users)))
+    print(TheoreticalPlots().simpletree(users))
     end = time.time()
     print("Time for simulation: " + str(end-start))
-    print("Theoretical Output Should be: ")
-    print(TheoreticalPlots().qarysic(10))
-    end = time.time()
-    print("Time for simulation: ")
-    print(end-start)
     pyplot.show()
 
 
@@ -80,9 +76,6 @@ def simulate_sic_oscillations(n_stop, k):
     print("Time for simulation: ")
     print(end-start)
     pyplot.show()
-
-
-
 
 def simulate_simple_tree_dynamic_multiple_runs():
     sim = Simulation()
@@ -161,13 +154,13 @@ if __name__ == '__main__':
     # Seed for reproducibility
     # np.random.seed(7)
     # Comment and uncomment the below methods as it suits
-    #simulate_tree_branching()
+    simulate_tree_branching()
     #simulate_simple_tree_static_multiple_runs()
     #simulate_sic_oscillations(100, 1)
     #simulate_simple_tree_dynamic_multiple_runs()
     # simulate_simple_tree_dynamic_multiple_runs_gated()
     #do_theoretical_iter()
-    print_theoretical_result()
+    #print_theoretical_result()
 
 
 

@@ -72,7 +72,7 @@ class TheoreticalPlots(object):
             ln = 0
             for j in range(1, d + 1):
                 l = 0
-                for nj in range(j, n):
+                for nj in range(0, n):
                     l += self.mycomb(n, nj)*(pj**nj)*((1-pj)**(n-nj))*self.recquaryrecursive(nj, pj, d)
                 ln += l
             ln = ln / ((1-(pj**n))-((d-1)*(((1-pj)/(d-1))**n)))
