@@ -12,6 +12,7 @@ class TreeState(object):
         # IF it was a simple tree, this would have been a result array. Its useful when we have to look for definite
         # collisions
         self.ST_result_array = []
+        self.gate_open = False
 
     def reset(self, sim):
         self.first_slot = sim.slot_no
@@ -20,6 +21,7 @@ class TreeState(object):
         self.result_array = []
         self.ST_result_array = []
         self.last_slot = 0
+        self.gate_open = False
 
     def update_metrics(self, sim):
         """

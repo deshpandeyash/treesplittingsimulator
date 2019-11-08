@@ -80,13 +80,13 @@ class Simulation(object):
         self.packets_gen = collided_packets
         packetlist.add_packets_to_tree(self)
         self.tree_state.reset(self)
-        # Run the simulation as long as all packets are processed
-        while len(self.active_array) != 0:
+        # Run the simulation as long as all packets are processed and tree is over
+        while len(self.active_array) != 0 or len(self.branch_node.branch_status) != 0:
             # Increment the slot
             self.slot_no += 1
             # Simulate the processes that would happen in the tx and rx in one slot, update the active array accordingly
             self.slot.oneslotprocess(self)
-            # Update the simstate metric according to the result of the simulation
+            # Update the simstate metrics according to the result of the simulation
             self.tree_state.update_metrics(self)
         # update the metrics from a tree to the simulation state
         self.sim_state.update_metrics(self)
