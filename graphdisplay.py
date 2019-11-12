@@ -24,5 +24,6 @@ def displaygraph(branch_array, result_array, number_array):
             variable_node = branch_array[j]
             if variable_node[:-1] == fixed_node:
                 cot.edge(fixed_node, variable_node, variable_node)
+    cot.edge_attr.update(fontcolor='green')
     cot.render('Result', view=True)
 

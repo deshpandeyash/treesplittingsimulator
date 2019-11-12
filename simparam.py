@@ -26,7 +26,7 @@ class SimParam(object):
         self.branch_biased[0] = self.branchprob
 
         # The number of packets that can be resolved in a multipacekt reception system in one slot.
-        self.K = 1
+        self.K = 2
 
         # No if runs in simstudy
         self.RUNS = 1000

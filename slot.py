@@ -28,20 +28,24 @@ class TreeSlot(object):
         """
         # this parameter is changed to the result of the transmission feedback
         sim.result = 0
-        # Sort the array in ascending order
-        packetlist.sort_packet_array(sim)
-        # Convert the array of Packet objects to just a list for easier and faster operation at transmitter
-        test_array = packetlist.extract_packet_id(sim.active_array)
-        count_array = packetlist.extract_packet_count(sim)
-        self.tx_packet_array = packetlist.extract_tx_packets(sim)
-        # Find out the packet count attributes for further statistics
-        self.no_active_packets = len(sim.active_array)
-        self.no_collided_packets = len(self.tx_packet_array)
-        self.no_waiting_packets = self.no_active_packets - self.no_collided_packets
-        # Update the number of transmissions in each packet
-        packetlist.update_transmissions(sim)
-        # Get the feedback form the receiver
-        feedback, self.resolved_packets = self.rxprocess(sim)
+        if len(sim.active_array) > 0:
+            # Sort the array in ascending order
+            packetlist.sort_packet_array(sim)
+            # Convert the array of Packet objects to just a list for easier and faster operation at transmitter
+            test_array = packetlist.extract_packet_id(sim.active_array)
+            count_array = packetlist.extract_packet_count(sim)
+            self.tx_packet_array = packetlist.extract_tx_packets(sim)
+            # Find out the packet count attributes for further statistics
+            self.no_active_packets = len(sim.active_array)
+            self.no_collided_packets = len(self.tx_packet_array)
+            self.no_waiting_packets = self.no_active_packets - self.no_collided_packets
+            # Update the number of transmissions in each packet
+            packetlist.update_transmissions(sim)
+            # Get the feedback form the receiver
+            feedback, self.resolved_packets = self.rxprocess(sim)
+        else:
+            feedback = 0
+            self.resolved_packets = 0
         # If Success
         if feedback == 1:
             # On a success, all other packets reduce their count
@@ -57,6 +61,8 @@ class TreeSlot(object):
             sim.result = feedback
         # If Idle
         elif feedback == 0:
+            # On an idle, we find the next leaf
+            sim.branch_node.next_leaf()
             # On an idle slot, all packets reduce their count by 1 if its not a definite collision
             packetlist.dec_packet_count(sim, 1)
             # To identify if the next slot after this idle slot is a definite collision, Modified tree Tree
@@ -118,8 +124,6 @@ class TreeSlot(object):
         # If the length of the array is 0 then there are no active packets, and no transmissions hence, IDLE
         if len(self.tx_packet_array) == 0:
             feedback = 0
-            # On an idle, we find the next leaf
-            sim.branch_node.next_leaf()
         # If array has K or less than K elements
         elif len(self.tx_packet_array) <= sim.sim_param.K:
             feedback = 1
