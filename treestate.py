@@ -12,7 +12,8 @@ class TreeState(object):
         # IF it was a simple tree, this would have been a result array. Its useful when we have to look for definite
         # collisions
         self.ST_result_array = []
-        self.gate_open = False
+        self.gate_open = True
+        self.number_in_slot = []
 
     def reset(self, sim):
         self.first_slot = sim.slot_no
@@ -21,7 +22,8 @@ class TreeState(object):
         self.result_array = []
         self.ST_result_array = []
         self.last_slot = 0
-        self.gate_open = False
+        self.gate_open = True
+        self.number_in_slot = []
 
     def update_metrics(self, sim):
         """
@@ -33,6 +35,7 @@ class TreeState(object):
         # Update the result of the slot in the result array
         self.result_array.append(sim.result)
         self.ST_result_array.append(sim.result)
+        self.number_in_slot.append(sim.slot.no_collided_packets)
         # Add the number of packets to statistical array for diagnosis
         sim.sim_state.arrival_stat_array.append(sim.packets_gen)
         if sim.result == 1:
