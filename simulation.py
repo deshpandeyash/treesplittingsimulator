@@ -89,7 +89,7 @@ class Simulation(object):
             # Update the simstate metrics according to the result of the simulation
             self.tree_state.update_metrics(self)
             # check if all the packets are processed and the tree is at its last branch
-            if len(self.active_array) == 0 or self.branch_node.branch_status == 0:
+            if len(self.active_array) == 0 and len(self.branch_node.branch_status) == 0:
                 self.tree_state.gate_open = False
         # update the metrics from a tree to the simulation state
         self.sim_state.update_metrics(self)
