@@ -49,10 +49,12 @@ class TreeSlot(object):
             self.no_waiting_packets = 0
         # If Success
         if feedback == 1:
+            self.def_collision = False
             # On a success, all other packets reduce their count
             packetlist.dec_packet_count(sim, self.resolved_packets)
             # If SIC process is used, then
             if sim.sim_param.sic and len(sim.branch_node.branch_status) > 0 and sim.branch_node.branch_status[-1] == '0':
+                self.def_collision = True
                 # We increment the count of the uncollided packets
                 packetlist.inc_uncollided_packet_count(sim, sim.sim_param.SPLIT - 1)
                 # And split the packets which might collide in the next slot
@@ -155,6 +157,8 @@ class TreeSlot(object):
         # Append this ID to the array of already Decoded IDs
         self.packetID.extend(single_packet)
         sic_resolved_packets = 1
+        sim.tree_state.ST_result_array.append(1)
+        sim.tree_state.ST_number_in_slot.append(len(single_packet))
         go_on = True
         # While we can succesively Decode the packets from previous collisons
         while go_on and len(self.collided_array) > 0:
@@ -163,22 +167,32 @@ class TreeSlot(object):
             # Remove all the packet IDS that have been resolved
             resolved_array = [x for x in last_coll if x not in self.packetID]
             # If only K or less packet remain, these can be resolved
+            # sim.branch_node.branch_status
             if len(resolved_array) <= sim.sim_param.K:
-                last_node = sim.branch_node.branch_status
-                sim.branch_node.branch_status = self.collided_node_array[-1]
-                diff_node = last_node[len(sim.branch_node.branch_status):]
+                resolved_node = sim.branch_node.branch_status
+                last_node = self.collided_node_array[-1]
+                diff_node = resolved_node[len(last_node):]
                 red_count = sum(int(digit) for digit in diff_node)
+                ################## Check Code from Here
+                for _ in range(0, red_count):
+                    sim.branch_node.next_leaf()
+                    sim.branch_node.update_ghost()
+                    sim.tree_state.ST_result_array.append(1)
+                    sim.tree_state.ST_number_in_slot.append('x')
+                ###################### Until Here
                 # Delete this collision
                 del self.collided_array[-1]
                 del self.collided_node_array[-1]
                 # Add the resolved packet to the packet IDS tht have already been resolved id
                 self.packetID.extend(resolved_array)
                 sic_resolved_packets += red_count
+                sim.branch_node.branch_status = last_node
             # This collision cannot be resolved
             else:
                 # We still remove only the resolved packets from the last collision, and stop the SIC process
                 del self.collided_array[-1]
                 self.collided_array.append(resolved_array)
                 sim.branch_node.next_leaf()
+                sim.branch_node.update_ghost()
                 go_on = False
         return sic_resolved_packets

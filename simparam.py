@@ -16,7 +16,7 @@ class SimParam(object):
         self.seed = 7
 
         # The branching split i,e Q
-        self.SPLIT = 2
+        self.SPLIT = 3
         self.biased_split = False
         # set branching probability for binary split
         self.branchprob = 0.5
@@ -29,12 +29,12 @@ class SimParam(object):
         self.K = 1
 
         # No if runs in simstudy
-        self.RUNS = 1000
+        self.RUNS = 100
 
         # The type of Resolution Algorithm
         self.modified = False
         self.unisplit = False
-        self.sic = False
+        self.sic = True
 
         # The start, stop and step size of the arrival rate when we sweep through arrival rate
         self.start = 0.20

@@ -29,11 +29,14 @@ class SimState(object):
         self.tree_depth_array = []
 
     def update_metrics(self, sim):
+        success_slots = sim.tree_state.result_array.count(1)
+        idle_slots = sim.tree_state.result_array.count(0)
+        collision_slots = sim.tree_state.result_array.count(2)
         # Append all the parameters from tree state to the arrays in this class
         self.successes_array.append(sim.tree_state.total_successes)
         self.throughput_array.append(sim.tree_state.total_successes/(sim.slot_no - sim.tree_state.first_slot))
-        self.collision_array.append(sim.tree_state.result_array.count(2)/(sim.slot_no - sim.tree_state.first_slot))
-        self.idle_array.append(sim.tree_state.result_array.count(0)/(sim.slot_no - sim.tree_state.first_slot))
+        self.collision_array.append(collision_slots/(sim.slot_no - sim.tree_state.first_slot))
+        self.idle_array.append(idle_slots/(sim.slot_no - sim.tree_state.first_slot))
         self.inti_collision_array.append(sim.tree_state.init_collided)
         self.slot_len_array.append(sim.slot_no - sim.tree_state.first_slot)
         self.tree_depth_array.append(len(max(sim.branch_node.branch_array[:-1], key=len)))
@@ -44,6 +47,9 @@ class SimState(object):
                 print("Error Simple Tree Problem, result array not matching!")
             if sim.tree_state.number_in_slot != sim.tree_state.ST_number_in_slot:
                 print("Error Simple Tree Problem, number in slot not matching!")
+        if (success_slots + idle_slots + collision_slots) != sim.slot_no - sim.tree_state.first_slot:
+            print("Error! Slots not Adding up!")
+
 
 
 
