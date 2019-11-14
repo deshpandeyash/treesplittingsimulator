@@ -22,8 +22,6 @@ class TreeSlot(object):
         we transmit the packets which have count 0, and then wait for the feedback and update the count in the packets
         accordingly
         :param sim: the simulation parameters
-        :param unisplit: if true then perform a uniform split
-        :param modified: if true the simulator will run the modified tree where we eliminate a deterministic collision
 
         """
         # this parameter is changed to the result of the transmission feedback
@@ -46,6 +44,9 @@ class TreeSlot(object):
         else:
             feedback = 0
             self.resolved_packets = 0
+            self.no_collided_packets = 0
+            self.no_active_packets = 0
+            self.no_waiting_packets = 0
         # If Success
         if feedback == 1:
             # On a success, all other packets reduce their count

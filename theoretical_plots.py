@@ -34,10 +34,8 @@ class TheoreticalPlots(object):
         throughput = n/ln
         return throughput
 
-    def qarysic(self, n, k, q):
+    def qarysic(self, n):
         param = SimParam()
-        param.K = k
-        param.SPLIT = q
         pj = param.branchprob
         if not param.biased_split:
             pj = 1/param.SPLIT
@@ -47,14 +45,14 @@ class TheoreticalPlots(object):
         to_sub = d
         if param.sic:
             to_sub -= 1
-        for i in range(t + 1, n+1):
+        for i in range(t + 1, n + 1):
             d_sum = 0
             for u in range(1, d + 1):
                 d_sum += pj ** i
             l = 0
             for j in range(0, t + 1):
-                l += (self.mycomb(i, j)*to_sub*((-1)**(i-j+1)))/(1-d_sum)
-            ln += self.mycomb(n, i)*l
+                l += self.mycomb(i, j)*((-1)**(i-j+1))
+            ln += self.mycomb(n, i)*l*to_sub/(1-d_sum)
         ln = 1 + ln
         throughput = n/ln
         return throughput/t

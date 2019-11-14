@@ -39,6 +39,12 @@ class SimState(object):
         self.tree_depth_array.append(len(max(sim.branch_node.branch_array[:-1], key=len)))
         if sim.tree_state.init_collided != sim.tree_state.total_successes:
             print("Tree incomplete!")
+        if not sim.sim_param.modified and not sim.sim_param.sic:
+            if sim.tree_state.result_array != sim.tree_state.ST_result_array:
+                print("Error Simple Tree Problem, result array not matching!")
+            if sim.tree_state.number_in_slot != sim.tree_state.ST_number_in_slot:
+                print("Error Simple Tree Problem, number in slot not matching!")
+
 
 
 
