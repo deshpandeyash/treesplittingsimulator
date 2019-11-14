@@ -14,6 +14,7 @@ class TreeState(object):
         self.ST_result_array = []
         self.gate_open = True
         self.number_in_slot = []
+        self.ST_number_in_slot = []
 
     def reset(self, sim):
         self.first_slot = sim.slot_no
@@ -24,6 +25,7 @@ class TreeState(object):
         self.last_slot = 0
         self.gate_open = True
         self.number_in_slot = []
+        self.ST_number_in_slot = []
 
     def update_metrics(self, sim):
         """
@@ -36,6 +38,7 @@ class TreeState(object):
         self.result_array.append(sim.result)
         self.ST_result_array.append(sim.result)
         self.number_in_slot.append(sim.slot.no_collided_packets)
+        self.ST_number_in_slot.append(sim.slot.no_collided_packets)
         # Add the number of packets to statistical array for diagnosis
         sim.sim_state.arrival_stat_array.append(sim.packets_gen)
         if sim.result == 1:
@@ -60,6 +63,7 @@ class TreeState(object):
             if sim.slot.def_collision or sim.sim_param.sic:
                 # And update the simple tree result as a collision
                 self.ST_result_array.append(2)
+                self.ST_number_in_slot.append(self.ST_number_in_slot[-sim.sim_param.SPLIT])
 
 
 

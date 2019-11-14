@@ -63,6 +63,7 @@ class TreeSlot(object):
         elif feedback == 0:
             # On an idle, we find the next leaf
             sim.branch_node.next_leaf()
+            sim.branch_node.update_ghost()
             # On an idle slot, all packets reduce their count by 1 if its not a definite collision
             packetlist.dec_packet_count(sim, 1)
             # To identify if the next slot after this idle slot is a definite collision, Modified tree Tree
@@ -80,6 +81,8 @@ class TreeSlot(object):
                     self.def_collision = False
             if sim.sim_param.sic and sim.branch_node.branch_status[-1] == '0':
                 self.def_collision = True
+            if self.def_collision and sim.branch_node.branch_status[-1] != '0':
+                self.def_collision = False
             # If the modified tree algorithm is used, and we have a definite collision
             if self.def_collision:
                 # increment the count for uncollided packets
@@ -94,7 +97,7 @@ class TreeSlot(object):
             # increment the count for uncollided packets
             packetlist.inc_uncollided_packet_count(sim, sim.sim_param.SPLIT - 1)
             # If unisplit and if its the first collision
-            if sim.sim_param.unisplit and sim.tree_state.total_collisions == 0:
+            if sim.sim_param.unisplit and len(sim.tree_state.result_array) == 0:
                 packetlist.unisplit_uncollided_packet_count(sim)
                 # Split the tree with no of collided packets
                 sim.branch_node.split(self.no_collided_packets)

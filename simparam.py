@@ -16,7 +16,7 @@ class SimParam(object):
         self.seed = 7
 
         # The branching split i,e Q
-        self.SPLIT = 3
+        self.SPLIT = 2
         self.biased_split = False
         # set branching probability for binary split
         self.branchprob = 0.5
@@ -26,14 +26,14 @@ class SimParam(object):
         self.branch_biased[0] = self.branchprob
 
         # The number of packets that can be resolved in a multipacekt reception system in one slot.
-        self.K = 2
+        self.K = 1
 
         # No if runs in simstudy
         self.RUNS = 1000
 
         # The type of Resolution Algorithm
-        self.modified = False
-        self.unisplit = False
+        self.modified = True
+        self.unisplit = True
         self.sic = False
 
         # The start, stop and step size of the arrival rate when we sweep through arrival rate

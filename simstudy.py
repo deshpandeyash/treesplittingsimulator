@@ -27,9 +27,7 @@ def simulate_tree_branching():
     print(sim.branch_node.branch_array[:-1])
     print("Mean Throughput is = " + str(sim.sim_result.throughput))
     print("The Depth of the tree is: " + str(sim.sim_result.mean_tree_depth))
-    graphdisplay.displaygraph(sim.branch_node.branch_array[:-1], sim.tree_state.result_array,
-                              sim.tree_state.number_in_slot)
-    print(sim.branch_node.branch_array)
+    graphdisplay.displaygraph(sim)
 
 def simulate_simple_tree_static_multiple_runs():
     start = time.time()

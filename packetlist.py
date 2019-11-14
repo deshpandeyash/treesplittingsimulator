@@ -92,7 +92,9 @@ def unisplit_uncollided_packet_count(sim):
     """
     for j in sim.active_array:
         if j.packet_count == 0:
-            j.packet_count += np.random.randint(0, sim.slot.no_collided_packets)
+            drawn_count = np.random.randint(0, sim.slot.no_collided_packets)
+            j.packet_count += drawn_count
+            j.selected_branch = str(sim.slot.no_collided_packets - 1 - drawn_count)
 
 
 def sort_packet_array(sim):
