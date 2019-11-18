@@ -19,7 +19,7 @@ def func(x, a, b, c):
 def simulate_tree_branching():
     sim = Simulation()
     sim.reset()
-    sim.do_simulation_simple_tree_static(20)
+    sim.do_simulation_simple_tree_static(10)
     print("Results were: ")
     print(sim.tree_state.result_array)
     print("Tree Progression was: ")

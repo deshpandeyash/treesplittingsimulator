@@ -15,7 +15,7 @@ def dec_packet_count(sim, count):
 
     """
     for j in sim.active_array:
-        j.packet_count -= count
+        j.dec_count(count)
 
 
 def inc_uncollided_packet_count(sim, count):
@@ -26,75 +26,26 @@ def inc_uncollided_packet_count(sim, count):
 
     """
     for j in sim.active_array:
-        if j.packet_count > 0:
-            j.packet_count += count
+        j.inc_count(count)
 
-# Not used for now
-def inc_uncolliding_packet_count(sim, count):
+
+def split_collided_packet_count(sim):
     """
-    increments the count in the packet_count of each uncolliding packet in the packet array
-    useful when modified trees are implemented
+    performs a uniform split where each packet chooses a random slot between 0 and the number of collided packets
     :param sim: the simulation object instance
-    :param count: the count by which to increment
-
     """
+
     for j in sim.active_array:
-        if j.packet_count > 1:
-            j.packet_count += count
+        j.split(sim)
 
 
-def split_uncollided_packet_count(sim):
+def unisplit_collided_packet_count(sim):
     """
     performs a uniform split where each packet chooses a random slot between 0 and the number of collided packets
     :param sim: the simulation object instance
     """
     for j in sim.active_array:
-        if j.packet_count == 0:
-            if sim.sim_param.SPLIT == 2:
-                if sim.sim_param.biased_split:
-                    drawn_count = np.random.binomial(1, sim.sim_param.branchprob)
-                else:
-                    drawn_count = np.random.binomial(1, 0.5)
-            else:
-                if sim.sim_param.biased_split:
-                    drawn_count = np.random.choice(sim.sim_param.SPLIT, 1, p=sim.sim_param.branch_biased)
-                else:
-                    drawn_count = np.random.randint(sim.sim_param.SPLIT)
-            j.packet_count += drawn_count
-            j.selected_branch = str(sim.sim_param.SPLIT - 1 - drawn_count)
-
-
-def split_colliding_packet_count(sim):
-    """
-    performs a uniform split where each packet chooses a random slot between 0 and the number of collided packets
-    This is used when modified trees are to be implemented where we avoid a deterministic collision
-    :param sim: the simulation object instance
-    """
-
-    for j in sim.active_array:
-        if j.packet_count == 1:
-            if sim.sim_param.SPLIT == 2:
-                if sim.sim_param.biased_split:
-                    j.packet_count = 0 + np.random.binomial(1, sim.sim_param.branchprob)
-                else:
-                    j.packet_count = 0 + np.random.binomial(1, 0.5)
-            else:
-                if sim.sim_param.biased_split:
-                    j.packet_count = 0 + np.random.choice(sim.sim_param.SPLIT, 1, p=sim.sim_param.branch_biased)
-                else:
-                    j.packet_count = 0 + np.random.randint(sim.sim_param.SPLIT)
-
-
-def unisplit_uncollided_packet_count(sim):
-    """
-    performs a uniform split where each packet chooses a random slot between 0 and the number of collided packets
-    :param sim: the simulation object instance
-    """
-    for j in sim.active_array:
-        if j.packet_count == 0:
-            drawn_count = np.random.randint(0, sim.slot.no_collided_packets)
-            j.packet_count += drawn_count
-            j.selected_branch = str(sim.slot.no_collided_packets - 1 - drawn_count)
+        j.unisplit(sim)
 
 
 def sort_packet_array(sim):

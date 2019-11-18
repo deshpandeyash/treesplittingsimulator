@@ -58,7 +58,7 @@ class TreeSlot(object):
                 # We increment the count of the uncollided packets
                 packetlist.inc_uncollided_packet_count(sim, sim.sim_param.SPLIT - 1)
                 # And split the packets which might collide in the next slot
-                packetlist.split_uncollided_packet_count(sim)
+                packetlist.split_collided_packet_count(sim)
                 # Here we update the node of the of the tree according to the result,
                 sim.branch_node.split(sim.sim_param.SPLIT)
             sim.result = feedback
@@ -91,7 +91,7 @@ class TreeSlot(object):
                 # increment the count for uncollided packets
                 packetlist.inc_uncollided_packet_count(sim, sim.sim_param.SPLIT - 1)
                 # Update the counts on the collided packets according to a Q ary split
-                packetlist.split_uncollided_packet_count(sim)
+                packetlist.split_collided_packet_count(sim)
                 # Then split the tree
                 sim.branch_node.split(sim.sim_param.SPLIT)
             sim.result = feedback
@@ -101,12 +101,12 @@ class TreeSlot(object):
             packetlist.inc_uncollided_packet_count(sim, sim.sim_param.SPLIT - 1)
             # If unisplit and if its the first collision
             if sim.sim_param.unisplit and len(sim.tree_state.result_array) == 0:
-                packetlist.unisplit_uncollided_packet_count(sim)
+                packetlist.unisplit_collided_packet_count(sim)
                 # Split the tree with no of collided packets
                 sim.branch_node.split(self.no_collided_packets)
             else:
                 # Update the counts on the collided packets according to a Q-ary split
-                packetlist.split_uncollided_packet_count(sim)
+                packetlist.split_collided_packet_count(sim)
                 # On a collision split the tree
                 sim.branch_node.split(sim.sim_param.SPLIT)
             sim.result = feedback
