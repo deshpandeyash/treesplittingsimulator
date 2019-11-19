@@ -123,22 +123,22 @@ def simulate_simple_tree_dynamic_multiple_runs_gated():
 
 def do_theoretical_iter():
     param = SimParam()
-    users = range(param.K, 12)
+    users = range(2, 12)
     theoretical = []
     for n in users:
         #output = TheoreticalPlots().qarysic(n)
-        output = TheoreticalPlots().simpletree(n)
+        #output = TheoreticalPlots().simpletree(n)
+        output = TheoreticalPlots().recsicta(n)
         theoretical.append(output)
         # print(output)
     pyplot.plot(users, theoretical)
-    pyplot.hlines(0.35, param.K - 2, 12)
+    pyplot.hlines(0.6931, 2, 12)
     pyplot.show()
-    # print(TheoreticalPlots().mycomb(4,2))
 
 def print_theoretical_result():
     start = time.time()
     theoretical = TheoreticalPlots()
-    users = 30
+    users = 10
     # Equation 16 or 32- Q ary with/without SIC with multipacket k
     #print(theoretical.qarysic(users))
     # Equation 30 from SICTA paper
@@ -146,16 +146,18 @@ def print_theoretical_result():
     # Simple Tree from Massey Paper (recursive) Equation no- 3.13
     #print(theoretical.simpletree(users))
     # Equation 41 or 45 - Q ary with/without SIC with multipacket K but recursive
-    print(theoretical.recquary(users))
+    #print(theoretical.recquary(users))
+    # Equation 18 from SICTA paper
+    print(theoretical.recsicta(users))
 
 
 if __name__ == '__main__':
     # Seed for reproducibility
     # np.random.seed(7)
     # Comment and uncomment the below methods as it suits
-    simulate_tree_branching()
+    #simulate_tree_branching()
     #simulate_simple_tree_static_multiple_runs()
-    #simulate_sic_oscillations(30)
+    simulate_sic_oscillations(30)
     #simulate_simple_tree_dynamic_multiple_runs()
     # simulate_simple_tree_dynamic_multiple_runs_gated()
     #do_theoretical_iter()

@@ -34,7 +34,7 @@ class SimState(object):
         collision_slots = sim.tree_state.result_array.count(2)
         # Append all the parameters from tree state to the arrays in this class
         self.successes_array.append(sim.tree_state.total_successes)
-        self.throughput_array.append(sim.tree_state.total_successes/(sim.slot_no - sim.tree_state.first_slot))
+        self.throughput_array.append(sim.tree_state.total_successes/(sim.slot_no - sim.tree_state.first_slot +1))
         self.collision_array.append(collision_slots/(sim.slot_no - sim.tree_state.first_slot))
         self.idle_array.append(idle_slots/(sim.slot_no - sim.tree_state.first_slot))
         self.inti_collision_array.append(sim.tree_state.init_collided)

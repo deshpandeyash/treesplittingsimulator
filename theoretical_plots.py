@@ -78,8 +78,23 @@ class TheoreticalPlots(object):
             ln = ln / ((1-(pj**n))-((d-1)*(((1-pj)/(d-1))**n)))
             return ln
 
+    def binomialProb(self, n, i, pj):
+        return self.mycomb(n, i)*(pj**i)*((1-pj)**(n-i))
 
+    def recsicta(self,n):
+        pj = 0.5
+        return n / self.recsictarecursive(n, pj)
 
+    def recsictarecursive(self, n, pj):
+        if n <= 1:
+            return 1
+        else:
+            ln = 0
+            for i in range(0, n):
+                ln += (self.binomialProb(n, i, pj) + self.binomialProb(n, n-i, pj))*self.recsictarecursive(i,pj)
+            den = 1 - (pj**n) - ((1 - pj)**n)
+            ln = ln/den
+            return ln
 
 
 
