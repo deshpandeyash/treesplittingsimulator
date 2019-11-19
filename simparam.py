@@ -28,7 +28,7 @@ class SimParam(object):
         self.branch_biased[0] = self.branchprob
 
         # The number of packets that can be resolved in a multipacekt reception system in one slot.
-        self.K = 2
+        self.K = 1
 
         # No if runs in simstudy
         self.RUNS = 1000
@@ -37,6 +37,7 @@ class SimParam(object):
         self.modified = False
         self.unisplit = False
         self.sic = True
+
 
         # The start, stop and step size of the arrival rate when we sweep through arrival rate
         self.start = 0.20

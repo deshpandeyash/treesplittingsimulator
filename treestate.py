@@ -46,7 +46,7 @@ class TreeState(object):
                 self.ST_result_array.pop()
                 self.ST_number_in_slot.pop()
             if sim.slot.def_collision:
-                self.ST_number_in_slot.append('x')
+                self.ST_number_in_slot.append(sim.slot.no_in_skipped_slot)
                 self.ST_result_array.append(2)
             go_on = True
             while go_on:
@@ -69,7 +69,7 @@ class TreeState(object):
             if sim.slot.def_collision:
                 # And update the simple tree result as a collision
                 self.ST_result_array.append(2)
-                self.ST_number_in_slot.append(self.ST_number_in_slot[-sim.sim_param.SPLIT])
+                self.ST_number_in_slot.append(sim.slot.no_in_skipped_slot)
 
 
 
