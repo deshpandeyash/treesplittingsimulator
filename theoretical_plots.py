@@ -50,10 +50,10 @@ class TheoreticalPlots(object):
             for u in range(1, d + 1):
                 d_sum += pj ** i
             l = 0
-            for j in range(0, t + 1):
+            for j in range(0, t +1):
                 l += self.mycomb(i, j)*((-1)**(i-j+1))
-            ln += self.mycomb(n, i)*l*to_sub/(1-d_sum)
-        ln = 1 + ln
+            ln += self.mycomb(n, i)*l*(to_sub**0.66)/(1-d_sum)
+        ln = 1+ln
         throughput = n/ln
         return throughput/t
 

@@ -15,10 +15,10 @@ class SimParam(object):
         # number of slots to simulate
         self.SIMTIME = 10000
         # set seed for random number generation
-        self.seed = 7
+        self.seed = 21412
 
         # The branching split i,e Q
-        self.SPLIT = 3
+        self.SPLIT = 9
         self.biased_split = False
         # set branching probability for binary split
         self.branchprob = 0.5
@@ -31,7 +31,7 @@ class SimParam(object):
         self.K = 2
 
         # No if runs in simstudy
-        self.RUNS = 1000
+        self.RUNS = 100
 
         # The type of Resolution Algorithm
         self.modified = False
