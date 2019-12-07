@@ -15,6 +15,8 @@ class TreeSlot(object):
         self.packetID = []
         self.result_array = []
         self.def_collision = False
+        self.no_in_skipped_slot = 0
+
 
     def oneslotprocess(self, sim):
         """
@@ -55,6 +57,7 @@ class TreeSlot(object):
             # If SIC process is used, then
             if sim.sim_param.sic and len(sim.branch_node.branch_status) > 0 and sim.branch_node.branch_status[-1] == '0':
                 self.def_collision = True
+                self.no_in_skipped_slot = (len(packetlist.extract_tx_packets(sim)))
                 # We increment the count of the uncollided packets
                 packetlist.inc_uncollided_packet_count(sim, sim.sim_param.SPLIT - 1)
                 # And split the packets which might collide in the next slot
@@ -89,6 +92,7 @@ class TreeSlot(object):
             # If the modified tree algorithm is used, and we have a definite collision
             if self.def_collision:
                 # increment the count for uncollided packets
+                self.no_in_skipped_slot = (len(packetlist.extract_tx_packets(sim)))
                 packetlist.inc_uncollided_packet_count(sim, sim.sim_param.SPLIT - 1)
                 # Update the counts on the collided packets according to a Q ary split
                 packetlist.split_collided_packet_count(sim)

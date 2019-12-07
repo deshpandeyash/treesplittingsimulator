@@ -158,6 +158,7 @@ if __name__ == '__main__':
     #simulate_tree_branching()
     #simulate_simple_tree_static_multiple_runs()
     simulate_sic_oscillations(20)
+    #simulate_sic_oscillations(30)
     #simulate_simple_tree_dynamic_multiple_runs()
     # simulate_simple_tree_dynamic_multiple_runs_gated()
     #do_theoretical_iter()
