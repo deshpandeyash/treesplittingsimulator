@@ -12,10 +12,6 @@ import os
 os.environ["PATH"] += os.pathsep + r'C:\Users\Murat\Anaconda3\Library\bin\graphviz'
 
 
-def func(x, a, b, c):
-    return a * np.exp(-b * x) + c
-
-
 def simulate_tree_branching():
     sim = Simulation()
     sim.reset()
@@ -32,12 +28,12 @@ def simulate_simple_tree_static_multiple_runs():
     start = time.time()
     sim = Simulation()
     throughput = []
-    users = 1000
+    users = 100
     for _ in range(sim.sim_param.RUNS):
         # Reset the simulation
         sim.reset()
         sim.do_simulation_simple_tree_static(users)
-        throughput.append(sim.sim_result.throughput)
+        throughput.append(sim.sim_result.throughput/sim.sim_param.K)
         if sim.tree_state.total_successes != users:
             print("Error total successes not equal to total users")
     print("Skewness in throughput distribution is :" + str(skew(np.asarray(throughput))))
@@ -63,7 +59,7 @@ def simulate_sic_oscillations(n_stop):
             # Reset the simulation
             sim.reset()
             sim.do_simulation_simple_tree_static(n)
-            throughput.append(sim.sim_result.throughput)
+            throughput.append(sim.sim_result.throughput/sim.sim_param.K)
         throughput_array.append(np.mean(throughput))
         theoretical_out_array.append(TheoreticalPlots().qarysic(n))
     theoretical_out = TheoreticalPlots().qarysic(n_stop)
@@ -157,10 +153,10 @@ if __name__ == '__main__':
     # Comment and uncomment the below methods as it suits
     #simulate_tree_branching()
     #simulate_simple_tree_static_multiple_runs()
-    simulate_sic_oscillations(20)
+    #simulate_sic_oscillations(20)
     #simulate_sic_oscillations(30)
     #simulate_simple_tree_dynamic_multiple_runs()
-    # simulate_simple_tree_dynamic_multiple_runs_gated()
+    simulate_simple_tree_dynamic_multiple_runs_gated()
     #do_theoretical_iter()
     #print_theoretical_result()
 

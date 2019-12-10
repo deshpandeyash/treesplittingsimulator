@@ -35,6 +35,7 @@ class TheoreticalPlots(object):
         return throughput
 
     def qarysic(self, n):
+        mystery_power  = 1
         param = SimParam()
         pj = param.branchprob
         if not param.biased_split:
@@ -52,7 +53,7 @@ class TheoreticalPlots(object):
             l = 0
             for j in range(0, t +1):
                 l += self.mycomb(i, j)*((-1)**(i-j+1))
-            ln += self.mycomb(n, i)*l*(to_sub**0.66)/(1-d_sum)
+            ln += self.mycomb(n, i)*l*(to_sub**mystery_power)/(1-d_sum)
         ln = 1+ln
         throughput = n/ln
         return throughput/t
@@ -81,7 +82,7 @@ class TheoreticalPlots(object):
     def binomialProb(self, n, i, pj):
         return self.mycomb(n, i)*(pj**i)*((1-pj)**(n-i))
 
-    def recsicta(self,n):
+    def recsicta(self, n):
         pj = 0.5
         return n / self.recsictarecursive(n, pj)
 

@@ -57,7 +57,7 @@ class Simulation(object):
         """
         # Run simulation for the number of slots
         self.tree_state.reset(self)
-        for self.slot_no in range(0, self.sim_param.SIMTIME):
+        for self.slot_no in range(1, self.sim_param.SIMTIME):
             # Generate a packet according to poisson distribution
             self.packets_gen = np.random.poisson(self.sim_param.lmbda)
             # Add the number of packets to the active packet array
@@ -102,25 +102,28 @@ class Simulation(object):
 
         """
         # Run the simulation where we at least simulate for the simtime and then wait for the last tree to be resolved.
-        while len(self.active_array) > 0 or self.slot_no < self.sim_param.SIMTIME:
-            self.slot_no += 1
+        while self.tree_state.gate_open or self.slot_no < self.sim_param.SIMTIME:
             # Generate a packet according to poisson distribution
             self.packets_gen = np.random.poisson(self.sim_param.lmbda)
             # Add the packet to the queue
             if self.slot_no < self.sim_param.SIMTIME:
                 packetlist.add_packets_to_queue(self)
             # if the active array is empty i.e the tree is resolved
-            if len(self.active_array) == 0:
+            if len(self.active_array) == 0 and len(self.branch_node.branch_status) == 0:
                 # Update the Sim_state class for the previous tree
-                self.sim_state.update_metrics(self)
+                if self.slot_no != 0:
+                    self.sim_state.update_metrics(self)
                 # Transfer the queue to the active array
-                self.active_array = self.queue_array
+                packetlist.copy_queue_to_active(self)
                 # Clear the queue
                 self.queue_array = []
                 # Reset all the parameters as we start a new tree
                 self.tree_state.reset(self)
                 # Reset the branches of the tree
                 self.branch_node.reset()
+                if len(self.active_array) == 0:
+                    self.tree_state.gate_open = False
+            self.slot_no += 1
             # Simulate the processes that would happen in the tx and rx in one slot, update the active array accordingly
             self.slot.oneslotprocess(self)
             # Update the metrics in sim_state depending on the result

@@ -95,7 +95,8 @@ def add_packets_to_tree(sim):
     :param sim: the simulation object instance
     """
     for j in range(0, sim.packets_gen):
-        sim.active_array.append(Packet(sim.slot_no, sum(sim.sim_state.arrival_stat_array) + j + 1))
+        sim.active_array.append(Packet(sim.slot_no, sum(sim.sim_state.arrival_stat_array) + j + 1,
+                                       sim.branch_node.branch_status))
 
 
 def add_packets_to_queue(sim):
@@ -107,7 +108,8 @@ def add_packets_to_queue(sim):
     :return:
     """
     for j in range(0, sim.packets_gen):
-        sim.queue_array.append(Packet(sim.slot_no, sum(sim.sim_state.arrival_stat_array) + j + 1))
+        sim.queue_array.append(Packet(sim.slot_no, sum(sim.sim_state.arrival_stat_array) + j + 1,
+                                      sim.branch_node.branch_status))
 
 
 def remove_successful_packet(sim):
@@ -124,6 +126,13 @@ def remove_successful_packet(sim):
             print("Error success branch different from selected branch at split")
     return pack
 
+def copy_queue_to_active(sim):
+    for j in sim.queue_array:
+        if len(sim.branch_node.branch_status) == 0:
+            j.selected_branch = sim.branch_node.branch_status
+        else:
+            j.selected_branch = sim.branch_node.branch_status[-1]
+    sim.active_array = sim.queue_array
 
 def update_transmissions(sim):
     """

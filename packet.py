@@ -6,14 +6,17 @@ class Packet(object):
     This class is to define the functions of a packet and what its attributes should be, how it must be sorted
     """
 
-    def __init__(self, slot_number, packet_number):
+    def __init__(self, slot_number, packet_number, branch_status):
         self.packetID = packet_number
         self.packet_count = 0
         self.birth_time = slot_number
         self.life_time = 0
         self.transmissions = 0
         self.rng = numpy.random.RandomState()
-        self.selected_branch = ''
+        if len(branch_status) == 0:
+            self.selected_branch = branch_status
+        else:
+            self.selected_branch = branch_status[-1]
 
     # To better sort the array of packets
     def __cmp__(self, other):
