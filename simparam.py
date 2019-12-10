@@ -13,7 +13,7 @@ class SimParam(object):
         self.lmbda = 0.34
 
         # number of slots to simulate
-        self.SIMTIME = 1000
+        self.SIMTIME = 10000
         # set seed for random number generation
         self.seed = 21412
 
