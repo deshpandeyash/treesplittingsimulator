@@ -43,7 +43,7 @@ class SimState(object):
             self.tree_depth_array.append(0)
         else:
             self.tree_depth_array.append(len(max(sim.branch_node.branch_array[:-1], key=len)))
-        if sim.tree_state.init_collided != sim.tree_state.total_successes:
+        if (sim.tree_state.init_collided != sim.tree_state.total_successes) and not sim.freeaccess:
             print("Tree incomplete!")
         if not sim.sim_param.modified and not sim.sim_param.sic:
             if sim.tree_state.result_array != sim.tree_state.ST_result_array:

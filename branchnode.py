@@ -44,5 +44,6 @@ class BranchNode(object):
             self.ghost_array.append(self.branch_status)
 
     def update_ghost(self):
+        # Update the ghost tree
         self.ghost_array.append(self.branch_status)
 

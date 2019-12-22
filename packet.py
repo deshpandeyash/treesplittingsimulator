@@ -40,7 +40,7 @@ class Packet(object):
 
     def unisplit(self,sim):
         if self.packet_count == 0:
-            drawn_count = self.rng.random.randint(0, sim.slot.no_collided_packets)
+            drawn_count = self.rng.randint(0, sim.slot.no_collided_packets)
             self.packet_count += drawn_count
             self.selected_branch = str(sim.slot.no_collided_packets - 1 - drawn_count)
 
