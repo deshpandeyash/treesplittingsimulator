@@ -89,24 +89,27 @@ class Simulation(object):
 
         """
         # Load active array with the collided packets
-        self.packets_gen = collided_packets
-        packetlist.add_packets_to_tree(self)
-        self.tree_state.reset(self)
-        # Run the simulation as long as all packets are processed and tree is over
-        while self.tree_state.gate_open:
-            # Increment the slot
-            self.slot_no += 1
-            # Simulate the processes that would happen in the tx and rx in one slot, update the active array accordingly
-            self.slot.oneslotprocess(self)
-            # Update the simstate metrics according to the result of the simulation
-            self.tree_state.update_metrics(self)
-            # check if all the packets are processed and the tree is at its last branch
-            if len(self.active_array) == 0 and len(self.branch_node.branch_status) == 0:
-                self.tree_state.gate_open = False
-        # update the metrics from a tree to the simulation state
-        self.sim_state.update_metrics(self)
-        # Update the results
-        self.sim_result.get_result(self)
+        if collided_packets > self.sim_param.K:
+            self.packets_gen = collided_packets
+            packetlist.add_packets_to_tree(self)
+            self.tree_state.reset(self)
+            # Run the simulation as long as all packets are processed and tree is over
+            while self.tree_state.gate_open:
+                # Increment the slot
+                self.slot_no += 1
+                # Simulate the processes that would happen in the tx and rx in one slot, update the active array accordingly
+                self.slot.oneslotprocess(self)
+                # Update the simstate metrics according to the result of the simulation
+                self.tree_state.update_metrics(self)
+                # check if all the packets are processed and the tree is at its last branch
+                if len(self.active_array) == 0 and len(self.branch_node.branch_status) == 0:
+                    self.tree_state.gate_open = False
+            # update the metrics from a tree to the simulation state
+            self.sim_state.update_metrics(self)
+            # Update the results
+            self.sim_result.get_result(self)
+        else:
+            self.sim_result.throughput = 1
 
     def do_simulation_gated_access(self):
         """

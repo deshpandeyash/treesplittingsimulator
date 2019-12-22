@@ -68,7 +68,7 @@ def simulate_users(sim, setting):
         for _ in range(setting.usersweep.runs):
             # Reset the simulation
             sim.reset(setting)
-            sim.do_simulation_simple_tree_static(n)
+            sim.do_simulation_simple_tree_static(np.random.poisson(n))
             throughput.append(sim.sim_result.throughput/sim.sim_param.K)
         throughput_array.append(np.mean(throughput))
         theoretical_out_array.append(TheoreticalPlots().qarysic(n, setting))
