@@ -38,15 +38,17 @@ def simulate_simple_tree_static_multiple_runs(sim, setting):
     for _ in range(setting.statictreewindow.runs):
         # Reset the simulation
         sim.reset(setting)
-        sim.do_simulation_simple_tree_static(setting.statictreewindow.users)
+        users = np.random.poisson(setting.statictreewindow.users)
+        sim.do_simulation_simple_tree_static(users)
         throughput.append(sim.sim_result.throughput/sim.sim_param.K)
-        if sim.tree_state.total_successes != setting.statictreewindow.users:
+        if sim.tree_state.total_successes != users:
             print("Error total successes not equal to total users")
     print("Skewness in throughput distribution is :" + str(skew(np.asarray(throughput))))
     print("Mean Throughput:  " + str(np.mean(throughput)))
     pyplot.hist(throughput, density=True)
     pyplot.show()
-    print("Theoretical Throughput: " + str(TheoreticalPlots().qarysic(38, setting)))
+    print("Theoretical Throughput: " + str(TheoreticalPlots().qarysic(30, setting)))
+    print("Theoretical Throughput and Mean throughput ratio = " + str(TheoreticalPlots().qarysic(30, setting)/np.mean(throughput)))
     #print("Theoretical Throughput: " + str(TheoreticalPlots().qarysic(users)))
     end = time.time()
     print("Time for simulation: " + str(end-start))
@@ -69,6 +71,7 @@ def simulate_users(sim, setting):
             # Reset the simulation
             sim.reset(setting)
             sim.do_simulation_simple_tree_static(np.random.poisson(n))
+            #sim.do_simulation_simple_tree_static(n)
             throughput.append(sim.sim_result.throughput/sim.sim_param.K)
         throughput_array.append(np.mean(throughput))
         theoretical_out_array.append(TheoreticalPlots().qarysic(n, setting))
@@ -191,6 +194,7 @@ if __name__ == '__main__':
         print("Multiple Tests should be done by running the scrip multiple times")
         exit()
     sim = Simulation(setting)
+    sim.sim_param.print_settings()
     # Comment and uncomment the below methods as it suits
     if True not in setting.secondwindow.test_values:
         print("No Test Selected")

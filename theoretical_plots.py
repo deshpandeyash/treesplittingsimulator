@@ -20,7 +20,7 @@ class TheoreticalPlots(object):
         to_sub = d
         if param.sic:
             to_sub -= 1
-            mystery_power = 1 - pj
+            mystery_power = 1
         for i in range(t + 1, n + 1):
             d_sum = 0
             for u in range(1, d + 1):

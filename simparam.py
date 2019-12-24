@@ -17,9 +17,11 @@ class SimParam(object):
         # The branching split i,e Q
         self.SPLIT = int(setting.firstwindow.test_values[0])
         self.biased_split = setting.firstwindow.test_values[2]
-        # set branching probability for binary split
-        self.branchprob = float(setting.firstwindow.test_values[3])
-
+        if self.biased_split:
+            # set branching probability for binary split
+            self.branchprob = float(setting.firstwindow.test_values[3])
+        else:
+            self.branchprob = 1/self.SPLIT
         # Set branching probability for a split
         self.branch_biased = np.full(self.SPLIT, (1 - self.branchprob)/(self.SPLIT - 1))
         self.branch_biased[0] = self.branchprob
@@ -33,3 +35,17 @@ class SimParam(object):
         self.unisplit = setting.firstwindow.test_values[5]
         self.sic = setting.firstwindow.test_values[6]
 
+    def print_settings(self):
+        print("Q = "+ str(self.SPLIT))
+        print("K = "+ str(self.K))
+        print("Branch Prob = " + str(self.branchprob))
+        if self.biased_split:
+            print("Using Biased Split")
+        if self.modified:
+            print("Modified Tree")
+        if self.sic:
+            print("Successive Interference Cancellataion")
+        if self.unisplit:
+            print("Uniform First Split")
+        if not self.modified and not self.sic:
+            print("Simple Tree")
