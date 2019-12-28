@@ -15,6 +15,7 @@ class TreeState(object):
         self.gate_open = True
         self.number_in_slot = []
         self.ST_number_in_slot = []
+        self.magic_counter = 0
 
     def reset(self, sim):
         self.first_slot = sim.slot_no
@@ -26,6 +27,7 @@ class TreeState(object):
         self.gate_open = True
         self.number_in_slot = []
         self.ST_number_in_slot = []
+        self.magic_counter = 0
 
     def update_metrics(self, sim):
         """
@@ -70,6 +72,7 @@ class TreeState(object):
                 # And update the simple tree result as a collision
                 self.ST_result_array.append(2)
                 self.ST_number_in_slot.append(sim.slot.no_in_skipped_slot)
+        self.magic_counter = sim.slot.magic_counter
 
 
 

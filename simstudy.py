@@ -24,7 +24,9 @@ def simulate_tree_branching(sim, setting):
     print(sim.tree_state.result_array)
     print("Tree Progression was: ")
     print(sim.branch_node.branch_array[:-1])
-    print("Mean Throughput is = " + str(sim.sim_result.throughput))
+    print("Throughput is = " + str(sim.sim_result.throughput))
+    print("Theoretically it should be = " + str(TheoreticalPlots().qarysic(setting.vizwindow.users, setting)))
+    print("Magic Throughput " + str(sim.sim_result.magic_throughput))
     print("The Depth of the tree is: " + str(sim.sim_result.mean_tree_depth))
     graphdisplay.displaygraph(sim)
 
@@ -49,6 +51,7 @@ def simulate_simple_tree_static_multiple_runs(sim, setting):
     pyplot.show()
     print("Theoretical Throughput: " + str(TheoreticalPlots().qarysic(30, setting)))
     print("Theoretical Throughput and Mean throughput ratio = " + str(TheoreticalPlots().qarysic(30, setting)/np.mean(throughput)))
+    print("Magic Throughput " + str(sim.sim_result.magic_throughput))
     #print("Theoretical Throughput: " + str(TheoreticalPlots().qarysic(users)))
     end = time.time()
     print("Time for simulation: " + str(end-start))
@@ -64,20 +67,24 @@ def simulate_users(sim, setting):
     start = time.time()
     throughput_array = []
     theoretical_out_array = []
+    magic_throughput_array = []
     user_array = np.arange(sim.sim_param.K + 1, setting.usersweep.n_stop)
     for n in user_array:
         throughput = []
+        magic = []
         for _ in range(setting.usersweep.runs):
             # Reset the simulation
             sim.reset(setting)
             sim.do_simulation_simple_tree_static(np.random.poisson(n))
-            #sim.do_simulation_simple_tree_static(n)
             throughput.append(sim.sim_result.throughput/sim.sim_param.K)
+            magic.append(sim.sim_result.magic_throughput/sim.sim_param.K)
         throughput_array.append(np.mean(throughput))
+        magic_throughput_array.append(np.mean(magic))
         theoretical_out_array.append(TheoreticalPlots().qarysic(n, setting))
     theoretical_out = TheoreticalPlots().qarysic(setting.usersweep.n_stop, setting)
     pyplot.plot(user_array, throughput_array,  'b-', label='simulation')
     pyplot.plot(user_array, theoretical_out_array, 'r', label='theoretical')
+    pyplot.plot(user_array, magic_throughput_array, 'g', label='Magic')
     #pyplot.hlines(theoretical_out, sim.sim_param.K, n_stop, colors='green', label='Steady State')
     pyplot.legend()
     end = time.time()

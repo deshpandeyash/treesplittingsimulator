@@ -17,6 +17,8 @@ class TreeSlot(object):
         self.def_collision = False
         self.no_in_skipped_slot = 0
 
+        self.magic_counter = 0
+
 
     def oneslotprocess(self, sim):
         """
@@ -188,6 +190,7 @@ class TreeSlot(object):
                     sim.tree_state.ST_result_array.append(1)
                     sim.tree_state.ST_number_in_slot.append('x')
                 ###################### Until Here
+                self.magic_counter += red_count - 1
                 # Delete this collision
                 del self.collided_array[-1]
                 del self.collided_node_array[-1]

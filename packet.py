@@ -27,12 +27,12 @@ class Packet(object):
         if self.packet_count == 0:
             if sim.sim_param.SPLIT == 2:
                 if sim.sim_param.biased_split:
-                    drawn_count = self.rng.binomial(1, sim.sim_param.branchprob)
+                    drawn_count = self.rng.binomial(1, 1 - sim.sim_param.branchprob)
                 else:
                     drawn_count = self.rng.binomial(1, 0.5)
             else:
                 if sim.sim_param.biased_split:
-                    drawn_count = self.rng.random.choice(sim.sim_param.SPLIT, 1, p=sim.sim_param.branch_biased)
+                    drawn_count = self.rng.choice(sim.sim_param.SPLIT, 1, p=sim.sim_param.branch_biased)[0]
                 else:
                     drawn_count = self.rng.randint(sim.sim_param.SPLIT)
             self.packet_count += drawn_count

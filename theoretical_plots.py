@@ -31,7 +31,10 @@ class TheoreticalPlots(object):
             ln += self.mycomb(n, i) * l * (to_sub ** mystery_power) / (1 - d_sum)
         ln = 1 + ln
         throughput = n / ln
-        return throughput / t
+        if n > t:
+            return throughput / t
+        else:
+            return 1
 
     # Non Recursive Equation from SICTA paper
     def sicta(self, n, setting):

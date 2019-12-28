@@ -16,6 +16,8 @@ class SimState(object):
         self.throughput_array = []
         self.tree_depth_array = []
 
+        self.magic_throughput = []
+
     def reset(self):
         self.delay_stat_array = []
         self.arrival_stat_array = []
@@ -28,6 +30,8 @@ class SimState(object):
         self.throughput_array = []
         self.tree_depth_array = []
 
+        self.magic_throughput = []
+
     def update_metrics(self, sim):
         success_slots = sim.tree_state.result_array.count(1)
         idle_slots = sim.tree_state.result_array.count(0)
@@ -35,6 +39,7 @@ class SimState(object):
         # Append all the parameters from tree state to the arrays in this class
         self.successes_array.append(sim.tree_state.total_successes)
         self.throughput_array.append((sim.tree_state.total_successes/(sim.slot_no - sim.tree_state.first_slot)))
+        self.magic_throughput.append((sim.tree_state.total_successes/(sim.slot_no - sim.tree_state.first_slot + sim.tree_state.magic_counter)))
         self.collision_array.append(collision_slots/(sim.slot_no - sim.tree_state.first_slot))
         self.idle_array.append(idle_slots/(sim.slot_no - sim.tree_state.first_slot))
         self.inti_collision_array.append(sim.tree_state.init_collided)
