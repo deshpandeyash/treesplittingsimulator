@@ -109,7 +109,10 @@ class Simulation(object):
             # Update the results
             self.sim_result.get_result(self)
         else:
-            self.sim_result.throughput = 1
+            self.sim_result.throughput = 0
+            self.sim_result.magic_throughput = 0
+
+
 
     def do_simulation_gated_access(self):
         """

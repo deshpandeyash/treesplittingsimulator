@@ -73,7 +73,8 @@ class TreeState(object):
                 self.ST_result_array.append(2)
                 self.ST_number_in_slot.append(sim.slot.no_in_skipped_slot)
         self.magic_counter = sim.slot.magic_counter
-
+        if sim.sim_param.SPLIT == 2 and self.magic_counter > 0:
+            print("Magic Counter error")
 
 
 

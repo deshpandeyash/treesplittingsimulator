@@ -54,3 +54,6 @@ class SimResult(object):
         self.mean_tree_depth = np.mean(sim.sim_state.tree_depth_array)
 
         self.magic_throughput = np.mean(sim.sim_state.magic_throughput)
+        if sim.sim_param.SPLIT == 2:
+            if self.magic_throughput != self.throughput:
+                print("Magic Throughput Error!")

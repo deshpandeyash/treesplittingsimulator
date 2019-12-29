@@ -30,6 +30,7 @@ class TreeSlot(object):
         """
         # this parameter is changed to the result of the transmission feedback
         sim.result = 0
+        #self.magic_counter = 0
         if len(sim.active_array) > 0:
             # Sort the array in ascending order
             packetlist.sort_packet_array(sim)
