@@ -13,9 +13,15 @@ class Simulation(object):
     This Holds the entire Simulation object, whose parameters we update according to the outcomes
     """
 
-    def __init__(self):
+    def __init__(self, setting):
         # Load simulation parameters
-        self.sim_param = SimParam()
+        self.sim_param = SimParam(setting)
+        # Load simtime
+        if setting.dynamictest:
+            self.SIMTIME = setting.dynamictest.simtime
+        self.freeaccess = False
+        if setting.secondwindow.test_values[3]:
+            self.freeaccess = True
         # Load the simulation state parameters
         self.sim_state = SimState()
         # Load the result parameters
@@ -37,8 +43,14 @@ class Simulation(object):
         # Load the parameters for single tree resolution
         self.tree_state = TreeState(self)
 
-    def reset(self):
-        self.sim_param = SimParam()
+
+    def reset(self, setting):
+        self.sim_param = SimParam(setting)
+        if setting.dynamictest:
+            self.SIMTIME = setting.dynamictest.simtime
+        self.freeaccess = False
+        if setting.secondwindow.test_values[3]:
+            self.freeaccess = True
         self.sim_state = SimState()
         self.sim_result = SimResult()
         self.slot = TreeSlot()
@@ -57,7 +69,7 @@ class Simulation(object):
         """
         # Run simulation for the number of slots
         self.tree_state.reset(self)
-        for self.slot_no in range(0, self.sim_param.SIMTIME):
+        for self.slot_no in range(1, self.SIMTIME):
             # Generate a packet according to poisson distribution
             self.packets_gen = np.random.poisson(self.sim_param.lmbda)
             # Add the number of packets to the active packet array
@@ -77,21 +89,30 @@ class Simulation(object):
 
         """
         # Load active array with the collided packets
-        self.packets_gen = collided_packets
-        packetlist.add_packets_to_tree(self)
-        self.tree_state.reset(self)
-        # Run the simulation as long as all packets are processed
-        while len(self.active_array) != 0:
-            # Increment the slot
-            self.slot_no += 1
-            # Simulate the processes that would happen in the tx and rx in one slot, update the active array accordingly
-            self.slot.oneslotprocess(self)
-            # Update the simstate metric according to the result of the simulation
-            self.tree_state.update_metrics(self)
-        # update the metrics from a tree to the simulation state
-        self.sim_state.update_metrics(self)
-        # Update the results
-        self.sim_result.get_result(self)
+        if collided_packets > self.sim_param.K:
+            self.packets_gen = collided_packets
+            packetlist.add_packets_to_tree(self)
+            self.tree_state.reset(self)
+            # Run the simulation as long as all packets are processed and tree is over
+            while self.tree_state.gate_open:
+                # Increment the slot
+                self.slot_no += 1
+                # Simulate the processes that would happen in the tx and rx in one slot, update the active array accordingly
+                self.slot.oneslotprocess(self)
+                # Update the simstate metrics according to the result of the simulation
+                self.tree_state.update_metrics(self)
+                # check if all the packets are processed and the tree is at its last branch
+                if len(self.active_array) == 0 and len(self.branch_node.branch_status) == 0:
+                    self.tree_state.gate_open = False
+            # update the metrics from a tree to the simulation state
+            self.sim_state.update_metrics(self)
+            # Update the results
+            self.sim_result.get_result(self)
+        else:
+            self.sim_result.throughput = 0
+            self.sim_result.magic_throughput = 0
+
+
 
     def do_simulation_gated_access(self):
         """
@@ -99,25 +120,28 @@ class Simulation(object):
 
         """
         # Run the simulation where we at least simulate for the simtime and then wait for the last tree to be resolved.
-        while len(self.active_array) > 0 or self.slot_no < self.sim_param.SIMTIME:
-            self.slot_no += 1
+        while self.tree_state.gate_open or self.slot_no < self.SIMTIME:
             # Generate a packet according to poisson distribution
             self.packets_gen = np.random.poisson(self.sim_param.lmbda)
             # Add the packet to the queue
-            if self.slot_no < self.sim_param.SIMTIME:
+            if self.slot_no < self.SIMTIME:
                 packetlist.add_packets_to_queue(self)
             # if the active array is empty i.e the tree is resolved
-            if len(self.active_array) == 0:
+            if len(self.active_array) == 0 and len(self.branch_node.branch_status) == 0:
                 # Update the Sim_state class for the previous tree
-                self.sim_state.update_metrics(self)
+                if self.slot_no != 0:
+                    self.sim_state.update_metrics(self)
                 # Transfer the queue to the active array
-                self.active_array = self.queue_array
+                packetlist.copy_queue_to_active(self)
                 # Clear the queue
                 self.queue_array = []
                 # Reset all the parameters as we start a new tree
                 self.tree_state.reset(self)
                 # Reset the branches of the tree
                 self.branch_node.reset()
+                if len(self.active_array) == 0:
+                    self.tree_state.gate_open = False
+            self.slot_no += 1
             # Simulate the processes that would happen in the tx and rx in one slot, update the active array accordingly
             self.slot.oneslotprocess(self)
             # Update the metrics in sim_state depending on the result

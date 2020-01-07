@@ -12,6 +12,10 @@ class TreeState(object):
         # IF it was a simple tree, this would have been a result array. Its useful when we have to look for definite
         # collisions
         self.ST_result_array = []
+        self.gate_open = True
+        self.number_in_slot = []
+        self.ST_number_in_slot = []
+        self.magic_counter = 0
 
     def reset(self, sim):
         self.first_slot = sim.slot_no
@@ -20,6 +24,10 @@ class TreeState(object):
         self.result_array = []
         self.ST_result_array = []
         self.last_slot = 0
+        self.gate_open = True
+        self.number_in_slot = []
+        self.ST_number_in_slot = []
+        self.magic_counter = 0
 
     def update_metrics(self, sim):
         """
@@ -31,9 +39,17 @@ class TreeState(object):
         # Update the result of the slot in the result array
         self.result_array.append(sim.result)
         self.ST_result_array.append(sim.result)
+        self.number_in_slot.append(sim.slot.no_collided_packets)
+        self.ST_number_in_slot.append(sim.slot.no_collided_packets)
         # Add the number of packets to statistical array for diagnosis
         sim.sim_state.arrival_stat_array.append(sim.packets_gen)
         if sim.result == 1:
+            if sim.sim_param.sic:
+                self.ST_result_array.pop()
+                self.ST_number_in_slot.pop()
+            if sim.slot.def_collision:
+                self.ST_number_in_slot.append(sim.slot.no_in_skipped_slot)
+                self.ST_result_array.append(2)
             go_on = True
             while go_on:
                 # If the 0 th element of the active array is less than 0, it mans that packet is resolved, hence remove
@@ -52,10 +68,13 @@ class TreeState(object):
                 else:
                     go_on = False
         elif sim.result == 0:
-            if sim.slot.def_collision or sim.sim_param.sic:
+            if sim.slot.def_collision:
                 # And update the simple tree result as a collision
                 self.ST_result_array.append(2)
-
+                self.ST_number_in_slot.append(sim.slot.no_in_skipped_slot)
+        self.magic_counter = sim.slot.magic_counter
+        if sim.sim_param.SPLIT == 2 and self.magic_counter > 0:
+            print("Magic Counter error")
 
 
 

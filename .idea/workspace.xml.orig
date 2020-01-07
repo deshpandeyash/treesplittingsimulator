@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-<<<<<<< HEAD
-    <list default="true" id="f762528b-3f0e-4ee4-a1e3-737e12756752" name="Default Changelist" comment="Dynamic Simlation now stable, different approach to SIC now starting" />
-=======
     <list default="true" id="f762528b-3f0e-4ee4-a1e3-737e12756752" name="Default Changelist" comment="Dynamic Simlation now stable, different approach to SIC now starting">
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/multipacket-tree-resolution.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/multipacket-tree-resolution.iml" afterDir="false" />
@@ -15,7 +12,6 @@
 =======
 >>>>>>> b348c152b01ee9dd4771eaed7668472bb0618c37
     </list>
->>>>>>> c529ebd33b30ed0341676d133d34097385bb2573
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -341,10 +337,6 @@
       <workItem from="1569320269950" duration="7338000" />
       <workItem from="1569419834062" duration="5515000" />
       <workItem from="1569441901764" duration="2702000" />
-<<<<<<< HEAD
-      <workItem from="1569498970905" duration="2126000" />
-      <workItem from="1572961856950" duration="76000" />
-=======
       <workItem from="1569498970905" duration="5917000" />
       <workItem from="1569513977392" duration="131000" />
       <workItem from="1569580445867" duration="14762000" />
@@ -370,12 +362,8 @@
       <workItem from="1572949248835" duration="377000" />
       <workItem from="1572955543662" duration="2176000" />
       <workItem from="1572961103232" duration="6000" />
-<<<<<<< HEAD
->>>>>>> c529ebd33b30ed0341676d133d34097385bb2573
-=======
       <workItem from="1572962906012" duration="6818000" />
       <workItem from="1573075229317" duration="3813000" />
->>>>>>> devsimpletree
     </task>
     <servers />
   </component>

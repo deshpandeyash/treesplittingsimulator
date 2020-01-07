@@ -1,0 +1,24 @@
+// Simple Tree
+digraph {
+	edge [fontcolor=green]
+	compound=true
+	Start [label=10 shape=doublecircle xlabel=2]
+	2 [label=3 xlabel=2]
+	Start -> 2 [label=2]
+	22 [label=2 xlabel=1]
+	21 [label=x fillcolor=red style=filled xlabel=1]
+	20 [label=x fillcolor=red style=filled xlabel=1]
+	1 [label=1 xlabel=1]
+	Start -> 1 [label=1]
+	0 [label=x fillcolor=red style=filled xlabel=2]
+	Start -> 0 [label=0]
+	02 [label=2 xlabel=1]
+	01 [label=2 xlabel=1]
+	00 [label=x fillcolor=red style=filled xlabel=1]
+	2 -> 22 [label=22]
+	2 -> 21 [label=21]
+	2 -> 20 [label=20]
+	0 -> 02 [label=02]
+	0 -> 01 [label=01]
+	0 -> 00 [label=00]
+}

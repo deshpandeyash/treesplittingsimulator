@@ -1,52 +1,51 @@
 import numpy as np
+
+
 class SimParam(object):
 
     """
     Contains all important simulation parameters
     """
 
-    def __init__(self):
+    def __init__(self, setting):
 
         # current buffer spaces and minimal buffer spaces
         self.lmbda = 0.34
 
-        # number of slots to simulate
-        self.SIMTIME = 10000
         # set seed for random number generation
-        self.seed = 7
 
         # The branching split i,e Q
-        self.SPLIT = 2
-        self.biased_split = False
-        # set branching probability for binary split
-        self.branchprob = 0.5
-
+        self.SPLIT = int(setting.firstwindow.test_values[0])
+        self.biased_split = setting.firstwindow.test_values[2]
+        if self.biased_split:
+            # set branching probability for binary split
+            self.branchprob = float(setting.firstwindow.test_values[3])
+        else:
+            self.branchprob = 1/self.SPLIT
         # Set branching probability for a split
         self.branch_biased = np.full(self.SPLIT, (1 - self.branchprob)/(self.SPLIT - 1))
         self.branch_biased[0] = self.branchprob
 
         # The number of packets that can be resolved in a multipacekt reception system in one slot.
-        self.K = 6
+        self.K = int(setting.firstwindow.test_values[1])
 
-        # No if runs in simstudy
-        self.RUNS = 1000
 
         # The type of Resolution Algorithm
-        self.modified = True
-        self.unisplit = False
-        self.sic = True
+        self.modified = setting.firstwindow.test_values[4]
+        self.unisplit = setting.firstwindow.test_values[5]
+        self.sic = setting.firstwindow.test_values[6]
 
-        # The start, stop and step size of the arrival rate when we sweep through arrival rate
-        self.start = 0.20
-        self.stop = 0.60
-        self.step = 0.05
-
-    def print_sim_config(self):
-        """
-        Print a basic system configuration string.
-        """
-        print("simulaiton Parameters are: ")
-        print("Arrival Rate, Lambda = " + str(self.lmbda))
-        print("No of runs = " + str(self.SIMTIME))
-        print("Random Number seed = " + str(self.seed))
-        print("Number of runs = " + str(self.RUNS))
+    def print_settings(self):
+        print("Q = "+ str(self.SPLIT))
+        print("K = "+ str(self.K))
+        print("Branch Prob = " + str(self.branchprob))
+        if self.biased_split:
+            print("Using Biased Split")
+        if self.modified:
+            print("Modified Tree")
+        if self.sic:
+            print("Successive Interference Cancellataion")
+        if self.unisplit:
+            print("Uniform First Split")
+        if not self.modified and not self.sic:
+            print("Simple Tree")

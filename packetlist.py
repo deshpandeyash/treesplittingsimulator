@@ -15,80 +15,37 @@ def dec_packet_count(sim, count):
 
     """
     for j in sim.active_array:
-        j.packet_count -= count
+        j.dec_count(count)
 
 
 def inc_uncollided_packet_count(sim, count):
     """
     increments the count in the packet_count of each uncollided packet in the packet array
     :param sim: the simulation object instance
+    :param count: decrement by this count
 
     """
     for j in sim.active_array:
-        if j.packet_count > 0:
-            j.packet_count += count
+        j.inc_count(count)
 
 
-def inc_uncolliding_packet_count(sim, count):
-    """
-    increments the count in the packet_count of each uncolliding packet in the packet array
-    useful when modified trees are implemented
-    :param sim: the simulation object instance
-
-    """
-    for j in sim.active_array:
-        if j.packet_count > 1:
-            j.packet_count += count
-
-
-def split_uncollided_packet_count(sim):
+def split_collided_packet_count(sim):
     """
     performs a uniform split where each packet chooses a random slot between 0 and the number of collided packets
     :param sim: the simulation object instance
     """
 
     for j in sim.active_array:
-        if j.packet_count == 0:
-            if sim.sim_param.SPLIT == 2:
-                if sim.sim_param.biased_split:
-                    j.packet_count += np.random.binomial(1, sim.sim_param.branchprob)
-                else:
-                    j.packet_count += np.random.binomial(1, 0.5)
-            else:
-                if sim.sim_param.biased_split:
-                    j.packet_count += np.random.choice(sim.sim_param.SPLIT, 1, p=sim.sim_param.branch_biased)
-                else:
-                    j.packet_count += np.random.randint(sim.sim_param.SPLIT)
-
-def split_colliding_packet_count(sim):
-    """
-    performs a uniform split where each packet chooses a random slot between 0 and the number of collided packets
-    This is used when modified trees are to be implemented where we avoid a deterministic collision
-    :param sim: the simulation object instance
-    """
-
-    for j in sim.active_array:
-        if j.packet_count == 1:
-            if sim.sim_param.SPLIT == 2:
-                if sim.sim_param.biased_split:
-                    j.packet_count = 0 + np.random.binomial(1, sim.sim_param.branchprob)
-                else:
-                    j.packet_count = 0 + np.random.binomial(1, 0.5)
-            else:
-                if sim.sim_param.biased_split:
-                    j.packet_count = 0 + np.random.choice(sim.sim_param.SPLIT, 1, p=sim.sim_param.branch_biased)
-                else:
-                    j.packet_count = 0 + np.random.randint(sim.sim_param.SPLIT)
+        j.split(sim)
 
 
-def unisplit_uncollided_packet_count(sim):
+def unisplit_collided_packet_count(sim):
     """
     performs a uniform split where each packet chooses a random slot between 0 and the number of collided packets
     :param sim: the simulation object instance
     """
     for j in sim.active_array:
-        if j.packet_count == 0:
-            j.packet_count += np.random.randint(0, sim.slot.no_collided_packets)
+        j.unisplit(sim)
 
 
 def sort_packet_array(sim):
@@ -138,7 +95,8 @@ def add_packets_to_tree(sim):
     :param sim: the simulation object instance
     """
     for j in range(0, sim.packets_gen):
-        sim.active_array.append(Packet(sim.slot_no, sum(sim.sim_state.arrival_stat_array) + j + 1))
+        sim.active_array.append(Packet(sim.slot_no, sum(sim.sim_state.arrival_stat_array) + j + 1,
+                                       sim.branch_node.branch_status))
 
 
 def add_packets_to_queue(sim):
@@ -150,7 +108,8 @@ def add_packets_to_queue(sim):
     :return:
     """
     for j in range(0, sim.packets_gen):
-        sim.queue_array.append(Packet(sim.slot_no, sum(sim.sim_state.arrival_stat_array) + j + 1))
+        sim.queue_array.append(Packet(sim.slot_no, sum(sim.sim_state.arrival_stat_array) + j + 1,
+                                      sim.branch_node.branch_status))
 
 
 def remove_successful_packet(sim):
@@ -162,8 +121,18 @@ def remove_successful_packet(sim):
 
     pack = sim.active_array.pop(0)
     pack.life_time = sim.slot_no - pack.birth_time
+    if not sim.sim_param.sic:
+        if pack.selected_branch != sim.branch_node.success_branch:
+            print("Error success branch different from selected branch at split")
     return pack
 
+def copy_queue_to_active(sim):
+    for j in sim.queue_array:
+        if len(sim.branch_node.branch_status) == 0:
+            j.selected_branch = sim.branch_node.branch_status
+        else:
+            j.selected_branch = sim.branch_node.branch_status[-1]
+    sim.active_array = sim.queue_array
 
 def update_transmissions(sim):
     """

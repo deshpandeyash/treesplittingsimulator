@@ -9,14 +9,18 @@ class BranchNode(object):
         self.branch_array = []
         # Keeps the current node you are on
         self.branch_status = ''
+        self.success_branch = ''
+        self.ghost_array = []
 
     def reset(self):
         self.branch_array = []
         self.branch_status = ''
+        self.success_branch = ''
+        self.ghost_array = []
 
-    def split(self, Q):
+    def split(self, q):
         # A split will split the node to Q branches,  the branch to the rightmost ( Q-1 )th branch
-        self.branch_status = self.branch_status + str(Q - 1)
+        self.branch_status = self.branch_status + str(q - 1)
 
     def next_leaf(self):
         """
@@ -36,4 +40,10 @@ class BranchNode(object):
     def update_array(self):
         # Update the array to keep track of the tree
         self.branch_array.append(self.branch_status)
+        if self.branch_status not in self.ghost_array:
+            self.ghost_array.append(self.branch_status)
+
+    def update_ghost(self):
+        # Update the ghost tree
+        self.ghost_array.append(self.branch_status)
 
