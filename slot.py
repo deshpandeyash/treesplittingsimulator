@@ -88,10 +88,11 @@ class TreeSlot(object):
                         self.def_collision = False
                 if sim.sim_param.sic:
                     self.def_collision = False
-            if sim.sim_param.sic and sim.branch_node.branch_status[-1] == '0':
-                self.def_collision = True
-            if self.def_collision and sim.branch_node.branch_status[-1] != '0':
-                self.def_collision = False
+            if len(sim.branch_node.branch_status) > 0:
+                if sim.sim_param.sic and sim.branch_node.branch_status[-1] == '0':
+                    self.def_collision = True
+                if self.def_collision and sim.branch_node.branch_status[-1] != '0':
+                    self.def_collision = False
             # If the modified tree algorithm is used, and we have a definite collision
             if self.def_collision:
                 # increment the count for uncollided packets

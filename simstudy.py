@@ -6,7 +6,7 @@ from theoretical_plots import TheoreticalPlots
 from simparam import SimParam
 from scipy.stats import skew
 import graphdisplay
-
+from graphviz import Digraph
 from simsetting import SimSetting
 
 import os
@@ -16,15 +16,18 @@ def simulate_tree_branching(sim, setting):
     To get the vizualization of 1 tree for the given settings and number of users as defined by simsettings and simparam
     also prints the obtained throughput, tree progression, result progression and tree depth
     """
+    if os.environ.get('graphviz-2.38')  is None:
+        print("Graphviz is not in the path")
+
+
     # os.environ["PATH"] += os.pathsep + r'C:\Users\Murat\Anaconda3\Library\bin\graphviz'
-    os.environ["PATH"] += os.pathsep + r'C:\Users\deshp\Anaconda3\Library\bin\graphviz'
     sim.reset(setting)
     sim.do_simulation_simple_tree_static(setting.vizwindow.users)
     print("Results were: ")
     print(sim.tree_state.result_array)
     print("Tree Progression was: ")
     print(sim.branch_node.branch_array[:-1])
-    print("Throughput is = " + str(sim.sim_result.throughput))
+    print("Throughput is = " + str(sim.sim_result.throughput/sim.sim_param.K))
     print("Theoretically it should be = " + str(TheoreticalPlots().qarysic(setting.vizwindow.users, setting)))
     print("Magic Throughput " + str(sim.sim_result.magic_throughput))
     print("The Depth of the tree is: " + str(sim.sim_result.mean_tree_depth))
@@ -37,21 +40,24 @@ def simulate_simple_tree_static_multiple_runs(sim, setting):
     """
     start = time.time()
     throughput = []
+    magic_throughput = []
     for _ in range(setting.statictreewindow.runs):
         # Reset the simulation
         sim.reset(setting)
         users = np.random.poisson(setting.statictreewindow.users)
         sim.do_simulation_simple_tree_static(users)
         throughput.append(sim.sim_result.throughput/sim.sim_param.K)
+        magic_throughput.append(sim.sim_result.magic_throughput/sim.sim_param.K)
         if sim.tree_state.total_successes != users:
             print("Error total successes not equal to total users")
+    print("Standard Deviation is : " + str(np.std(np.asarray(throughput))))
     print("Skewness in throughput distribution is :" + str(skew(np.asarray(throughput))))
     print("Mean Throughput:  " + str(np.mean(throughput)))
     pyplot.hist(throughput, density=True)
-    pyplot.show()
+    pyplot.xlabel("Throughput")
     print("Theoretical Throughput: " + str(TheoreticalPlots().qarysic(30, setting)))
     print("Theoretical Throughput and Mean throughput ratio = " + str(TheoreticalPlots().qarysic(30, setting)/np.mean(throughput)))
-    print("Magic Throughput " + str(sim.sim_result.magic_throughput))
+    print("Magic Throughput " + str(np.mean(magic_throughput)))
     #print("Theoretical Throughput: " + str(TheoreticalPlots().qarysic(users)))
     end = time.time()
     print("Time for simulation: " + str(end-start))
@@ -76,6 +82,7 @@ def simulate_users(sim, setting):
             # Reset the simulation
             sim.reset(setting)
             sim.do_simulation_simple_tree_static(np.random.poisson(n))
+            #sim.do_simulation_simple_tree_static(n)
             throughput.append(sim.sim_result.throughput/sim.sim_param.K)
             magic.append(sim.sim_result.magic_throughput/sim.sim_param.K)
         throughput_array.append(np.mean(throughput))
@@ -84,8 +91,12 @@ def simulate_users(sim, setting):
     theoretical_out = TheoreticalPlots().qarysic(setting.usersweep.n_stop, setting)
     pyplot.plot(user_array, throughput_array,  'b-', label='simulation')
     pyplot.plot(user_array, theoretical_out_array, 'r', label='theoretical')
-    pyplot.plot(user_array, magic_throughput_array, 'g', label='Magic')
+    print("Max THeoretical throughput is " + str(max(theoretical_out_array)) + " at Users "
+          + str(user_array[theoretical_out_array.index(max(theoretical_out_array))]))
+    pyplot.plot(user_array, magic_throughput_array, 'g', label='Right Skipped Simulation')
     #pyplot.hlines(theoretical_out, sim.sim_param.K, n_stop, colors='green', label='Steady State')
+    pyplot.xlabel("Mean Users")
+    pyplot.ylabel("Throughput")
     pyplot.legend()
     end = time.time()
     print("Time for simulation: ")
