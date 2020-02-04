@@ -4,6 +4,7 @@ class BranchNode(object):
     Currently the easiest method seems to be to keep it in a string. This process is not iterative right now.
 
     """
+
     def __init__(self):
         # Keeps the movement of the tree in array
         self.branch_array = []
@@ -46,4 +47,3 @@ class BranchNode(object):
     def update_ghost(self):
         # Update the ghost tree
         self.ghost_array.append(self.branch_status)
-

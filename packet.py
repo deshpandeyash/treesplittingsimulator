@@ -38,7 +38,7 @@ class Packet(object):
             self.packet_count += drawn_count
             self.selected_branch = str(sim.sim_param.SPLIT - 1 - drawn_count)
 
-    def unisplit(self,sim):
+    def unisplit(self, sim):
         if self.packet_count == 0:
             drawn_count = self.rng.randint(0, sim.slot.no_collided_packets)
             self.packet_count += drawn_count
@@ -50,5 +50,3 @@ class Packet(object):
 
     def dec_count(self, count):
         self.packet_count -= count
-
-

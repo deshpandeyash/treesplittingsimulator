@@ -6,7 +6,7 @@ from theoretical_plots import TheoreticalPlots
 from simparam import SimParam
 from scipy.stats import skew
 import graphdisplay
-from graphviz import Digraph
+from make_stat import mean_confidence_interval, plot_conf_interval
 from simsetting import SimSetting
 
 import os
@@ -39,29 +39,46 @@ def simulate_simple_tree_static_multiple_runs(sim, setting):
     theoretical throughput
     """
     start = time.time()
-    throughput = []
-    magic_throughput = []
-    for _ in range(setting.statictreewindow.runs):
-        # Reset the simulation
-        sim.reset(setting)
-        users = np.random.poisson(setting.statictreewindow.users)
-        sim.do_simulation_simple_tree_static(users)
-        throughput.append(sim.sim_result.throughput/sim.sim_param.K)
-        magic_throughput.append(sim.sim_result.magic_throughput/sim.sim_param.K)
-        if sim.tree_state.total_successes != users:
-            print("Error total successes not equal to total users")
+    conf_intervals = []
+    for j in range(10):
+        throughput = []
+        magic_throughput = []
+        for _ in range(setting.statictreewindow.runs):
+            # Reset the simulation
+            sim.reset(setting)
+            users = np.random.poisson(setting.statictreewindow.users)
+            sim.do_simulation_simple_tree_static(users)
+            throughput.append(sim.sim_result.throughput/sim.sim_param.K)
+            magic_throughput.append(sim.sim_result.magic_throughput/sim.sim_param.K)
+            if sim.tree_state.total_successes != users:
+                print("Error total successes not equal to total users")
+        conf_mean, conf_min, conf_max = mean_confidence_interval(throughput, 0.95)
+        conf_intervals.append((conf_min,conf_max))
     print("Standard Deviation is : " + str(np.std(np.asarray(throughput))))
     print("Skewness in throughput distribution is :" + str(skew(np.asarray(throughput))))
     print("Mean Throughput:  " + str(np.mean(throughput)))
-    pyplot.hist(throughput, density=True)
-    pyplot.xlabel("Throughput")
-    print("Theoretical Throughput: " + str(TheoreticalPlots().qarysic(30, setting)))
-    print("Theoretical Throughput and Mean throughput ratio = " + str(TheoreticalPlots().qarysic(30, setting)/np.mean(throughput)))
+    theoretical_throughput = TheoreticalPlots().qarysic(30, setting)
+    print("Theoretical Throughput: " + str(theoretical_throughput))
+    print("Theoretical Throughput and Mean throughput ratio = " + str(theoretical_throughput/np.mean(throughput)))
     print("Magic Throughput " + str(np.mean(magic_throughput)))
+    print("Confidence Intervals : " + str(conf_min) + " , " + str(conf_max))
     #print("Theoretical Throughput: " + str(TheoreticalPlots().qarysic(users)))
+    bin_height, bin_boundary = np.histogram(throughput, density=True)
+    width = bin_boundary[1] - bin_boundary[0]
+    bin_height = bin_height / float(sum(bin_height))
+    pyplot.bar(bin_boundary[:-1], bin_height, width=width)
+    #pyplot.hist(throughput, density=True)
+    pyplot.vlines(theoretical_throughput, 0, max(bin_height), colors='r', label='Theoretical Throughput')
+    pyplot.vlines(conf_min, 0, max(bin_height), colors='y', label='Conf Intervals')
+    pyplot.vlines(conf_max, 0, max(bin_height), colors='y')
+    pyplot.xlabel("Throughput")
+    pyplot.legend()
+    pyplot.savefig('K' + str(sim.sim_param.K) + 'Q' + str(sim.sim_param.SPLIT) + 'histogram_static.png', dpi=300)
     end = time.time()
     print("Time for simulation: " + str(end-start))
     pyplot.show()
+    plot_conf_interval(conf_intervals,theoretical_mean=0.368)
+
 
 
 def simulate_users(sim, setting):
@@ -88,11 +105,13 @@ def simulate_users(sim, setting):
         throughput_array.append(np.mean(throughput))
         magic_throughput_array.append(np.mean(magic))
         theoretical_out_array.append(TheoreticalPlots().qarysic(n, setting))
+        #theoretical_out_array.append(TheoreticalPlots().qsicta(n, setting))
     theoretical_out = TheoreticalPlots().qarysic(setting.usersweep.n_stop, setting)
     pyplot.plot(user_array, throughput_array,  'b-', label='simulation')
     pyplot.plot(user_array, theoretical_out_array, 'r', label='theoretical')
-    print("Max THeoretical throughput is " + str(max(theoretical_out_array)) + " at Users "
+    print("Max Theoretical throughput is " + str(max(theoretical_out_array)) + " at Users "
           + str(user_array[theoretical_out_array.index(max(theoretical_out_array))]))
+    print("Steady State Theoretical Value = " + str(theoretical_out))
     pyplot.plot(user_array, magic_throughput_array, 'g', label='Right Skipped Simulation')
     #pyplot.hlines(theoretical_out, sim.sim_param.K, n_stop, colors='green', label='Steady State')
     pyplot.xlabel("Mean Users")
@@ -172,6 +191,7 @@ def do_theoretical_iter(sim, setting):
     theoretical2 = []
     theoretical3 = []
     theoretical4 = []
+    theoretical5 = []
     for n in users:
         if setting.theorsweep.test_values[0]:
             theoretical.append(TheoreticalPlots().qarysic(n, setting))
@@ -183,6 +203,8 @@ def do_theoretical_iter(sim, setting):
             theoretical3.append(TheoreticalPlots().recsicta(n))
         if setting.theorsweep.test_values[4]:
             theoretical4.append(TheoreticalPlots().recquary(n, setting))
+        if setting.theorsweep.test_values[5]:
+            theoretical5.append(TheoreticalPlots().qsicta(n, setting))
     if setting.theorsweep.test_values[0]:
         pyplot.plot(users, theoretical, 'b-', label='Quary Sic')
     if setting.theorsweep.test_values[1]:
@@ -190,9 +212,11 @@ def do_theoretical_iter(sim, setting):
     if setting.theorsweep.test_values[2]:
         pyplot.plot(users, theoretical2, 'r-', label='Simple Tree')
     if setting.theorsweep.test_values[3]:
-        pyplot.plot(users, theoretical2, 'c-', label='Recursive SICTA')
+        pyplot.plot(users, theoretical3, 'c-', label='Recursive SICTA')
     if setting.theorsweep.test_values[4]:
-        pyplot.plot(users, theoretical2, 'm-', label='Recursive Quary')
+        pyplot.plot(users, theoretical4, 'm-', label='Recursive Quary')
+    if setting.theorsweep.test_values[5]:
+        pyplot.plot(users, theoretical5, 'y-', label='QSICTA Giannakkis')
 
     pyplot.xlabel('Users')
     pyplot.ylabel('Throughput')

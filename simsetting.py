@@ -1,6 +1,7 @@
 from tkinter import *
-class SimSetting(object):
 
+
+class SimSetting(object):
     """
     Contains all important simulation setting
     """
@@ -72,7 +73,7 @@ class First(Frame):
 
         l1 = Label(self.master, text="Q")
         l2 = Label(self.master, text="K")
-        l3 = Checkbutton(self.master, text=self.test_names[0], variable= self.var_array[2], onvalue=True,offvalue=False)
+        l3 = Checkbutton(self.master, text=self.test_names[0], variable=self.var_array[2], onvalue=True, offvalue=False)
         l4 = Label(self.master, text="Branch Probability if biased")
 
         l1.place(x=0, y=0)
@@ -83,7 +84,7 @@ class First(Frame):
         self.e1 = Entry(self.master)
         self.e1.insert(0, '2')
         self.e2 = Entry(self.master)
-        self.e2.insert(0,'1')
+        self.e2.insert(0, '1')
         self.e3 = Entry(self.master)
         self.e3.insert(0, '0.5')
 
@@ -93,10 +94,11 @@ class First(Frame):
 
         for i in range(1, len(self.test_names)):
             self.var_array.append(BooleanVar())
-            c = Checkbutton(self.master, text=self.test_names[i], variable= self.var_array[i+3], onvalue=True,offvalue=False)
-            c.place(x=0, y=50*i + 200)
+            c = Checkbutton(self.master, text=self.test_names[i], variable=self.var_array[i + 3], onvalue=True,
+                            offvalue=False)
+            c.place(x=0, y=50 * i + 200)
 
-        NextButton = Button(self, text="Next", command=lambda : [self.first_box(), self.master.destroy()])
+        NextButton = Button(self, text="Next", command=lambda: [self.first_box(), self.master.destroy()])
         NextButton.place(x=0, y=400)
 
     def first_box(self):
@@ -104,8 +106,8 @@ class First(Frame):
         self.test_values.append(self.e2.get())
         self.test_values.append(self.var_array[2].get())
         self.test_values.append(self.e3.get())
-        for i in range(len(self.test_names)-1):
-            self.test_values.append(self.var_array[i+4].get())
+        for i in range(len(self.test_names) - 1):
+            self.test_values.append(self.var_array[i + 4].get())
 
 
 class Second(Frame):
@@ -121,7 +123,7 @@ class Second(Frame):
                            "Sweep Through different arrival rates in Free Access",
                            "Sweep Through different arrival rates in Gated Access",
                            "Sweep through users only of theoretical formulas"]
-        self.checkbutton = self.checkbutton*len(self.test_names)
+        self.checkbutton = self.checkbutton * len(self.test_names)
         self.init_window()
 
     def init_window(self):
@@ -133,8 +135,9 @@ class Second(Frame):
 
         for i in range(len(self.test_names)):
             self.var_array.append(BooleanVar())
-            self.checkbutton[i] = Checkbutton(self.master, text=self.test_names[i], variable=self.var_array[i], onvalue=True,
-                            offvalue=False)
+            self.checkbutton[i] = Checkbutton(self.master, text=self.test_names[i], variable=self.var_array[i],
+                                              onvalue=True,
+                                              offvalue=False)
             self.checkbutton[i].place(x=0, y=50 * i)
         self.checkbutton[0].select()
         # creating a button instance
@@ -155,7 +158,6 @@ class Third(Frame):
         self.init_window()
 
     def init_window(self):
-
         self.master.title("Tree Visualization")
         self.pack(fill=BOTH, expand=1)
 
@@ -165,7 +167,7 @@ class Third(Frame):
         self.e1 = Entry(self.master)
         self.e1.insert(0, '10')
         self.e1.place(x=250, y=0)
-        NextButton = Button(self, text="Done", command=lambda : [self.first_box(), self.master.destroy()])
+        NextButton = Button(self, text="Done", command=lambda: [self.first_box(), self.master.destroy()])
         NextButton.place(x=0, y=250)
 
     def first_box(self):
@@ -182,7 +184,6 @@ class Fourth(Frame):
         self.init_window()
 
     def init_window(self):
-
         self.master.title("Static Tree")
         self.pack(fill=BOTH, expand=1)
 
@@ -191,14 +192,13 @@ class Fourth(Frame):
         l2 = Label(self.master, text="No of Runs to take the mean throughput")
         l2.place(x=0, y=100)
 
-
         self.e1 = Entry(self.master)
         self.e1.insert(0, '1000')
         self.e1.place(x=250, y=0)
         self.e2 = Entry(self.master)
         self.e2.insert(0, '100')
         self.e2.place(x=250, y=100)
-        NextButton = Button(self, text="Done", command=lambda : [self.first_box(), self.master.destroy()])
+        NextButton = Button(self, text="Done", command=lambda: [self.first_box(), self.master.destroy()])
         NextButton.place(x=0, y=250)
 
     def first_box(self):
@@ -216,7 +216,6 @@ class Fifth(Frame):
         self.init_window()
 
     def init_window(self):
-
         self.master.title("Sweep Through No if Users ( < 40")
         self.pack(fill=BOTH, expand=1)
 
@@ -225,14 +224,13 @@ class Fifth(Frame):
         l1 = Label(self.master, text="No of Runs to take the mean throughput")
         l1.place(x=0, y=100)
 
-
         self.e1 = Entry(self.master)
         self.e1.insert(0, '30')
         self.e1.place(x=250, y=0)
         self.e2 = Entry(self.master)
         self.e2.insert(0, '100')
         self.e2.place(x=250, y=100)
-        NextButton = Button(self, text="Done", command=lambda : [self.first_box(), self.master.destroy()])
+        NextButton = Button(self, text="Done", command=lambda: [self.first_box(), self.master.destroy()])
         NextButton.place(x=0, y=250)
 
     def first_box(self):
@@ -257,7 +255,6 @@ class Sixth(Frame):
         self.e = self.e * len(self.labels)
         self.init_window()
 
-
     def init_window(self):
 
         self.master.title("Sweep Through No if Users ( < 40")
@@ -265,12 +262,12 @@ class Sixth(Frame):
 
         for i in range(len(self.labels)):
             l = Label(self.master, text=self.labels[i])
-            l.place(x=0, y=i*50)
+            l.place(x=0, y=i * 50)
             self.e[i] = (Entry(self.master))
             self.e[i].insert(0, str(self.param[i]))
-            self.e[i].place(x=250, y=i*50)
+            self.e[i].place(x=250, y=i * 50)
 
-        NextButton = Button(self, text="Done", command=lambda : [self.first_box(), self.master.destroy()])
+        NextButton = Button(self, text="Done", command=lambda: [self.first_box(), self.master.destroy()])
         NextButton.place(x=0, y=250)
 
     def first_box(self):
@@ -299,7 +296,7 @@ class Seventh(Frame):
         self.test_names = ["Quick Template - OWN PAPER", "SICTA",
                            "Captenakis Simple Tree",
                            "Recursive SICTA",
-                           "Recursive Own Paper"]
+                           "Recursive Own Paper", "Giannakis QSICTA"]
         self.checkbutton = self.checkbutton * len(self.test_names)
         self.n_stop = 10
         self.init_window()
@@ -320,13 +317,13 @@ class Seventh(Frame):
         self.checkbutton[0].select()
 
         l1 = Label(self.master, text="Max Numbers of users in the Sweep")
-        l1.place(x=0, y=250)
+        l1.place(x=0, y=300)
         l2 = Label(self.master, text="Note - Cannot be higher than 15 if using any Recursive Equation")
-        l2.place(x=0, y=300)
+        l2.place(x=0, y=350)
 
         self.e1 = Entry(self.master)
         self.e1.insert(0, '15')
-        self.e1.place(x=250, y=250)
+        self.e1.place(x=250, y=300)
         # creating a button instance
         quitButton = Button(self, text="Done", command=lambda: [self.first_box(), self.master.destroy()])
         quitButton.place(x=0, y=400)
@@ -335,4 +332,3 @@ class Seventh(Frame):
         for i in range(len(self.test_names)):
             self.test_values.append(self.var_array[i].get())
         self.n_stop = int(self.e1.get())
-

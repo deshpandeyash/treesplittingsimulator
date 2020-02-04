@@ -1,5 +1,4 @@
 import packetlist
-from branchnode import BranchNode
 
 
 class TreeState(object):
@@ -75,10 +74,3 @@ class TreeState(object):
         self.magic_counter = sim.slot.magic_counter
         if sim.sim_param.SPLIT == 2 and self.magic_counter > 0:
             print("Magic Counter error")
-
-
-
-
-
-
-

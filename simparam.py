@@ -2,7 +2,6 @@ import numpy as np
 
 
 class SimParam(object):
-
     """
     Contains all important simulation parameters
     """
@@ -21,14 +20,13 @@ class SimParam(object):
             # set branching probability for binary split
             self.branchprob = float(setting.firstwindow.test_values[3])
         else:
-            self.branchprob = 1/self.SPLIT
+            self.branchprob = 1 / self.SPLIT
         # Set branching probability for a split
-        self.branch_biased = np.full(self.SPLIT, (1 - self.branchprob)/(self.SPLIT - 1))
+        self.branch_biased = np.full(self.SPLIT, (1 - self.branchprob) / (self.SPLIT - 1))
         self.branch_biased[0] = self.branchprob
 
         # The number of packets that can be resolved in a multipacekt reception system in one slot.
         self.K = int(setting.firstwindow.test_values[1])
-
 
         # The type of Resolution Algorithm
         self.modified = setting.firstwindow.test_values[4]
@@ -36,8 +34,8 @@ class SimParam(object):
         self.sic = setting.firstwindow.test_values[6]
 
     def print_settings(self):
-        print("Q = "+ str(self.SPLIT))
-        print("K = "+ str(self.K))
+        print("Q = " + str(self.SPLIT))
+        print("K = " + str(self.K))
         print("Branch Prob = " + str(self.branchprob))
         if self.biased_split:
             print("Using Biased Split")

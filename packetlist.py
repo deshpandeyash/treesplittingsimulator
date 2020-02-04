@@ -1,4 +1,3 @@
-import numpy as np
 from packet import Packet
 
 """
@@ -126,6 +125,7 @@ def remove_successful_packet(sim):
             print("Error success branch different from selected branch at split")
     return pack
 
+
 def copy_queue_to_active(sim):
     for j in sim.queue_array:
         if len(sim.branch_node.branch_status) == 0:
@@ -133,6 +133,7 @@ def copy_queue_to_active(sim):
         else:
             j.selected_branch = sim.branch_node.branch_status[-1]
     sim.active_array = sim.queue_array
+
 
 def update_transmissions(sim):
     """
@@ -142,7 +143,3 @@ def update_transmissions(sim):
     for j in sim.active_array:
         if j.packet_count == 0:
             j.transmissions += 1
-
-
-
-
