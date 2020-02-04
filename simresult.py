@@ -28,7 +28,6 @@ class SimResult(object):
         self.idle_rate = 0
         self.collision_rate = 0
         self.mean_tree_depth = 0
-
         self.magic_throughput = 0
 
     def get_result(self, sim):

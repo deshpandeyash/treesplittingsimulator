@@ -1,24 +1,25 @@
-from simulation import Simulation
-from matplotlib import pyplot
-import numpy as np
+import os
 import time
-from theoretical_plots import TheoreticalPlots
-from simparam import SimParam
+
+import numpy as np
+from matplotlib import pyplot
 from scipy.stats import skew
+
 import graphdisplay
 from make_stat import mean_confidence_interval, plot_conf_interval
+from simparam import SimParam
 from simsetting import SimSetting
+from simulation import Simulation
+from theoretical_plots import TheoreticalPlots
 
-import os
 
 def simulate_tree_branching(sim, setting):
     """
     To get the vizualization of 1 tree for the given settings and number of users as defined by simsettings and simparam
     also prints the obtained throughput, tree progression, result progression and tree depth
     """
-    if os.environ.get('graphviz-2.38')  is None:
+    if os.environ.get('graphviz-2.38') is None:
         print("Graphviz is not in the path")
-
 
     # os.environ["PATH"] += os.pathsep + r'C:\Users\Murat\Anaconda3\Library\bin\graphviz'
     sim.reset(setting)
@@ -27,11 +28,12 @@ def simulate_tree_branching(sim, setting):
     print(sim.tree_state.result_array)
     print("Tree Progression was: ")
     print(sim.branch_node.branch_array[:-1])
-    print("Throughput is = " + str(sim.sim_result.throughput/sim.sim_param.K))
+    print("Throughput is = " + str(sim.sim_result.throughput / sim.sim_param.K))
     print("Theoretically it should be = " + str(TheoreticalPlots().qarysic(setting.vizwindow.users, setting)))
     print("Magic Throughput " + str(sim.sim_result.magic_throughput))
     print("The Depth of the tree is: " + str(sim.sim_result.mean_tree_depth))
     graphdisplay.displaygraph(sim)
+
 
 def simulate_simple_tree_static_multiple_runs(sim, setting):
     """
@@ -48,37 +50,35 @@ def simulate_simple_tree_static_multiple_runs(sim, setting):
             sim.reset(setting)
             users = np.random.poisson(setting.statictreewindow.users)
             sim.do_simulation_simple_tree_static(users)
-            throughput.append(sim.sim_result.throughput/sim.sim_param.K)
-            magic_throughput.append(sim.sim_result.magic_throughput/sim.sim_param.K)
+            # sim.do_simulation_simple_tree_static(setting.statictreewindow.users)
+            throughput.append(sim.sim_result.throughput / sim.sim_param.K)
+            magic_throughput.append(sim.sim_result.magic_throughput / sim.sim_param.K)
             if sim.tree_state.total_successes != users:
                 print("Error total successes not equal to total users")
         conf_mean, conf_min, conf_max = mean_confidence_interval(throughput, 0.95)
-        conf_intervals.append((conf_min,conf_max))
+        conf_intervals.append((conf_min, conf_max))
     print("Standard Deviation is : " + str(np.std(np.asarray(throughput))))
     print("Skewness in throughput distribution is :" + str(skew(np.asarray(throughput))))
     print("Mean Throughput:  " + str(np.mean(throughput)))
     theoretical_throughput = TheoreticalPlots().qarysic(30, setting)
     print("Theoretical Throughput: " + str(theoretical_throughput))
-    print("Theoretical Throughput and Mean throughput ratio = " + str(theoretical_throughput/np.mean(throughput)))
+    print("Theoretical Throughput and Mean throughput ratio = " + str(theoretical_throughput / np.mean(throughput)))
     print("Magic Throughput " + str(np.mean(magic_throughput)))
     print("Confidence Intervals : " + str(conf_min) + " , " + str(conf_max))
-    #print("Theoretical Throughput: " + str(TheoreticalPlots().qarysic(users)))
     bin_height, bin_boundary = np.histogram(throughput, density=True)
     width = bin_boundary[1] - bin_boundary[0]
     bin_height = bin_height / float(sum(bin_height))
     pyplot.bar(bin_boundary[:-1], bin_height, width=width)
-    #pyplot.hist(throughput, density=True)
     pyplot.vlines(theoretical_throughput, 0, max(bin_height), colors='r', label='Theoretical Throughput')
     pyplot.vlines(conf_min, 0, max(bin_height), colors='y', label='Conf Intervals')
     pyplot.vlines(conf_max, 0, max(bin_height), colors='y')
     pyplot.xlabel("Throughput")
     pyplot.legend()
-    pyplot.savefig('K' + str(sim.sim_param.K) + 'Q' + str(sim.sim_param.SPLIT) + 'histogram_static.png', dpi=300)
+    # pyplot.savefig('K' + str(sim.sim_param.K) + 'Q' + str(sim.sim_param.SPLIT) + 'histogram_static.png', dpi=300)
     end = time.time()
-    print("Time for simulation: " + str(end-start))
+    print("Time for simulation: " + str(end - start))
     pyplot.show()
-    plot_conf_interval(conf_intervals,theoretical_mean=0.368)
-
+    plot_conf_interval(conf_intervals, theoretical_mean=0.368)
 
 
 def simulate_users(sim, setting):
@@ -99,37 +99,37 @@ def simulate_users(sim, setting):
             # Reset the simulation
             sim.reset(setting)
             sim.do_simulation_simple_tree_static(np.random.poisson(n))
-            #sim.do_simulation_simple_tree_static(n)
-            throughput.append(sim.sim_result.throughput/sim.sim_param.K)
-            magic.append(sim.sim_result.magic_throughput/sim.sim_param.K)
+            # sim.do_simulation_simple_tree_static(n)
+            throughput.append(sim.sim_result.throughput / sim.sim_param.K)
+            magic.append(sim.sim_result.magic_throughput / sim.sim_param.K)
         throughput_array.append(np.mean(throughput))
         magic_throughput_array.append(np.mean(magic))
         theoretical_out_array.append(TheoreticalPlots().qarysic(n, setting))
-        #theoretical_out_array.append(TheoreticalPlots().qsicta(n, setting))
     theoretical_out = TheoreticalPlots().qarysic(setting.usersweep.n_stop, setting)
-    pyplot.plot(user_array, throughput_array,  'b-', label='simulation')
+    pyplot.plot(user_array, throughput_array, 'b-', label='simulation')
     pyplot.plot(user_array, theoretical_out_array, 'r', label='theoretical')
     print("Max Theoretical throughput is " + str(max(theoretical_out_array)) + " at Users "
           + str(user_array[theoretical_out_array.index(max(theoretical_out_array))]))
     print("Steady State Theoretical Value = " + str(theoretical_out))
     pyplot.plot(user_array, magic_throughput_array, 'g', label='Right Skipped Simulation')
-    #pyplot.hlines(theoretical_out, sim.sim_param.K, n_stop, colors='green', label='Steady State')
     pyplot.xlabel("Mean Users")
     pyplot.ylabel("Throughput")
     pyplot.legend()
     end = time.time()
     print("Time for simulation: ")
-    print(end-start)
+    print(end - start)
     pyplot.show()
 
-def simulate_simple_tree_dynamic_multiple_runs(sim,setting):
+
+def simulate_simple_tree_dynamic_multiple_runs(sim, setting):
     """
     FREE ACCESS SIMULATION
     Sweep through different arrival rate, take average through no of runs. Plot delay, success rate vs arrival rate.
 
     """
     start = time.time()
-    rate_array = np.arange(setting.dynamictest.start, setting.dynamictest.stop + setting.dynamictest.step, setting.dynamictest.step)
+    rate_array = np.arange(setting.dynamictest.start, setting.dynamictest.stop + setting.dynamictest.step,
+                           setting.dynamictest.step)
     succ_rate = []
     delay = []
     for p in rate_array:
@@ -158,7 +158,8 @@ def simulate_simple_tree_dynamic_multiple_runs(sim,setting):
 
 def simulate_simple_tree_dynamic_multiple_runs_gated(sim, setting):
     start = time.time()
-    rate_array = np.arange(setting.dynamictest.start, setting.dynamictest.stop + setting.dynamictest.step, setting.dynamictest.step)
+    rate_array = np.arange(setting.dynamictest.start, setting.dynamictest.stop + setting.dynamictest.step,
+                           setting.dynamictest.step)
     delay = []
     for p in rate_array:
         counter = []
@@ -174,7 +175,8 @@ def simulate_simple_tree_dynamic_multiple_runs_gated(sim, setting):
     pyplot.grid()
     pyplot.show()
     end = time.time()
-    print("Time for Simulaiton: " + str(end-start))
+    print("Time for Simulaiton: " + str(end - start))
+
 
 def do_theoretical_iter(sim, setting):
     """
@@ -224,9 +226,43 @@ def do_theoretical_iter(sim, setting):
     pyplot.show()
 
 
+def experimental_runs(sim, setting):
+    """
+    This function can be used to runs experimnetal code and tests within the framework of the GUI
+    For now I am using this to figure out a formula for Q ary SIC and a closed form equation for a maximum of K
+    """
+
+    theoretical_array = []
+    param = SimParam(setting)
+    users = range(param.K + 1, setting.usersweep.n_stop + 1)
+    for n in users:
+        theoretical_array.append(TheoreticalPlots().qarysic(n, setting))
+    pyplot.plot(users, theoretical_array, 'b-', label='Throughput')
+    pyplot.xlabel('Users')
+    pyplot.ylabel('Throughput')
+    pyplot.legend()
+    print_message = f"The Maximum throughput is {max(theoretical_array):.3f} at" \
+                    f" {users[theoretical_array.index(max(theoretical_array))]} Users "
+    print(print_message)
+
+    extrema_values = []
+    for n in users:
+        extrema_values.append(TheoreticalPlots().qarysic(n, setting) - TheoreticalPlots().qarysic(n+1, setting))
+    pyplot.twinx()
+    pyplot.plot(users, extrema_values, 'g-', label='Extrema Values')
+    pyplot.xlabel('Users')
+    pyplot.ylabel('Throughput Extrema')
+    pyplot.legend(loc=4)
+    pyplot.title(print_message)
+    pyplot.savefig('Results/NewResults/' + 'K' + str(param.K) + 'Q' + str(param.SPLIT) + 'TheoreticalPlot.png', dpi=300)
+    pyplot.show()
+
+
+
+# This array basically just has the functions, one of which is run by the GUI
 test_array = [simulate_tree_branching, simulate_simple_tree_static_multiple_runs, simulate_users,
               simulate_simple_tree_dynamic_multiple_runs, simulate_simple_tree_dynamic_multiple_runs_gated,
-              do_theoretical_iter]
+              do_theoretical_iter, experimental_runs]
 
 if __name__ == '__main__':
     setting = SimSetting()
@@ -245,11 +281,3 @@ if __name__ == '__main__':
             if setting.secondwindow.test_values[test_array.index(test)]:
                 sim.reset(setting)
                 test(sim, setting)
-
-
-
-
-
-
-
-

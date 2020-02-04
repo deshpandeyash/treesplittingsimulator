@@ -15,6 +15,7 @@ class SimSetting(object):
         self.dynamictest = None
         self.theorsweep = None
 
+
         self.guiprocess()
 
     def guiprocess(self):
@@ -39,7 +40,7 @@ class SimSetting(object):
             root.geometry("500x300")
             self.statictreewindow = Fourth(root)
             root.mainloop()
-        elif self.secondwindow.test_values[2]:
+        elif self.secondwindow.test_values[2] or self.secondwindow.test_values[6]:
             root = Tk()
             root.geometry("500x300")
             self.usersweep = Fifth(root)
@@ -122,7 +123,8 @@ class Second(Frame):
                            "Sweep Through different values of Users",
                            "Sweep Through different arrival rates in Free Access",
                            "Sweep Through different arrival rates in Gated Access",
-                           "Sweep through users only of theoretical formulas"]
+                           "Sweep through users only of theoretical formulas",
+                           "Run the experimental Code Test"]
         self.checkbutton = self.checkbutton * len(self.test_names)
         self.init_window()
 
