@@ -1,10 +1,8 @@
-# Multipacket Tree Resolution
+# Tree Splitting Simulator
 
-This plans to simulate K-Multpiacket reception with succesive interference cancellation. 
+This project is lecensed under MIT Open Source License
 
-The documentation will be updated when work on the K- Multipacket with SIC algorithm will begin.
+All documentation can be found on the proejct Wiki. 
 
-For current code use, simple tree and modified tree simualtions can be done. 
-
-For direct execution of the simulations with all parameters pre loaded, comment and uncomment the methods in the main in simstudy.py and run the script. You can change basic parameters in simparam.py. 
+For direct execution of the simulations with all parameters pre loaded, execute simstudy.py and the GUI will guide you through different parameters and simulation tests. 
 
