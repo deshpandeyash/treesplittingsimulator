@@ -1,6 +1,6 @@
 # Tree Splitting Simulator
 
-This project is lecensed under MIT Open Source License
+This project is licensed under MIT Open Source License
 
 All documentation can be found on the proejct Wiki. 
 
