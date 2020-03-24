@@ -1,16 +1,15 @@
-import os
 import time
-
 import numpy as np
 from matplotlib import pyplot
 from scipy.stats import skew
-
 import graphdisplay
-from make_stat import mean_confidence_interval, plot_conf_interval
+from make_stat import mean_confidence_interval, make_histogram_cont, make_histogram_discrete
+from make_stat import make_multiplot, plot_conf_interval
 from simparam import SimParam
 from simsetting import SimSetting
 from simulation import Simulation
 from theoretical_plots import TheoreticalPlots
+import tikzplotlib
 
 
 def simulate_tree_branching(sim, setting):
@@ -18,8 +17,6 @@ def simulate_tree_branching(sim, setting):
     To get the vizualization of 1 tree for the given settings and number of users as defined by simsettings and simparam
     also prints the obtained throughput, tree progression, result progression and tree depth
     """
-    if os.environ.get('graphviz-2.38') is None:
-        print("Graphviz is not in the path")
 
     # os.environ["PATH"] += os.pathsep + r'C:\Users\Murat\Anaconda3\Library\bin\graphviz'
     sim.reset(setting)
@@ -29,7 +26,9 @@ def simulate_tree_branching(sim, setting):
     print("Tree Progression was: ")
     print(sim.branch_node.branch_array[:-1])
     print("Throughput is = " + str(sim.sim_result.throughput / sim.sim_param.K))
-    print("Theoretically it should be = " + str(TheoreticalPlots().qarysic(setting.vizwindow.users, setting)))
+
+    print("Theoretically it should be = " + str.format('{0:.15f}', TheoreticalPlots().qarysic(setting.vizwindow.users,
+                                                                                              sim.sim_param)))
     print("Magic Throughput " + str(sim.sim_result.magic_throughput))
     print("The Depth of the tree is: " + str(sim.sim_result.mean_tree_depth))
     graphdisplay.displaygraph(sim)
@@ -40,45 +39,55 @@ def simulate_simple_tree_static_multiple_runs(sim, setting):
     Does a a number of runs with the same number of users, plots the distribution of throughput and prints out the
     theoretical throughput
     """
+    print_result = True
     start = time.time()
     conf_intervals = []
-    for j in range(10):
-        throughput = []
-        magic_throughput = []
-        for _ in range(setting.statictreewindow.runs):
-            # Reset the simulation
-            sim.reset(setting)
-            users = np.random.poisson(setting.statictreewindow.users)
-            sim.do_simulation_simple_tree_static(users)
-            # sim.do_simulation_simple_tree_static(setting.statictreewindow.users)
-            throughput.append(sim.sim_result.throughput / sim.sim_param.K)
-            magic_throughput.append(sim.sim_result.magic_throughput / sim.sim_param.K)
-            if sim.tree_state.total_successes != users:
-                print("Error total successes not equal to total users")
-        conf_mean, conf_min, conf_max = mean_confidence_interval(throughput, 0.95)
-        conf_intervals.append((conf_min, conf_max))
-    print("Standard Deviation is : " + str(np.std(np.asarray(throughput))))
-    print("Skewness in throughput distribution is :" + str(skew(np.asarray(throughput))))
-    print("Mean Throughput:  " + str(np.mean(throughput)))
-    theoretical_throughput = TheoreticalPlots().qarysic(30, setting)
-    print("Theoretical Throughput: " + str(theoretical_throughput))
-    print("Theoretical Throughput and Mean throughput ratio = " + str(theoretical_throughput / np.mean(throughput)))
-    print("Magic Throughput " + str(np.mean(magic_throughput)))
-    print("Confidence Intervals : " + str(conf_min) + " , " + str(conf_max))
-    bin_height, bin_boundary = np.histogram(throughput, density=True)
-    width = bin_boundary[1] - bin_boundary[0]
-    bin_height = bin_height / float(sum(bin_height))
-    pyplot.bar(bin_boundary[:-1], bin_height, width=width)
-    pyplot.vlines(theoretical_throughput, 0, max(bin_height), colors='r', label='Theoretical Throughput')
-    pyplot.vlines(conf_min, 0, max(bin_height), colors='y', label='Conf Intervals')
-    pyplot.vlines(conf_max, 0, max(bin_height), colors='y')
-    pyplot.xlabel("Throughput")
-    pyplot.legend()
-    # pyplot.savefig('K' + str(sim.sim_param.K) + 'Q' + str(sim.sim_param.SPLIT) + 'histogram_static.png', dpi=300)
+    number_in_slot = []
+    tx_stat_array = []
+    throughput = []
+    magic_throughput = []
+    for _ in range(setting.statictreewindow.runs):
+        # Reset the simulation
+        sim.reset(setting)
+        #users = np.random.poisson(setting.statictreewindow.users)
+        users = setting.statictreewindow.users
+        sim.do_simulation_simple_tree_static(users)
+        throughput.append(sim.sim_result.throughput / sim.sim_param.K)
+        number_in_slot += sim.tree_state.number_in_slot[1:]
+        tx_stat_array += sim.sim_state.tx_stat_array
+        magic_throughput.append(sim.sim_result.magic_throughput / sim.sim_param.K)
+        if sim.tree_state.total_successes != users:
+            print("Error total successes not equal to total users")
+    conf_mean, conf_min, conf_max = mean_confidence_interval(throughput, 0.95)
+    conf_intervals.append((conf_min, conf_max))
+    theoretical_throughput = TheoreticalPlots().qarysic(1000, sim.sim_param)
+    # Create F Strings for print
+    std_dev = F"Standard Deviation = {np.std(np.asarray(throughput))}"
+    skewness = F"Skewness in throughput distribution = {skew(np.asarray(throughput))}"
+    mean_throughput = F"Mean Throughput = {np.mean(throughput)}"
+    theoretical_mean_throughput = F"Theoretical Throughput = {theoretical_throughput:.6f}"
+    left_skipped_throughput = F"Left Skipped Throughput = {np.mean(magic_throughput)}"
+    if print_result:
+        print(std_dev)
+        print(skewness)
+        print(mean_throughput)
+        print(theoretical_mean_throughput)
+        if sim.sim_param.sic and sim.sim_param.SPLIT > 2:
+            print("This is the problem with the Giannakis Equation for d > 2 but, ")
+            print(left_skipped_throughput)
+    # Plots start here
+    # First the throughput histogram
+    make_histogram_cont(throughput, sim, xlabel='Throughput', conf_ints=(conf_min, conf_max),
+                        theoretical_mean=theoretical_throughput, save_fig=True)
+    # Then the Packet in a slot distribuiton
+    number_in_slot = np.asarray(number_in_slot) / sim.sim_param.K
+    make_histogram_discrete(number_in_slot, sim, setting, xlabel='Packets in a Slot', save_fig=False)
+    # Then the retransmission Distribution
+    make_histogram_discrete(tx_stat_array, sim, setting, xlabel='Transmissions per Packet', save_fig=False)
     end = time.time()
     print("Time for simulation: " + str(end - start))
     pyplot.show()
-    plot_conf_interval(conf_intervals, theoretical_mean=0.368)
+
 
 
 def simulate_users(sim, setting):
@@ -104,20 +113,22 @@ def simulate_users(sim, setting):
             magic.append(sim.sim_result.magic_throughput / sim.sim_param.K)
         throughput_array.append(np.mean(throughput))
         magic_throughput_array.append(np.mean(magic))
-        theoretical_out_array.append(TheoreticalPlots().qarysic(n, setting))
-    theoretical_out = TheoreticalPlots().qarysic(setting.usersweep.n_stop, setting)
+        theoretical_out_array.append(TheoreticalPlots().qarysic(n, sim.sim_param))
+    theoretical_out = TheoreticalPlots().qarysic(setting.usersweep.n_stop, sim.sim_param)
     pyplot.plot(user_array, throughput_array, 'b-', label='simulation')
     pyplot.plot(user_array, theoretical_out_array, 'r', label='theoretical')
-    print("Max Theoretical throughput is " + str(max(theoretical_out_array)) + " at Users "
-          + str(user_array[theoretical_out_array.index(max(theoretical_out_array))]))
-    print("Steady State Theoretical Value = " + str(theoretical_out))
-    pyplot.plot(user_array, magic_throughput_array, 'g', label='Right Skipped Simulation')
+    print(F"Max Theoretical throughput is {max(theoretical_out_array):.6f}"
+          F" at Users {user_array[theoretical_out_array.index(max(theoretical_out_array))]}")
+    print(F"Steady State Theoretical Value =   {theoretical_out:.6f}")
+    #pyplot.plot(user_array, magic_throughput_array, 'g', label='Right Skipped Simulation')
     pyplot.xlabel("Mean Users")
     pyplot.ylabel("Throughput")
     pyplot.legend()
+    figname = F"K{sim.sim_param.K}Q{sim.sim_param.SPLIT}UserSweep"
+    pyplot.savefig(figname + '.png', dpi=300)
+    tikzplotlib.save(figname + '.tex')
     end = time.time()
-    print("Time for simulation: ")
-    print(end - start)
+    print(F"Time for simulation: {end - start} Seconds")
     pyplot.show()
 
 
@@ -152,6 +163,10 @@ def simulate_simple_tree_dynamic_multiple_runs(sim, setting):
     pyplot.plot(rate_array, delay, color='blue')
     pyplot.ylabel('Mean Packet Delay')
     pyplot.show()
+    pyplot.grid()
+    figname = F"K{sim.sim_param.K}Q{sim.sim_param.SPLIT}FreeArrivalSweep"
+    pyplot.savefig(figname + '.png', dpi=300)
+    tikzplotlib.save(figname + '.tex')
     end = time.time()
     print("Time for Simulaiton: " + str(end - start))
 
@@ -173,6 +188,9 @@ def simulate_simple_tree_dynamic_multiple_runs_gated(sim, setting):
     pyplot.xlabel('Arrival rate (packets/slot)')
     pyplot.ylabel('Mean Packet Delay')
     pyplot.grid()
+    figname = F"K{sim.sim_param.K}Q{sim.sim_param.SPLIT}GatedArrivalSweep"
+    pyplot.savefig(figname + '.png', dpi=300)
+    tikzplotlib.save(figname + '.tex')
     pyplot.show()
     end = time.time()
     print("Time for Simulaiton: " + str(end - start))
@@ -196,17 +214,17 @@ def do_theoretical_iter(sim, setting):
     theoretical5 = []
     for n in users:
         if setting.theorsweep.test_values[0]:
-            theoretical.append(TheoreticalPlots().qarysic(n, setting))
+            theoretical.append(TheoreticalPlots().qarysic(n, param))
         if setting.theorsweep.test_values[1]:
-            theoretical1.append(TheoreticalPlots().sicta(n, setting))
+            theoretical1.append(TheoreticalPlots().sicta(n, param))
         if setting.theorsweep.test_values[2]:
             theoretical2.append(TheoreticalPlots().simpletree(n))
         if setting.theorsweep.test_values[3]:
             theoretical3.append(TheoreticalPlots().recsicta(n))
         if setting.theorsweep.test_values[4]:
-            theoretical4.append(TheoreticalPlots().recquary(n, setting))
+            theoretical4.append(TheoreticalPlots().recquary(n, param))
         if setting.theorsweep.test_values[5]:
-            theoretical5.append(TheoreticalPlots().qsicta(n, setting))
+            theoretical5.append(TheoreticalPlots().qsicta(n, param))
     if setting.theorsweep.test_values[0]:
         pyplot.plot(users, theoretical, 'b-', label='Quary Sic')
     if setting.theorsweep.test_values[1]:
@@ -223,48 +241,126 @@ def do_theoretical_iter(sim, setting):
     pyplot.xlabel('Users')
     pyplot.ylabel('Throughput')
     pyplot.legend()
+    pyplot.xscale('log')
+    figname = F"K{sim.sim_param.K}Q{sim.sim_param.SPLIT}TheoreticalCalc"
+    pyplot.savefig(figname + '.png', dpi=300)
+    tikzplotlib.save(figname + '.tex')
     pyplot.show()
+
+def static_grid_run(sim,setting):
+    """
+    Static Grid Run Sweeps across k and and N to get slot distribution and other parameters as a function of n for
+    different k
+
+    """
+    start = time.time()
+    user_array = [10, 50, 100]
+    k_array = range(1, 9)
+    aggregate_slot_array = []
+    aggregate_retx_array = []
+    aggregate_delay_array = []
+    for users in user_array:
+        mean_slot_dist = []
+        mean_retx_dist = []
+        mean_delay_dist = []
+        for k in k_array:
+            number_in_slot = []
+            tx_stat_array = []
+            delay_array = []
+            throughput = []
+            for _ in range(setting.statictreewindow.runs):
+                # Reset the simulation
+                sim.reset(setting)
+                sim.sim_param.K = k
+                sim.do_simulation_simple_tree_static(users)
+                throughput.append(sim.sim_result.throughput / sim.sim_param.K)
+                number_in_slot += sim.tree_state.number_in_slot[1:]
+                tx_stat_array += sim.sim_state.tx_stat_array
+                delay_array.append(sim.sim_result.mean_packet_delay)
+                if sim.tree_state.total_successes != users:
+                    print("Error total successes not equal to total users")
+            number_in_slot = np.asarray(number_in_slot) / sim.sim_param.K
+            mean_slot_dist.append(np.mean(number_in_slot))
+            mean_retx_dist.append(np.mean(tx_stat_array))
+            mean_delay_dist.append(np.mean(delay_array))
+        aggregate_slot_array.append(mean_slot_dist)
+        aggregate_retx_array.append(mean_retx_dist)
+        aggregate_delay_array.append(mean_delay_dist)
+
+    make_multiplot(k_array,aggregate_slot_array,user_array,ylabel='K normalized mean Packets per slot', xlabel='K',
+                   save_fig=True, figname='SlotDegreeDistribution')
+    make_multiplot(k_array, aggregate_retx_array, user_array, ylabel='Mean No of Retransmissions per Packet', xlabel='K',
+                   save_fig=True, figname='RetxDegreeDistribution')
+    make_multiplot(k_array, aggregate_delay_array, user_array, ylabel='Mean Packet Delay', xlabel='K',
+                   save_fig=True, figname='DelayDegreeDistribution')
+    end = time.time()
+    print(F"Time for Simulaiton is {end-start} seconds")
+
 
 
 def experimental_runs(sim, setting):
     """
     This function can be used to runs experimnetal code and tests within the framework of the GUI
     For now I am using this to figure out a formula for Q ary SIC and a closed form equation for a maximum of K
+
     """
 
-    theoretical_array = []
-    param = SimParam(setting)
-    users = range(param.K + 1, setting.usersweep.n_stop + 1)
-    for n in users:
-        theoretical_array.append(TheoreticalPlots().qarysic(n, setting))
-    pyplot.plot(users, theoretical_array, 'b-', label='Throughput')
+    start = time.time()
+    k_array = [5, 10, 15, 30, 50]
+    multiple_theoretical = []
+    maximum_array = []
+    n_array = []
+    for k in k_array:
+        sim.sim_param.K = k
+        user_array = np.arange(sim.sim_param.K + 1, setting.usersweep.n_stop)
+
+        theoretical = []
+        for n in user_array:
+            theoretical.append(TheoreticalPlots().qarysic(n, sim.sim_param))
+        multiple_theoretical.append(theoretical)
+        maximum_array.append(max(theoretical))
+        n_array.append(user_array[theoretical.index(max(theoretical))])
+        pyplot.plot(user_array, theoretical, label=f"K = {k}")
+    pyplot.plot(n_array, maximum_array, 'r--', label='Maximum')
+
+    pyplot.xscale('log')
+    pyplot.legend()
     pyplot.xlabel('Users')
     pyplot.ylabel('Throughput')
-    pyplot.legend()
-    print_message = f"The Maximum throughput is {max(theoretical_array):.3f} at" \
-                    f" {users[theoretical_array.index(max(theoretical_array))]} Users "
-    print(print_message)
+    figname = f"Q{sim.sim_param.SPLIT}allKplotsp"
+    pyplot.savefig(figname + '.png', dpi=300)
+    tikzplotlib.save(figname + '.tex')
 
-    extrema_values = []
-    for n in users:
-        extrema_values.append(TheoreticalPlots().qarysic(n, setting) - TheoreticalPlots().qarysic(n+1, setting))
-    pyplot.twinx()
-    pyplot.plot(users, extrema_values, 'g-', label='Extrema Values')
-    pyplot.xlabel('Users')
-    pyplot.ylabel('Throughput Extrema')
-    pyplot.legend(loc=4)
-    pyplot.title(print_message)
-    pyplot.savefig('Results/NewResults/' + 'K' + str(param.K) + 'Q' + str(param.SPLIT) + 'TheoreticalPlot.png', dpi=300)
     pyplot.show()
+    end = time.time()
+    print("Time for Simulations = " + str(end-start))
 
+    # start = time.time()
+    # k_array = [1, 3, 5, 10]
+    # pj_array = [0.1, 0.2, 0.3,  0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    # for k in k_array:
+    #     theoretical = []
+    #     sim.sim_param.K = k
+    #     for p in pj_array:
+    #         sim.sim_param.branchprob = p
+    #         theoretical.append(TheoreticalPlots().qarysic(100, sim.sim_param))
+    #     pyplot.plot(pj_array,theoretical, label=f"K = {k}")
+    # pyplot.legend()
+    # pyplot.xlabel("Probability to Choose 1st Slot")
+    # pyplot.ylabel("Throughput for 100 Users")
+    # figname = f"unfairSplit"
+    # pyplot.savefig(figname + '.png', dpi=300)
+    # tikzplotlib.save(figname + '.tex')
+    # pyplot.show()
+    # end = time.time()
+    # print("Time for Simulations = " + str(end-start))
 
-
-# This array basically just has the functions, one of which is run by the GUI
-test_array = [simulate_tree_branching, simulate_simple_tree_static_multiple_runs, simulate_users,
-              simulate_simple_tree_dynamic_multiple_runs, simulate_simple_tree_dynamic_multiple_runs_gated,
-              do_theoretical_iter, experimental_runs]
 
 if __name__ == '__main__':
+    # This array basically just has the functions, one of which is run by the GUI
+    test_array = [simulate_tree_branching, simulate_simple_tree_static_multiple_runs, simulate_users,
+                  simulate_simple_tree_dynamic_multiple_runs, simulate_simple_tree_dynamic_multiple_runs_gated,
+                  do_theoretical_iter, experimental_runs, static_grid_run]
     setting = SimSetting()
     # Seed for reproducibility
     # np.random.seed(setting.seed)

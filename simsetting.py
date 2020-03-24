@@ -35,7 +35,7 @@ class SimSetting(object):
             root.geometry("500x300")
             self.vizwindow = Third(root)
             root.mainloop()
-        elif self.secondwindow.test_values[1]:
+        elif self.secondwindow.test_values[1] or self.secondwindow.test_values[7]:
             root = Tk()
             root.geometry("500x300")
             self.statictreewindow = Fourth(root)
@@ -124,7 +124,8 @@ class Second(Frame):
                            "Sweep Through different arrival rates in Free Access",
                            "Sweep Through different arrival rates in Gated Access",
                            "Sweep through users only of theoretical formulas",
-                           "Run the experimental Code Test"]
+                           "Run the experimental Code Test",
+                           "Static Gridsweep scross K and N"]
         self.checkbutton = self.checkbutton * len(self.test_names)
         self.init_window()
 
@@ -144,7 +145,7 @@ class Second(Frame):
         self.checkbutton[0].select()
         # creating a button instance
         quitButton = Button(self, text="Next", command=lambda: [self.first_box(), self.master.destroy()])
-        quitButton.place(x=0, y=400)
+        quitButton.place(x=0, y=450)
 
     def first_box(self):
         for i in range(len(self.test_names)):
@@ -195,7 +196,7 @@ class Fourth(Frame):
         l2.place(x=0, y=100)
 
         self.e1 = Entry(self.master)
-        self.e1.insert(0, '1000')
+        self.e1.insert(0, '100')
         self.e1.place(x=250, y=0)
         self.e2 = Entry(self.master)
         self.e2.insert(0, '100')
@@ -218,7 +219,7 @@ class Fifth(Frame):
         self.init_window()
 
     def init_window(self):
-        self.master.title("Sweep Through No if Users ( < 40")
+        self.master.title("Sweep Through No if Users")
         self.pack(fill=BOTH, expand=1)
 
         l1 = Label(self.master, text="Max No of Users")
@@ -245,7 +246,7 @@ class Sixth(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
         self.master = master
-        self.simtime = 10000
+        self.simtime = 1000
         self.runs = 5
         self.start = 0.20
         self.step = 0.05
@@ -259,7 +260,7 @@ class Sixth(Frame):
 
     def init_window(self):
 
-        self.master.title("Sweep Through No if Users ( < 40")
+        self.master.title("Sweep Through No if Users")
         self.pack(fill=BOTH, expand=1)
 
         for i in range(len(self.labels)):
