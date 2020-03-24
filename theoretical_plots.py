@@ -65,7 +65,7 @@ class TheoreticalPlots(object):
                 ln += comb(k - t, i, exact=True) * ((-1) ** (i + 1)) * i / (d_sum_sub * (i + t))
             ln += decimal.Decimal(pois_multiplier) * ln * to_sub * comb(k, t, exact=True)
         ln = 1 + ln
-        throughput = (decimal.Decimal(z) / ln) * 300
+        throughput = (decimal.Decimal(z) / ln)
         # if n > t:
         return throughput / t
         # else:
