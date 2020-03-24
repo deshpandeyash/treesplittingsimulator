@@ -1,10 +1,11 @@
-# Multipacket Tree Resolution
+# Tree Splitting Simulator
 
-This plans to simulate K-Multpiacket reception with succesive interference cancellation. 
+In mulit-user communication on a wireless channel, the medium access problem haas many well known solutions. The first common random-access algorithm known as pure ALOHA was conceptualized and implemented in the 1970s. The meduim access schemes can be divided into two broad categories, namely static allocation (reservation based) and dynamic allocation. Reservation based (fixed allocation) schemes such as TDMA and FDMA are suitable for steady and heavy traffic, dynamic allocation is better for bursty and sporadic traffic. In the scenario of random access over a shared channel, packets are bound to collide, in which case all the information is lost. Hence, there arises the need for retransmissions in order to ensure delivery of data by the nodes. In order to ensure that all the packets that have collided, are transmitted succesfully, collision resolution algorithms (CRAs) came up, and one such CRA was proposed by Capetanakis (1979)[1] known as the Tree Resolution Algorithm or the tree splitting collision resolution algorithm. More detials about the the setup and scheme for this algorithm can be found on the wiki page https://github.com/deshpandeyash/treesplittingsimulator/wiki .
 
-The documentation will be updated when work on the K- Multipacket with SIC algorithm will begin.
+Since then more people have inverstigated their properties and suggested improvements. One such notable improvement was the addition of Successive Interference Cancellaiton (SIC) to the tree resoltion algorithms. In this scheme, collisions are saved and then cancelled after one succesful transmssion by the reciever. This was proposed by Yu and Giannakis in 2007[2]
 
-For current code use, simple tree and modified tree simualtions can be done. 
+This simulator plans to simulate those algorithms and any additions that contributors wish to add. The code has been written in a maintainable fashion in PEP8 wherever possible. The algorithm part of the code itself has comments on every line for the user to understand. The target for this simulator are educators who wish to use the vizualisation tools in this to better illustrate the algorithms or researchers who wish to investigate and build their own algorithms. For starters, it would be great to read the relevant material and begin with running the tests offered by the GUI. 
 
-For direct execution of the simulations with all parameters pre loaded, comment and uncomment the methods in the main in simstudy.py and run the script. You can change basic parameters in simparam.py. 
-
+This project is licensed under MIT Open License.
+ https://github.com/deshpandeyash/treesplittingsimulator/blob/master/LICENSE.md
+ 
