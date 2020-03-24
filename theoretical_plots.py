@@ -1,4 +1,5 @@
 from scipy.special import comb
+from scipy.stats import poisson
 import decimal
 from math import log
 import numpy as np
@@ -39,6 +40,36 @@ class TheoreticalPlots(object):
             return throughput / t
         else:
             return 1
+
+    def windowed_sic(self, n, param):
+        """
+        Windowed access SIC test equation, work in progress....for now use only fair splitting
+        """
+        z = n / 10
+        param.branch_biased = np.full(param.SPLIT, (1 - param.branchprob) / (param.SPLIT - 1))
+        param.branch_biased[0] = param.branchprob
+        pj_array = param.branch_biased
+        ln = decimal.Decimal(0)
+        t = param.K
+        d = param.SPLIT
+        to_sub = d
+        if param.sic:
+            to_sub -= 1
+        for k in range(0, 300):
+            pois_multiplier = poisson.pmf(k, z, loc=0)
+            for i in range(1, k + 1):
+                d_sum = decimal.Decimal(0)
+                for u in range(1, d + 1):
+                    d_sum += decimal.Decimal(decimal.Decimal(pj_array[u - 1]) ** decimal.Decimal((i + t)))
+                d_sum_sub = decimal.Decimal(1) - d_sum
+                ln += comb(k - t, i, exact=True) * ((-1) ** (i + 1)) * i / (d_sum_sub * (i + t))
+            ln += decimal.Decimal(pois_multiplier) * ln * to_sub * comb(k, t, exact=True)
+        ln = 1 + ln
+        throughput = (decimal.Decimal(z) / ln) * 300
+        # if n > t:
+        return throughput / t
+        # else:
+        #    return 1
 
 
 

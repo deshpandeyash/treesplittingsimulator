@@ -299,7 +299,8 @@ class Seventh(Frame):
         self.test_names = ["Quick Template - OWN PAPER", "SICTA",
                            "Captenakis Simple Tree",
                            "Recursive SICTA",
-                           "Recursive Own Paper", "Giannakis QSICTA"]
+                           "Recursive Own Paper", "Giannakis QSICTA",
+                           "Recursive SICTA - Test"]
         self.checkbutton = self.checkbutton * len(self.test_names)
         self.n_stop = 10
         self.init_window()
@@ -320,16 +321,16 @@ class Seventh(Frame):
         self.checkbutton[0].select()
 
         l1 = Label(self.master, text="Max Numbers of users in the Sweep")
-        l1.place(x=0, y=300)
+        l1.place(x=0, y=350)
         l2 = Label(self.master, text="Note - Cannot be higher than 15 if using any Recursive Equation")
-        l2.place(x=0, y=350)
+        l2.place(x=0, y=400)
 
         self.e1 = Entry(self.master)
         self.e1.insert(0, '15')
-        self.e1.place(x=250, y=300)
+        self.e1.place(x=250, y=350)
         # creating a button instance
         quitButton = Button(self, text="Done", command=lambda: [self.first_box(), self.master.destroy()])
-        quitButton.place(x=0, y=400)
+        quitButton.place(x=0, y=450)
 
     def first_box(self):
         for i in range(len(self.test_names)):

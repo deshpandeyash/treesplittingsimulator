@@ -212,6 +212,7 @@ def do_theoretical_iter(sim, setting):
     theoretical3 = []
     theoretical4 = []
     theoretical5 = []
+    theoretical6 = []
     for n in users:
         if setting.theorsweep.test_values[0]:
             theoretical.append(TheoreticalPlots().qarysic(n, param))
@@ -225,6 +226,8 @@ def do_theoretical_iter(sim, setting):
             theoretical4.append(TheoreticalPlots().recquary(n, param))
         if setting.theorsweep.test_values[5]:
             theoretical5.append(TheoreticalPlots().qsicta(n, param))
+        if setting.theorsweep.test_values[6]:
+            theoretical6.append(TheoreticalPlots().windowed_sic(n, param))
     if setting.theorsweep.test_values[0]:
         pyplot.plot(users, theoretical, 'b-', label='Quary Sic')
     if setting.theorsweep.test_values[1]:
@@ -237,6 +240,9 @@ def do_theoretical_iter(sim, setting):
         pyplot.plot(users, theoretical4, 'm-', label='Recursive Quary')
     if setting.theorsweep.test_values[5]:
         pyplot.plot(users, theoretical5, 'y-', label='QSICTA Giannakkis')
+    if setting.theorsweep.test_values[6]:
+        pyplot.plot(users, theoretical6, 'y-', label='Windowed SICTA')
+
 
     pyplot.xlabel('Users')
     pyplot.ylabel('Throughput')
@@ -244,7 +250,7 @@ def do_theoretical_iter(sim, setting):
     pyplot.xscale('log')
     figname = F"K{sim.sim_param.K}Q{sim.sim_param.SPLIT}TheoreticalCalc"
     pyplot.savefig(figname + '.png', dpi=300)
-    tikzplotlib.save(figname + '.tex')
+    #tikzplotlib.save(figname + '.tex')
     pyplot.show()
 
 def static_grid_run(sim,setting):
