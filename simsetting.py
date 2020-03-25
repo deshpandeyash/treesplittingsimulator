@@ -299,8 +299,7 @@ class Seventh(Frame):
         self.test_names = ["Quick Template - OWN PAPER", "SICTA",
                            "Captenakis Simple Tree",
                            "Recursive SICTA",
-                           "Recursive Own Paper", "Giannakis QSICTA",
-                           "Recursive SICTA - Test"]
+                           "Recursive Own Paper", "Giannakis QSICTA"]
         self.checkbutton = self.checkbutton * len(self.test_names)
         self.n_stop = 10
         self.init_window()

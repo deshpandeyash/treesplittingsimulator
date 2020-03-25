@@ -49,7 +49,7 @@ def simulate_simple_tree_static_multiple_runs(sim, setting):
     for _ in range(setting.statictreewindow.runs):
         # Reset the simulation
         sim.reset(setting)
-        #users = np.random.poisson(setting.statictreewindow.users)
+        # users = np.random.poisson(setting.statictreewindow.users)
         users = setting.statictreewindow.users
         sim.do_simulation_simple_tree_static(users)
         throughput.append(sim.sim_result.throughput / sim.sim_param.K)
@@ -89,7 +89,6 @@ def simulate_simple_tree_static_multiple_runs(sim, setting):
     pyplot.show()
 
 
-
 def simulate_users(sim, setting):
     """
     Sweeps through number of users, taking an average over the runs defined in simsetting for each run.
@@ -120,7 +119,7 @@ def simulate_users(sim, setting):
     print(F"Max Theoretical throughput is {max(theoretical_out_array):.6f}"
           F" at Users {user_array[theoretical_out_array.index(max(theoretical_out_array))]}")
     print(F"Steady State Theoretical Value =   {theoretical_out:.6f}")
-    #pyplot.plot(user_array, magic_throughput_array, 'g', label='Right Skipped Simulation')
+    # pyplot.plot(user_array, magic_throughput_array, 'g', label='Right Skipped Simulation')
     pyplot.xlabel("Mean Users")
     pyplot.ylabel("Throughput")
     pyplot.legend()
@@ -212,7 +211,6 @@ def do_theoretical_iter(sim, setting):
     theoretical3 = []
     theoretical4 = []
     theoretical5 = []
-    theoretical6 = []
     for n in users:
         if setting.theorsweep.test_values[0]:
             theoretical.append(TheoreticalPlots().qarysic(n, param))
@@ -226,8 +224,6 @@ def do_theoretical_iter(sim, setting):
             theoretical4.append(TheoreticalPlots().recquary(n, param))
         if setting.theorsweep.test_values[5]:
             theoretical5.append(TheoreticalPlots().qsicta(n, param))
-        if setting.theorsweep.test_values[6]:
-            theoretical6.append(TheoreticalPlots().windowed_sic(n, param))
     if setting.theorsweep.test_values[0]:
         pyplot.plot(users, theoretical, 'b-', label='Quary Sic')
     if setting.theorsweep.test_values[1]:
@@ -240,20 +236,19 @@ def do_theoretical_iter(sim, setting):
         pyplot.plot(users, theoretical4, 'm-', label='Recursive Quary')
     if setting.theorsweep.test_values[5]:
         pyplot.plot(users, theoretical5, 'y-', label='QSICTA Giannakkis')
-    if setting.theorsweep.test_values[6]:
-        pyplot.plot(users, theoretical6, 'y-', label='Windowed SICTA')
-
 
     pyplot.xlabel('Users')
     pyplot.ylabel('Throughput')
     pyplot.legend()
-    pyplot.xscale('log')
+    pyplot.grid()
+    # pyplot.xscale('log')
     figname = F"K{sim.sim_param.K}Q{sim.sim_param.SPLIT}TheoreticalCalc"
     pyplot.savefig(figname + '.png', dpi=300)
-    #tikzplotlib.save(figname + '.tex')
+    # tikzplotlib.save(figname + '.tex')
     pyplot.show()
 
-def static_grid_run(sim,setting):
+
+def static_grid_run(sim, setting):
     """
     Static Grid Run Sweeps across k and and N to get slot distribution and other parameters as a function of n for
     different k
@@ -293,15 +288,15 @@ def static_grid_run(sim,setting):
         aggregate_retx_array.append(mean_retx_dist)
         aggregate_delay_array.append(mean_delay_dist)
 
-    make_multiplot(k_array,aggregate_slot_array,user_array,ylabel='K normalized mean Packets per slot', xlabel='K',
+    make_multiplot(k_array, aggregate_slot_array, user_array, ylabel='K normalized mean Packets per slot', xlabel='K',
                    save_fig=True, figname='SlotDegreeDistribution')
-    make_multiplot(k_array, aggregate_retx_array, user_array, ylabel='Mean No of Retransmissions per Packet', xlabel='K',
+    make_multiplot(k_array, aggregate_retx_array, user_array, ylabel='Mean No of Retransmissions per Packet',
+                   xlabel='K',
                    save_fig=True, figname='RetxDegreeDistribution')
     make_multiplot(k_array, aggregate_delay_array, user_array, ylabel='Mean Packet Delay', xlabel='K',
                    save_fig=True, figname='DelayDegreeDistribution')
     end = time.time()
-    print(F"Time for Simulaiton is {end-start} seconds")
-
+    print(F"Time for Simulaiton is {end - start} seconds")
 
 
 def experimental_runs(sim, setting):
@@ -311,36 +306,37 @@ def experimental_runs(sim, setting):
 
     """
 
-    start = time.time()
-    k_array = [5, 10, 15, 30, 50]
-    multiple_theoretical = []
-    maximum_array = []
-    n_array = []
-    for k in k_array:
-        sim.sim_param.K = k
-        user_array = np.arange(sim.sim_param.K + 1, setting.usersweep.n_stop)
+    # ------------------------------------ For the Large Oscillation Plot -----------------------------------
+    #start = time.time()
+    # k_array = [1, 5, 10, 15, 30, 50]
+    # multiple_theoretical = []
+    # maximum_array = []
+    # n_array = []
+    # for k in k_array:
+    #     sim.sim_param.K = k
+    #     user_array = np.arange(sim.sim_param.K + 1, setting.usersweep.n_stop)
+    #     theoretical = []
+    #     for n in user_array:
+    #         theoretical.append(TheoreticalPlots().qarysic(n, sim.sim_param))
+    #     multiple_theoretical.append(theoretical)
+    #     maximum_array.append(max(theoretical))
+    #     n_array.append(user_array[theoretical.index(max(theoretical))])
+    #     pyplot.plot(user_array, theoretical, label=f"K = {k}")
+    # pyplot.plot(n_array, maximum_array, 'r--', label='Maximum')
+    #
+    # pyplot.xscale('log')
+    # pyplot.legend()
+    # pyplot.xlabel('Users')
+    # pyplot.ylabel('Throughput')
+    # figname = f"Q{sim.sim_param.SPLIT}allKplotsp"
+    # pyplot.savefig(figname + '.png', dpi=300)
+    # tikzplotlib.save(figname + '.tex')
+    #
+    # pyplot.show()
+    # end = time.time()
+    # print("Time for Simulations = " + str(end-start))
 
-        theoretical = []
-        for n in user_array:
-            theoretical.append(TheoreticalPlots().qarysic(n, sim.sim_param))
-        multiple_theoretical.append(theoretical)
-        maximum_array.append(max(theoretical))
-        n_array.append(user_array[theoretical.index(max(theoretical))])
-        pyplot.plot(user_array, theoretical, label=f"K = {k}")
-    pyplot.plot(n_array, maximum_array, 'r--', label='Maximum')
-
-    pyplot.xscale('log')
-    pyplot.legend()
-    pyplot.xlabel('Users')
-    pyplot.ylabel('Throughput')
-    figname = f"Q{sim.sim_param.SPLIT}allKplotsp"
-    pyplot.savefig(figname + '.png', dpi=300)
-    tikzplotlib.save(figname + '.tex')
-
-    pyplot.show()
-    end = time.time()
-    print("Time for Simulations = " + str(end-start))
-
+    # ----------------- For the plot that shows optimal pj --------------------------------------------------
     # start = time.time()
     # k_array = [1, 3, 5, 10]
     # pj_array = [0.1, 0.2, 0.3,  0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
@@ -360,6 +356,23 @@ def experimental_runs(sim, setting):
     # pyplot.show()
     # end = time.time()
     # print("Time for Simulations = " + str(end-start))
+
+    # -------------------------- Windowed Accesss ------------------------------------------------------
+    start = time.time()
+    z_array = np.arange(0, 5, 0.1)
+    fz_array = TheoreticalPlots().windowed_sic(sim.sim_param, z_array)
+    max_f = max(fz_array)
+    min_f = min(fz_array)
+    indexer = np.argmax(fz_array)
+    optimum_z = z_array[indexer]
+    pyplot.plot(z_array, fz_array)
+    pyplot.vlines(optimum_z, min_f, max_f)
+    end = time.time()
+    pyplot.xlabel('z')
+    pyplot.ylabel('fz')
+    pyplot.show()
+    print(F"Max Fz is {max_f:.4f} for Z = {optimum_z}")
+    print(F"Time for Simulation is {end-start} seconds")
 
 
 if __name__ == '__main__':
