@@ -370,6 +370,7 @@ def experimental_runs(sim, setting):
     end = time.time()
     pyplot.xlabel('z')
     pyplot.ylabel('fz')
+    pyplot.savefig('windowed_access.png', dpi=300)
     pyplot.show()
     print(F"Max Fz is {max_f:.4f} for Z = {optimum_z}")
     print(F"Time for Simulation is {end-start} seconds")

@@ -51,7 +51,7 @@ class TheoreticalPlots(object):
         fz_array = []
         for z in z_array:
             ln = 0
-            for k in range(0, 100):
+            for k in range(0, 300):
                 pois_multiplier = poisson.pmf(k, z, loc=0)
                 tree_length = self.qarysic(k, param)
                 ln += decimal.Decimal(pois_multiplier) * decimal.Decimal(tree_length)
