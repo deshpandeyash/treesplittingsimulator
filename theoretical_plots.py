@@ -1,7 +1,7 @@
 from scipy.special import comb
 from scipy.stats import poisson
 import decimal
-from math import log
+from math import log, e, pi , exp, factorial
 import numpy as np
 
 from simparam import SimParam
@@ -12,12 +12,10 @@ class TheoreticalPlots(object):
     decimal.getcontext().prec = 1000
 
     # Equation from quick template
-    def qarysic(self, n, param):
+
+    def qarylen(self, n, param):
         """
-        Final Equation from the paper published by H. Murat Gursu, Yash Deshpande etc.
-        Includes all parameters and additionaly a d parameter for a d-ary split which will be fixed after correction in
-        the old Giannakis paper.
-        Main addition in the K-MPR parameter.
+           Return the length according to the final equation according to the paper by H murat and Yash
         """
         param.branch_biased = np.full(param.SPLIT, (1 - param.branchprob) / (param.SPLIT - 1))
         param.branch_biased[0] = param.branchprob
@@ -25,14 +23,15 @@ class TheoreticalPlots(object):
         ln = decimal.Decimal(0)
         t = param.K
         d = param.SPLIT
-        to_sub = d
-        if param.sic:
-            to_sub -= 1
+
         if n == 0:
-            return 0
+            return 1
         elif 0 < n <= t:
-            return n / t
+            return 1
         else:
+            to_sub = d
+            if param.sic:
+                to_sub -= 1
             for i in range(1, n + 1):
                 d_sum = decimal.Decimal(0)
                 for u in range(1, d + 1):
@@ -40,22 +39,37 @@ class TheoreticalPlots(object):
                 d_sum_sub = decimal.Decimal(1) - d_sum
                 ln += comb(n - t, i, exact=True) * ((-1) ** (i + 1)) * i / (d_sum_sub * (i + t))
             ln = 1 + (ln * to_sub * comb(n, t, exact=True))
-            throughput = n / ln
-            return throughput / t
+            return ln
+
+
+    def qarysic(self, n, param):
+        """
+        Final Equation from the paper published by H. Murat Gursu, Yash Deshpande etc.
+        Includes all parameters and additionaly a d parameter for a d-ary split which will be fixed after correction in
+        the old Giannakis paper.
+        Main addition in the K-MPR parameter.
+        """
+        t = param.K
+        length = self.qarylen(n, param)
+        throughput = n / length
+        norm_throughput = throughput / t
+        return norm_throughput
 
     def windowed_sic(self, param, z_array):
         """
         Windowed access SIC test equation, work in progress....
         """
 
+        t = param.K
         fz_array = []
         for z in z_array:
             ln = 0
             for k in range(0, 300):
                 pois_multiplier = poisson.pmf(k, z, loc=0)
-                tree_length = self.qarysic(k, param)
+                tree_length = self.qarylen(k, param)
                 ln += decimal.Decimal(pois_multiplier) * decimal.Decimal(tree_length)
-            fz_array.append(ln)
+            throughput = decimal.Decimal(z) / (ln * t)
+            fz_array.append(throughput)
         return fz_array
 
     def qsicta(self, n, param):

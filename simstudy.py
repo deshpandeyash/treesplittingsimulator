@@ -237,6 +237,12 @@ def do_theoretical_iter(sim, setting):
     if setting.theorsweep.test_values[5]:
         pyplot.plot(users, theoretical5, 'y-', label='QSICTA Giannakkis')
 
+    max_f = max(theoretical)
+    min_f = min(theoretical)
+    indexer = np.argmax(theoretical)
+    optimum = users[indexer]
+    print(F"Max throughput is {max_f:.4f} at users {optimum}")
+
     pyplot.xlabel('Users')
     pyplot.ylabel('Throughput')
     pyplot.legend()
@@ -359,20 +365,27 @@ def experimental_runs(sim, setting):
 
     # -------------------------- Windowed Accesss ------------------------------------------------------
     start = time.time()
-    z_array = np.arange(0, 5, 0.1)
-    fz_array = TheoreticalPlots().windowed_sic(sim.sim_param, z_array)
-    max_f = max(fz_array)
-    min_f = min(fz_array)
-    indexer = np.argmax(fz_array)
-    optimum_z = z_array[indexer]
-    pyplot.plot(z_array, fz_array)
-    pyplot.vlines(optimum_z, min_f, max_f)
+    k_array = [1, 5, 10]
+    p_array = [0.7, 0.6, 0.5]
+    for k in k_array:
+    #for p in p_array:
+        #sim.sim_param.branchprob = p
+        sim.sim_param.K = k
+        z_array = np.arange(0.1, 30, 0.1)
+        fz_array = TheoreticalPlots().windowed_sic(sim.sim_param, z_array)
+        max_f = max(fz_array)
+        min_f = min(fz_array)
+        indexer = np.argmax(fz_array)
+        optimum_z = z_array[indexer]
+        pyplot.plot(z_array, fz_array, label =F"K = {k}")
+        pyplot.vlines(optimum_z, min_f, max_f)
+        pyplot.xlabel('z')
+        pyplot.ylabel('fz')
+        pyplot.savefig('windowed_access.png', dpi=300)
+        print(F"For K = {k} : ")
+        print(F"Max Fz is {max_f:.4f} for Z = {optimum_z}")
     end = time.time()
-    pyplot.xlabel('z')
-    pyplot.ylabel('fz')
-    pyplot.savefig('windowed_access.png', dpi=300)
     pyplot.show()
-    print(F"Max Fz is {max_f:.4f} for Z = {optimum_z}")
     print(F"Time for Simulation is {end-start} seconds")
 
 
