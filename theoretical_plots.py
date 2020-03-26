@@ -72,6 +72,25 @@ class TheoreticalPlots(object):
             fz_array.append(throughput)
         return fz_array
 
+    def gated_sic(self, param, my_lambda, length_array):
+        """
+        Gated access SIC test equation, work in progress....
+        """
+
+        for l in length_array:
+            ln = decimal.Decimal(0)
+            z = l * my_lambda
+            for k in range(0, 300):
+                pois_multiplier = poisson.pmf(k, z, loc=0)
+                tree_length = self.qarylen(k, param)
+                ln += decimal.Decimal(pois_multiplier) * decimal.Decimal(tree_length)
+            if ln + decimal.Decimal(0.05) >= decimal.Decimal(l) >= ln - decimal.Decimal(0.05):
+                print("BAM")
+                return l
+        return max(length_array)
+
+
+
     def qsicta(self, n, param):
         """
         Equation from giannakis and yu for the d-ary SICTA

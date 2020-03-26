@@ -308,19 +308,20 @@ def static_grid_run(sim, setting):
 def experimental_runs(sim, setting):
     """
     This function can be used to runs experimnetal code and tests within the framework of the GUI
-    For now I am using this to figure out a formula for Q ary SIC and a closed form equation for a maximum of K
+    All other parameters must be inputted by User, just the parameters from the tree will remain
 
     """
 
     # ------------------------------------ For the Large Oscillation Plot -----------------------------------
-    #start = time.time()
-    # k_array = [1, 5, 10, 15, 30, 50]
+    # start = time.time()
+    # k_array = [1, 5, 10]
     # multiple_theoretical = []
     # maximum_array = []
     # n_array = []
+    #n_stop = 1000
     # for k in k_array:
     #     sim.sim_param.K = k
-    #     user_array = np.arange(sim.sim_param.K + 1, setting.usersweep.n_stop)
+    #     user_array = np.arange(sim.sim_param.K + 1, n_stop)
     #     theoretical = []
     #     for n in user_array:
     #         theoretical.append(TheoreticalPlots().qarysic(n, sim.sim_param))
@@ -329,7 +330,7 @@ def experimental_runs(sim, setting):
     #     n_array.append(user_array[theoretical.index(max(theoretical))])
     #     pyplot.plot(user_array, theoretical, label=f"K = {k}")
     # pyplot.plot(n_array, maximum_array, 'r--', label='Maximum')
-    #
+    # print(F"N array is {n_array}")
     # pyplot.xscale('log')
     # pyplot.legend()
     # pyplot.xlabel('Users')
@@ -364,29 +365,59 @@ def experimental_runs(sim, setting):
     # print("Time for Simulations = " + str(end-start))
 
     # -------------------------- Windowed Accesss ------------------------------------------------------
+    # start = time.time()
+    # k_array = [2, 3, 4]
+    # p_array = [0.7, 0.6, 0.5]
+    # for k in k_array:
+    # #for p in p_array:
+    #     #sim.sim_param.branchprob = p
+    #     sim.sim_param.K = k
+    #     z_array = np.arange(0.1, 10, 0.1)
+    #     fz_array = TheoreticalPlots().windowed_sic(sim.sim_param, z_array)
+    #     max_f = max(fz_array)
+    #     min_f = min(fz_array)
+    #     indexer = np.argmax(fz_array)
+    #     optimum_z = z_array[indexer]
+    #     pyplot.plot(z_array, fz_array, label=F"K = {k}")
+    #     #pyplot.vlines(optimum_z, min_f, max_f)
+    #     pyplot.xlabel('z')
+    #     pyplot.ylabel('fz')
+    #     print(F"For K = {k} : ")
+    #     print(F"Max Fz is {max_f:.4f} for Z = {optimum_z}")
+    # pyplot.legend()
+    # pyplot.savefig('windowed_access.png', dpi=300)
+    # tikzplotlib.save('windowed_access.tex', encoding='utf-8')
+    # pyplot.show()
+    # end = time.time()
+    # print(F"Time for Simulation is {end-start} seconds")
+
+    # ---------------------------------Gated Access ---------------------------------------------
     start = time.time()
-    k_array = [1, 5, 10]
-    p_array = [0.7, 0.6, 0.5]
+    k_array = [1]
+    lambda_array = np.arange(0.2, 0.50, 0.05)
     for k in k_array:
-    #for p in p_array:
-        #sim.sim_param.branchprob = p
         sim.sim_param.K = k
-        z_array = np.arange(0.1, 30, 0.1)
-        fz_array = TheoreticalPlots().windowed_sic(sim.sim_param, z_array)
-        max_f = max(fz_array)
-        min_f = min(fz_array)
-        indexer = np.argmax(fz_array)
-        optimum_z = z_array[indexer]
-        pyplot.plot(z_array, fz_array, label =F"K = {k}")
-        pyplot.vlines(optimum_z, min_f, max_f)
-        pyplot.xlabel('z')
-        pyplot.ylabel('fz')
-        pyplot.savefig('windowed_access.png', dpi=300)
-        print(F"For K = {k} : ")
-        print(F"Max Fz is {max_f:.4f} for Z = {optimum_z}")
-    end = time.time()
+        length_result = []
+        for my_lambda in lambda_array:
+            length_array = np.arange(1, 10, 0.1)
+            length = TheoreticalPlots().gated_sic(sim.sim_param, my_lambda*k, length_array)
+            length_result.append(length)
+        #grad = np.diff(length_result)/np.diff(lambda_array)
+        pyplot.plot(lambda_array, length_result, label=F"K = {k}")
+    pyplot.xlabel("Lambda")
+    pyplot.ylabel("Length")
+    pyplot.legend()
+    pyplot.savefig('Gated_Access.png', dpi=300)
+    tikzplotlib.save('Gated_Access.tex', encoding='utf-8')
     pyplot.show()
-    print(F"Time for Simulation is {end-start} seconds")
+    end = time.time()
+    print(F"The Time Required for simulation is {end - start} Seconds")
+    # _____________ Single lambda ____________
+    # length_array = np.arange(1, 10, 0.1)
+    # my_lambda = 0.69
+    # length = TheoreticalPlots().gated_sic(sim.sim_param, my_lambda, length_array)
+    # print(length)
+
 
 
 if __name__ == '__main__':

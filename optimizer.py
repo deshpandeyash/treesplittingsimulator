@@ -42,7 +42,7 @@ For now its just a scratch pad to try different optimizer functions, nothing imp
 # print(sum(result_array))
 # plt.show()
 
-z = 5
+z = 3
 for k in range(0, 300):
     pois_multiplier = poisson.pmf(k, z, loc=0)
     print(pois_multiplier)
