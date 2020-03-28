@@ -172,7 +172,7 @@ def simulate_simple_tree_dynamic_multiple_runs(sim, setting):
 
 def simulate_simple_tree_dynamic_multiple_runs_gated(sim, setting):
     """
-    GATED ACCESS SIMULATION - plots cri length and mean packet delay
+    GATED ACCESS SIMULATION - plots cri length and mean packet delay should add a k sweep
     """
     start = time.time()
     rate_array = np.arange(setting.dynamictest.start, setting.dynamictest.stop + setting.dynamictest.step,
