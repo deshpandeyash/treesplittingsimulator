@@ -366,13 +366,13 @@ def experimental_runs(sim, setting):
 
     # -------------------------- Windowed Accesss ------------------------------------------------------
     # start = time.time()
-    # k_array = [2, 3, 4]
+    # k_array = [1, 5, 10]
     # p_array = [0.7, 0.6, 0.5]
     # for k in k_array:
     # #for p in p_array:
     #     #sim.sim_param.branchprob = p
     #     sim.sim_param.K = k
-    #     z_array = np.arange(0.1, 10, 0.1)
+    #     z_array = np.arange(0.1, 20, 0.1)
     #     fz_array = TheoreticalPlots().windowed_sic(sim.sim_param, z_array)
     #     max_f = max(fz_array)
     #     min_f = min(fz_array)
@@ -392,32 +392,102 @@ def experimental_runs(sim, setting):
     # print(F"Time for Simulation is {end-start} seconds")
 
     # ---------------------------------Gated Access ---------------------------------------------
-    start = time.time()
-    k_array = [1]
-    lambda_array = np.arange(0.2, 0.50, 0.05)
-    for k in k_array:
-        sim.sim_param.K = k
-        length_result = []
-        for my_lambda in lambda_array:
-            length_array = np.arange(1, 10, 0.1)
-            length = TheoreticalPlots().gated_sic(sim.sim_param, my_lambda*k, length_array)
-            length_result.append(length)
-        #grad = np.diff(length_result)/np.diff(lambda_array)
-        pyplot.plot(lambda_array, length_result, label=F"K = {k}")
-    pyplot.xlabel("Lambda")
-    pyplot.ylabel("Length")
-    pyplot.legend()
-    pyplot.savefig('Gated_Access.png', dpi=300)
-    tikzplotlib.save('Gated_Access.tex', encoding='utf-8')
-    pyplot.show()
-    end = time.time()
-    print(F"The Time Required for simulation is {end - start} Seconds")
+    # start = time.time()
+    # k_array = [1]
+    # lambda_array = np.arange(0.2, 0.50, 0.05)
+    # for k in k_array:
+    #     sim.sim_param.K = k
+    #     length_result = []
+    #     for my_lambda in lambda_array:
+    #         length_array = np.arange(1, 10, 0.1)
+    #         length = TheoreticalPlots().gated_sic(sim.sim_param, my_lambda*k, length_array)
+    #         length_result.append(length)
+    #     #grad = np.diff(length_result)/np.diff(lambda_array)
+    #     pyplot.plot(lambda_array, length_result, label=F"K = {k}")
+    # pyplot.xlabel("Lambda")
+    # pyplot.ylabel("Length")
+    # pyplot.legend()
+    # pyplot.savefig('Gated_Access.png', dpi=300)
+    # tikzplotlib.save('Gated_Access.tex', encoding='utf-8')
+    # pyplot.show()
+    # end = time.time()
+    # print(F"The Time Required for simulation is {end - start} Seconds")
     # _____________ Single lambda ____________
     # length_array = np.arange(1, 10, 0.1)
     # my_lambda = 0.69
     # length = TheoreticalPlots().gated_sic(sim.sim_param, my_lambda, length_array)
     # print(length)
+    # ______________ Try Recursive Gated Access _____________
 
+    start = time.time()
+    k_array = [1, 5, 10]
+    k_lambda_array = [np.arange(0.58, 0.72, 0.01), np.arange(0.60, 0.75, 0.01), np.arange(0.60, 0.75, 0.01)]
+    for k, lambda_array in zip(k_array, k_lambda_array):
+        sim.sim_param.K = k
+        new_lambda_array = k * lambda_array
+        full_length_array = []
+        for fixed_lambda in new_lambda_array:
+            # Initialise the length of the 0th CRI to 0
+            prev_length = 0
+            length_array = []
+            # Taking the values for 6 CRI's
+            for j in range(0, 60):
+                # Get the length of the CRI depending on prev length and var_lambda
+                length = TheoreticalPlots().rec_gated(sim.sim_param, fixed_lambda, prev_length)
+                # Add to the array of lengths, this array just holds the lengths for different CRI's
+                length_array.append(length)
+                # Update the prev length for the next iteration
+                prev_length = length
+            full_length_array.append(length_array[-1] - length_array[-2])
+        pyplot.plot(lambda_array, full_length_array, label=F"K = {k}")
+    pyplot.xlabel('Arrival Rate Lambda')
+    pyplot.ylabel('Delta CRI')
+    pyplot.legend()
+    pyplot.savefig('Gated_Access_CRI_SIC.png', dpi=300)
+    tikzplotlib.save('Gated_Access_CRI_SIC.tex', encoding='utf-8')
+    pyplot.show()
+    end = time.time()
+    print(F"The Time Required for simulation is {end - start} Seconds")
+
+    # _____________---Single Recursive -- _______
+    # start = time.time()
+    # k = 5
+    # sim.sim_param.K = k
+    # lambda_array = [0.65, 0.7, 0.75]
+    # for fixed_lambda in lambda_array:
+    #     fixed_lambda = fixed_lambda * k
+    #     prev_length = 0
+    #     length_array = []
+    #     for j in range(0, 30):
+    #         length = TheoreticalPlots().rec_gated(sim.sim_param, fixed_lambda, prev_length)
+    #         length_array.append(length)
+    #         prev_length = length
+    #     pyplot.plot(length_array, label=F"Lambda={fixed_lambda/ k}")
+    # pyplot.xlabel('CRI')
+    # pyplot.ylabel('CRI Length')
+    # pyplot.title(F"K = {5}")
+    # pyplot.legend()
+    # pyplot.savefig('IllustrativeFigure.png', dpi=300)
+    # pyplot.show()
+    # end = time.time()
+    # print(F"The Time Required for simulation is {end - start} Seconds")
+    # ________________________ Single Recursive single Delta value ___________________
+    # start = time.time()
+    # k = 1
+    # sim.sim_param.K = k
+    # fixed_lambda = 0.63
+    # prev_length = 0
+    # length_array = []
+    # for j in range(0, 100):
+    #     length = TheoreticalPlots().rec_gated(sim.sim_param, fixed_lambda, prev_length)
+    #     length_array.append(length)
+    #     prev_length = length
+    # delta_value = length_array[-1] - length_array[-2]
+    # print(F"Delta Value is {delta_value}")
+    # if delta_value > 0:
+    #     print(F"We are unstable")
+    # end = time.time()
+    # print(F"The Time Required for simulation is {end - start} Seconds")
 
 
 if __name__ == '__main__':

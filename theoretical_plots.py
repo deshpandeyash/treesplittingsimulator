@@ -89,6 +89,24 @@ class TheoreticalPlots(object):
                 return l
         return max(length_array)
 
+    def rec_gated(self, param, var_lambda, prev_length):
+        """
+        Trial of a recursive gated equation
+        """
+
+
+        ln = 0
+        if prev_length == 0:
+            z = var_lambda * 1
+        else:
+            z = var_lambda * float(prev_length)
+        for k in range(0, 300):
+            pois_multiplier = poisson.pmf(k, z, loc=0)
+            tree_length = self.qarylen(k, param)
+            ln += decimal.Decimal(pois_multiplier) * decimal.Decimal(tree_length)
+        return ln
+
+
 
 
     def qsicta(self, n, param):
