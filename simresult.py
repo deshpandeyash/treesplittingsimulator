@@ -14,7 +14,7 @@ class SimResult(object):
         self.idle_rate = 0
         self.collision_rate = 0
         self.mean_tree_depth = 0
-
+        self.mean_tree_length = 0
         self.magic_throughput = 0
 
     def reset(self):
@@ -28,6 +28,7 @@ class SimResult(object):
         self.idle_rate = 0
         self.collision_rate = 0
         self.mean_tree_depth = 0
+        self.mean_tree_length = 0
         self.magic_throughput = 0
 
     def get_result(self, sim):
@@ -51,8 +52,7 @@ class SimResult(object):
         self.no_trees = len(sim.sim_state.successes_array)
         # Average tree depth is the mean of the tree depth array in simstate
         self.mean_tree_depth = np.mean(sim.sim_state.tree_depth_array)
-
+        # Average tree length
+        self.mean_tree_length = np.mean(sim.sim_state.tree_length_array)
+        # To show the error in d > 2 in SICTA
         self.magic_throughput = np.mean(sim.sim_state.magic_throughput)
-        if sim.sim_param.SPLIT == 2:
-            if self.magic_throughput != self.throughput:
-                print("Magic Throughput Error!")

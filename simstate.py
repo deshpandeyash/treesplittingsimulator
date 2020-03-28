@@ -15,7 +15,7 @@ class SimState(object):
         self.slot_len_array = []
         self.throughput_array = []
         self.tree_depth_array = []
-
+        self.tree_length_array = []
         self.magic_throughput = []
 
     def reset(self):
@@ -29,7 +29,7 @@ class SimState(object):
         self.slot_len_array = []
         self.throughput_array = []
         self.tree_depth_array = []
-
+        self.tree_length_array = []
         self.magic_throughput = []
 
     def update_metrics(self, sim):
@@ -45,6 +45,7 @@ class SimState(object):
         self.idle_array.append(idle_slots / (sim.slot_no - sim.tree_state.first_slot))
         self.inti_collision_array.append(sim.tree_state.init_collided)
         self.slot_len_array.append(sim.slot_no - sim.tree_state.first_slot)
+        self.tree_length_array.append(len(sim.branch_node.branch_array))
         if len(sim.branch_node.branch_array) <= 1:
             self.tree_depth_array.append(0)
         else:

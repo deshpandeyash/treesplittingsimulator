@@ -171,28 +171,38 @@ def simulate_simple_tree_dynamic_multiple_runs(sim, setting):
 
 
 def simulate_simple_tree_dynamic_multiple_runs_gated(sim, setting):
+    """
+    GATED ACCESS SIMULATION - plots cri length and mean packet delay
+    """
     start = time.time()
     rate_array = np.arange(setting.dynamictest.start, setting.dynamictest.stop + setting.dynamictest.step,
                            setting.dynamictest.step)
     delay = []
+    cri_length = []
     for p in rate_array:
-        counter = []
+        delay_counter = []
+        cri_length_counter = []
         for _ in range(setting.dynamictest.runs):
             sim.reset(setting)
-            sim.sim_param.lmbda = p
+            sim.sim_param.lmbda = p * sim.sim_param.K
             sim.do_simulation_gated_access()
-            counter.append(sim.sim_result.mean_packet_delay)
-        delay.append(np.mean(counter))
+            delay_counter.append(sim.sim_result.mean_packet_delay)
+            cri_length_counter.append(sim.sim_result.mean_tree_length)
+        delay.append(np.mean(delay_counter))
+        cri_length.append(np.mean(cri_length_counter))
     pyplot.plot(rate_array, delay, color='blue')
     pyplot.xlabel('Arrival rate (packets/slot)')
     pyplot.ylabel('Mean Packet Delay')
+    pyplot.twinx()
+    pyplot.plot(rate_array, cri_length, color='red')
+    pyplot.ylabel('Mean CRI Length')
     pyplot.grid()
     figname = F"K{sim.sim_param.K}Q{sim.sim_param.SPLIT}GatedArrivalSweep"
     pyplot.savefig(figname + '.png', dpi=300)
     tikzplotlib.save(figname + '.tex')
     pyplot.show()
     end = time.time()
-    print("Time for Simulaiton: " + str(end - start))
+    print("Time for Simulation: " + str(end - start))
 
 
 def do_theoretical_iter(sim, setting):
