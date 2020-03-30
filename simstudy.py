@@ -106,8 +106,8 @@ def simulate_users(sim, setting):
         for _ in range(setting.usersweep.runs):
             # Reset the simulation
             sim.reset(setting)
-            sim.do_simulation_simple_tree_static(np.random.poisson(n))
-            # sim.do_simulation_simple_tree_static(n)
+            #sim.do_simulation_simple_tree_static(np.random.poisson(n))
+            sim.do_simulation_simple_tree_static(n)
             throughput.append(sim.sim_result.throughput / sim.sim_param.K)
             magic.append(sim.sim_result.magic_throughput / sim.sim_param.K)
         throughput_array.append(np.mean(throughput))
@@ -177,25 +177,26 @@ def simulate_simple_tree_dynamic_multiple_runs_gated(sim, setting):
     start = time.time()
     rate_array = np.arange(setting.dynamictest.start, setting.dynamictest.stop + setting.dynamictest.step,
                            setting.dynamictest.step)
-    delay = []
-    cri_length = []
-    for p in rate_array:
-        delay_counter = []
-        cri_length_counter = []
-        for _ in range(setting.dynamictest.runs):
-            sim.reset(setting)
-            sim.sim_param.lmbda = p * sim.sim_param.K
-            sim.do_simulation_gated_access()
-            delay_counter.append(sim.sim_result.mean_packet_delay)
-            cri_length_counter.append(sim.sim_result.mean_tree_length)
-        delay.append(np.mean(delay_counter))
-        cri_length.append(np.mean(cri_length_counter))
-    pyplot.plot(rate_array, delay, color='blue')
+    k_array = [1, 5, 10]
+    for k in k_array:
+        sim.sim_param.K = k
+        delay = []
+        cri_length = []
+        for p in rate_array:
+            delay_counter = []
+            cri_length_counter = []
+            for _ in range(setting.dynamictest.runs):
+                sim.reset(setting)
+                sim.sim_param.lmbda = p * sim.sim_param.K
+                sim.do_simulation_gated_access()
+                delay_counter.append(sim.sim_result.mean_packet_delay)
+                cri_length_counter.append(sim.sim_result.mean_tree_length)
+            delay.append(np.mean(delay_counter))
+            cri_length.append(np.mean(cri_length_counter))
+        pyplot.plot(rate_array, delay, label=F"K = {k}")
     pyplot.xlabel('Arrival rate (packets/slot)')
     pyplot.ylabel('Mean Packet Delay')
-    pyplot.twinx()
-    pyplot.plot(rate_array, cri_length, color='red')
-    pyplot.ylabel('Mean CRI Length')
+    pyplot.legend()
     pyplot.grid()
     figname = F"K{sim.sim_param.K}Q{sim.sim_param.SPLIT}GatedArrivalSweep"
     pyplot.savefig(figname + '.png', dpi=300)
@@ -429,53 +430,53 @@ def experimental_runs(sim, setting):
     # print(length)
     # ______________ Try Recursive Gated Access _____________
 
-    start = time.time()
-    k_array = [1, 5, 10]
-    k_lambda_array = [np.arange(0.58, 0.72, 0.01), np.arange(0.60, 0.75, 0.01), np.arange(0.60, 0.75, 0.01)]
-    for k, lambda_array in zip(k_array, k_lambda_array):
-        sim.sim_param.K = k
-        new_lambda_array = k * lambda_array
-        full_length_array = []
-        for fixed_lambda in new_lambda_array:
-            # Initialise the length of the 0th CRI to 0
-            prev_length = 0
-            length_array = []
-            # Taking the values for 6 CRI's
-            for j in range(0, 60):
-                # Get the length of the CRI depending on prev length and var_lambda
-                length = TheoreticalPlots().rec_gated(sim.sim_param, fixed_lambda, prev_length)
-                # Add to the array of lengths, this array just holds the lengths for different CRI's
-                length_array.append(length)
-                # Update the prev length for the next iteration
-                prev_length = length
-            full_length_array.append(length_array[-1] - length_array[-2])
-        pyplot.plot(lambda_array, full_length_array, label=F"K = {k}")
-    pyplot.xlabel('Arrival Rate Lambda')
-    pyplot.ylabel('Delta CRI')
-    pyplot.legend()
-    pyplot.savefig('Gated_Access_CRI_SIC.png', dpi=300)
-    tikzplotlib.save('Gated_Access_CRI_SIC.tex', encoding='utf-8')
-    pyplot.show()
-    end = time.time()
-    print(F"The Time Required for simulation is {end - start} Seconds")
+    # start = time.time()
+    # k_array = [1, 5, 10]
+    # k_lambda_array = [np.arange(0.58, 0.72, 0.01), np.arange(0.60, 0.75, 0.01), np.arange(0.60, 0.75, 0.01)]
+    # for k, lambda_array in zip(k_array, k_lambda_array):
+    #     sim.sim_param.K = k
+    #     new_lambda_array = k * lambda_array
+    #     full_length_array = []
+    #     for fixed_lambda in new_lambda_array:
+    #         # Initialise the length of the 0th CRI to 0
+    #         prev_length = 0
+    #         length_array = []
+    #         # Taking the values for 6 CRI's
+    #         for j in range(0, 60):
+    #             # Get the length of the CRI depending on prev length and var_lambda
+    #             length = TheoreticalPlots().rec_gated(sim.sim_param, fixed_lambda, prev_length)
+    #             # Add to the array of lengths, this array just holds the lengths for different CRI's
+    #             length_array.append(length)
+    #             # Update the prev length for the next iteration
+    #             prev_length = length
+    #         full_length_array.append(length_array[-1] - length_array[-2])
+    #     pyplot.plot(lambda_array, full_length_array, label=F"K = {k}")
+    # pyplot.xlabel('Arrival Rate Lambda')
+    # pyplot.ylabel('Delta CRI')
+    # pyplot.legend()
+    # pyplot.savefig('Gated_Access_CRI_SIC.png', dpi=300)
+    # tikzplotlib.save('Gated_Access_CRI_SIC.tex', encoding='utf-8')
+    # pyplot.show()
+    # end = time.time()
+    # print(F"The Time Required for simulation is {end - start} Seconds")
 
     # _____________---Single Recursive -- _______
     # start = time.time()
     # k = 5
     # sim.sim_param.K = k
-    # lambda_array = [0.65, 0.7, 0.75]
+    # lambda_array = [0.33,0.35]
     # for fixed_lambda in lambda_array:
     #     fixed_lambda = fixed_lambda * k
-    #     prev_length = 0
+    #     prev_length = 10000
     #     length_array = []
-    #     for j in range(0, 30):
+    #     for j in range(0,3):
     #         length = TheoreticalPlots().rec_gated(sim.sim_param, fixed_lambda, prev_length)
     #         length_array.append(length)
     #         prev_length = length
     #     pyplot.plot(length_array, label=F"Lambda={fixed_lambda/ k}")
     # pyplot.xlabel('CRI')
     # pyplot.ylabel('CRI Length')
-    # pyplot.title(F"K = {5}")
+    # pyplot.title(F"K = {k}")
     # pyplot.legend()
     # pyplot.savefig('IllustrativeFigure.png', dpi=300)
     # pyplot.show()
@@ -485,8 +486,8 @@ def experimental_runs(sim, setting):
     # start = time.time()
     # k = 1
     # sim.sim_param.K = k
-    # fixed_lambda = 0.63
-    # prev_length = 0
+    # fixed_lambda = 0.4
+    # prev_length = 1000
     # length_array = []
     # for j in range(0, 100):
     #     length = TheoreticalPlots().rec_gated(sim.sim_param, fixed_lambda, prev_length)
@@ -498,6 +499,57 @@ def experimental_runs(sim, setting):
     #     print(F"We are unstable")
     # end = time.time()
     # print(F"The Time Required for simulation is {end - start} Seconds")
+    # ______________________ New Approeach Gated ________________________________________
+    # start = time.time()
+    # k_array = [1, 5, 10, 15, 30, 50,100]
+    # min_bound = []
+    # for k in k_array:
+    #     sim.sim_param.K = k
+    #     alpha_array = []
+    #     for n in range(k+1, k+100):
+    #         length = TheoreticalPlots().qarylen(n, sim.sim_param)
+    #         alpha_array.append(((length+1)*k)/n)
+    #     max_alpha = max(alpha_array)
+    #     min_alpha = min(alpha_array)
+    #     print(F"K = {k}")
+    #     #print(F"Max Aplha is {max_alpha}")
+    #     #print(F"Min Aplha is {min_alpha}")
+    #     print(F"Max Lambda is {1/min_alpha}")
+    #     # print(F"Min Lambda is {1/max_alpha}")
+    #     #pyplot.plot(range(k+1, 500), alpha_array, label=F"K = {k}")
+    #     min_bound.append(1/min_alpha)
+    # pyplot.plot(k_array, min_bound)
+    # pyplot.xlabel('K')
+    # pyplot.ylabel('Max Lambda')
+    # pyplot.title('SIC')
+    # pyplot.savefig('Max_lambda_SIC.png', dpi=300)
+    # pyplot.show()
+    # end = time.time()
+    # print(F"The Time Required for simulation is {end - start} Seconds")
+    # _________________________ aplha plots ______________________________________________
+    start = time.time()
+    k_array = [1, 5, 10]
+    mylambda = 0.70
+    alpha = 1 / mylambda
+    for k in k_array:
+        sim.sim_param.K = k
+        n_array = np.arange(k+1, 100)
+        alpha_array = ((alpha*n_array)/k) + 1
+        length_array = []
+        for n in n_array:
+            length = TheoreticalPlots().qarylen(n, sim.sim_param)
+            length_array.append(float(length))
+        diff_array = np.subtract(length_array, alpha_array)
+        pyplot.plot(n_array, diff_array, label=F"K = {k}")
+    pyplot.hlines(0, 2, 100)
+    pyplot.title(F"Lambda = {mylambda}")
+    pyplot.legend()
+    pyplot.savefig('BoundsPlots.png', dpi=300)
+    pyplot.show()
+    end = time.time()
+    print(F"Time for simulation is {end-start}")
+
+
 
 
 if __name__ == '__main__':

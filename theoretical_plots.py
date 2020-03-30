@@ -97,7 +97,7 @@ class TheoreticalPlots(object):
 
         ln = 0
         if prev_length == 0:
-            z = var_lambda * 1
+            z = var_lambda * 0
         else:
             z = var_lambda * float(prev_length)
         for k in range(0, 300):
