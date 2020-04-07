@@ -1,7 +1,10 @@
 from graphviz import Digraph
 
 
-def displaygraph(sim):
+def displaygraph(sim, date_time_folder):
+    """
+    This method takes the simulation results, mainly a single tree and uses graphviz to plot the Tree visualization
+    """
     real_tree_branch = sim.branch_node.branch_array[:-1]
     branch_array = sim.branch_node.ghost_array[:-1]
     result_array = sim.tree_state.ST_result_array
@@ -29,4 +32,4 @@ def displaygraph(sim):
             if variable_node[:-1] == fixed_node:
                 cot.edge(fixed_node, variable_node, variable_node)
     cot.edge_attr.update(fontcolor='green')
-    cot.render('Results/Result', view=True)
+    cot.render(date_time_folder + 'TreeImage', view=True)

@@ -57,6 +57,7 @@ class SimResult(object):
         # Average tree length
         self.mean_tree_length = np.mean(sim.sim_state.tree_length_array)
         # Delta CRI is the difference between the CRI of the last and second last tree
-        self.delta_cri = sim.sim_state.tree_length_array[-3] - sim.sim_state.tree_length_array[-4]
+        if len(sim.sim_state.tree_length_array) > 5:
+            self.delta_cri = sim.sim_state.tree_length_array[-3] - sim.sim_state.tree_length_array[-4]
         # To show the error in d > 2 in SICTA
         self.magic_throughput = np.mean(sim.sim_state.magic_throughput)

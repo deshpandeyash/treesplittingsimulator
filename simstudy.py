@@ -1,4 +1,6 @@
 import time
+from datetime import date
+from datetime import time
 import numpy as np
 from matplotlib import pyplot
 from scipy.stats import skew
@@ -10,10 +12,12 @@ from simsetting import SimSetting
 from simulation import Simulation
 from theoretical_plots import TheoreticalPlots
 import tikzplotlib
+import os
+import sys
 import math
 
 
-def simulate_tree_branching(sim, setting):
+def simulate_tree_branching(sim, setting, date_time_folder, txt_context):
     """
     To get the vizualization of 1 tree for the given settings and number of users as defined by simsettings and simparam
     also prints the obtained throughput, tree progression, result progression and tree depth
@@ -32,10 +36,11 @@ def simulate_tree_branching(sim, setting):
                                                                                               sim.sim_param)))
     print("Magic Throughput " + str(sim.sim_result.magic_throughput))
     print("The Depth of the tree is: " + str(sim.sim_result.mean_tree_depth))
-    graphdisplay.displaygraph(sim)
+    graphdisplay.displaygraph(sim, date_time_folder)
 
 
-def simulate_simple_tree_static_multiple_runs(sim, setting):
+
+def simulate_simple_tree_static_multiple_runs(sim, setting, date_time_folder, txt_context):
     """
     Does a a number of runs with the same number of users, plots the distribution of throughput and prints out the
     theoretical throughput
@@ -89,7 +94,7 @@ def simulate_simple_tree_static_multiple_runs(sim, setting):
     pyplot.show()
 
 
-def simulate_users(sim, setting):
+def simulate_users(sim, setting, date_time_folder, txt_context):
     """
     Sweeps through number of users, taking an average over the runs defined in simsetting for each run.
     At the same time plots the theoretical results.
@@ -122,7 +127,7 @@ def simulate_users(sim, setting):
     pyplot.xlabel("Mean Users")
     pyplot.ylabel("Throughput")
     pyplot.legend()
-    figname = F"K{sim.sim_param.K}Q{sim.sim_param.SPLIT}UserSweep"
+    figname = date_time_folder + F"K{sim.sim_param.K}Q{sim.sim_param.SPLIT}UserSweep"
     pyplot.savefig(figname + '.png', dpi=300)
     tikzplotlib.save(figname + '.tex')
     end = time.time()
@@ -130,7 +135,7 @@ def simulate_users(sim, setting):
     pyplot.show()
 
 
-def simulate_simple_tree_dynamic_multiple_runs(sim, setting):
+def simulate_simple_tree_dynamic_multiple_runs(sim, setting, date_time_folder, txt_context):
     """
     FREE ACCESS SIMULATION
     Sweep through different arrival rate, take average through no of runs. Plot delay, success rate vs arrival rate.
@@ -162,42 +167,41 @@ def simulate_simple_tree_dynamic_multiple_runs(sim, setting):
     pyplot.ylabel('Mean Packet Delay')
     pyplot.show()
     pyplot.grid()
-    figname = F"K{sim.sim_param.K}Q{sim.sim_param.SPLIT}FreeArrivalSweep"
+    figname = date_time_folder + F"K{sim.sim_param.K}Q{sim.sim_param.SPLIT}FreeArrivalSweep"
     pyplot.savefig(figname + '.png', dpi=300)
     tikzplotlib.save(figname + '.tex')
     end = time.time()
     print("Time for Simulaiton: " + str(end - start))
 
 
-def simulate_simple_tree_dynamic_multiple_runs_gated(sim, setting):
+def simulate_simple_tree_dynamic_multiple_runs_gated(sim, setting, date_time_folder, txt_context):
     """
     GATED ACCESS SIMULATION - plots cri length and mean packet delay should add a k sweep
     """
     start = time.time()
     rate_array = np.arange(setting.dynamictest.start, setting.dynamictest.stop + setting.dynamictest.step,
                            setting.dynamictest.step)
-    k_array = [1, 5, 10]
-    for k in k_array:
-        sim.sim_param.K = k
-        delay = []
-        cri_length = []
-        for p in rate_array:
-            delay_counter = []
-            delta_length_counter = []
-            for _ in range(setting.dynamictest.runs):
-                sim.reset(setting)
-                sim.sim_param.lmbda = p * sim.sim_param.K
-                sim.do_simulation_gated_access()
-                delay_counter.append(sim.sim_result.mean_packet_delay)
-                delta_length_counter.append(sim.sim_result.delta_cri)
-            delay.append(np.mean(delay_counter))
-            cri_length.append(np.mean(delta_length_counter))
-        pyplot.plot(rate_array, delay, label=F"K = {k}")
-    pyplot.xlabel('Arrival rate (packets/slot)')
-    pyplot.ylabel('Mean Packet Delay')
+
+    delay = []
+    cri_length = []
+    for p in rate_array:
+        delay_counter = []
+        delta_length_counter = []
+        for j in range(setting.dynamictest.runs):
+            sim.reset(setting)
+            sim.sim_param.lmbda = p * sim.sim_param.K
+            sim.do_simulation_gated_access()
+            delay_counter.append(sim.sim_result.mean_packet_delay)
+            delta_length_counter.append(sim.sim_result.delta_cri)
+        delay.append(np.mean(delay_counter))
+        cri_length.append(np.mean(delta_length_counter))
+    pyplot.plot(rate_array, delay)
+    pyplot.xlabel('CRI')
+    pyplot.ylabel('Init Collision')
+    pyplot.title(F"Mean Packet Delay")
     pyplot.legend()
     pyplot.grid()
-    figname = F"K{sim.sim_param.K}Q{sim.sim_param.SPLIT}GatedArrivalSweep"
+    figname = date_time_folder + F"K{sim.sim_param.K}Q{sim.sim_param.SPLIT}GatedArrivalSweep"
     pyplot.savefig(figname + '.png', dpi=300)
     tikzplotlib.save(figname + '.tex', encoding='utf-8')
     pyplot.show()
@@ -205,7 +209,7 @@ def simulate_simple_tree_dynamic_multiple_runs_gated(sim, setting):
     print("Time for Simulation: " + str(end - start))
 
 
-def do_theoretical_iter(sim, setting):
+def do_theoretical_iter(sim, setting, date_time_folder, txt_context):
     """
     :param n_stop: till the end of number of users we want to sweep till
     can be used to compare different formulas in different formulas in different papers.
@@ -246,25 +250,18 @@ def do_theoretical_iter(sim, setting):
         pyplot.plot(users, theoretical4, 'm-', label='Recursive Quary')
     if setting.theorsweep.test_values[5]:
         pyplot.plot(users, theoretical5, 'y-', label='QSICTA Giannakkis')
-
-    max_f = max(theoretical)
-    min_f = min(theoretical)
-    indexer = np.argmax(theoretical)
-    optimum = users[indexer]
-    print(F"Max throughput is {max_f:.4f} at users {optimum}")
-
     pyplot.xlabel('Users')
     pyplot.ylabel('Throughput')
     pyplot.legend()
     pyplot.grid()
-    # pyplot.xscale('log')
-    figname = F"K{sim.sim_param.K}Q{sim.sim_param.SPLIT}TheoreticalCalc"
+    pyplot.xscale('log')
+    figname = close_txt_file(txt_context) + F"K{sim.sim_param.K}Q{sim.sim_param.SPLIT}TheoreticalCalc"
     pyplot.savefig(figname + '.png', dpi=300)
-    # tikzplotlib.save(figname + '.tex')
+    tikzplotlib.save(figname + '.tex')
     pyplot.show()
 
 
-def static_grid_run(sim, setting):
+def static_grid_run(sim, setting, date_time_folder, txt_context):
     """
     Static Grid Run Sweeps across k and and N to get slot distribution and other parameters as a function of n for
     different k
@@ -315,7 +312,7 @@ def static_grid_run(sim, setting):
     print(F"Time for Simulaiton is {end - start} seconds")
 
 
-def experimental_runs(sim, setting):
+def experimental_runs(sim, setting, date_time_folder, txt_context):
     """
     This function can be used to runs experimnetal code and tests within the framework of the GUI
     All other parameters must be inputted by User, just the parameters from the tree will remain
@@ -345,7 +342,7 @@ def experimental_runs(sim, setting):
     # pyplot.legend()
     # pyplot.xlabel('Users')
     # pyplot.ylabel('Throughput')
-    # figname = f"Q{sim.sim_param.SPLIT}allKplotsp"
+    # figname = date_time_folder +  f"Q{sim.sim_param.SPLIT}allKplotsp"
     # pyplot.savefig(figname + '.png', dpi=300)
     # tikzplotlib.save(figname + '.tex')
     #
@@ -367,7 +364,7 @@ def experimental_runs(sim, setting):
     # pyplot.legend()
     # pyplot.xlabel("Probability to Choose 1st Slot")
     # pyplot.ylabel("Throughput for 100 Users")
-    # figname = f"unfairSplit"
+    # figname = date_time_folder + f"unfairSplit"
     # pyplot.savefig(figname + '.png', dpi=300)
     # tikzplotlib.save(figname + '.tex')
     # pyplot.show()
@@ -395,33 +392,13 @@ def experimental_runs(sim, setting):
     #     print(F"For K = {k} : ")
     #     print(F"Max Fz is {max_f:.4f} for Z = {optimum_z}")
     # pyplot.legend()
-    # pyplot.savefig('windowed_access.png', dpi=300)
-    # tikzplotlib.save('windowed_access.tex', encoding='utf-8')
+    # figname = date_time_folder + 'windowed_access'
+    # pyplot.savefig(figname + '.png', dpi=300)
+    # tikzplotlib.save(figname + '.tex', encoding='utf-8')
     # pyplot.show()
     # end = time.time()
     # print(F"Time for Simulation is {end-start} seconds")
 
-    # ---------------------------------Gated Access ---------------------------------------------
-    # start = time.time()
-    # k_array = [1]
-    # lambda_array = np.arange(0.2, 0.50, 0.05)
-    # for k in k_array:
-    #     sim.sim_param.K = k
-    #     length_result = []
-    #     for my_lambda in lambda_array:
-    #         length_array = np.arange(1, 10, 0.1)
-    #         length = TheoreticalPlots().gated_sic(sim.sim_param, my_lambda*k, length_array)
-    #         length_result.append(length)
-    #     #grad = np.diff(length_result)/np.diff(lambda_array)
-    #     pyplot.plot(lambda_array, length_result, label=F"K = {k}")
-    # pyplot.xlabel("Lambda")
-    # pyplot.ylabel("Length")
-    # pyplot.legend()
-    # pyplot.savefig('Gated_Access.png', dpi=300)
-    # tikzplotlib.save('Gated_Access.tex', encoding='utf-8')
-    # pyplot.show()
-    # end = time.time()
-    # print(F"The Time Required for simulation is {end - start} Seconds")
     # _____________ Single lambda ____________
     # length_array = np.arange(1, 10, 0.1)
     # my_lambda = 0.69
@@ -453,8 +430,9 @@ def experimental_runs(sim, setting):
     # pyplot.xlabel('Arrival Rate Lambda')
     # pyplot.ylabel('Delta CRI')
     # pyplot.legend()
-    # pyplot.savefig('Gated_Access_CRI_SIC.png', dpi=300)
-    # tikzplotlib.save('Gated_Access_CRI_SIC.tex', encoding='utf-8')
+    # figname = date_time_folder + 'Gated_Access_CRI_SIC'
+    # pyplot.savefig(figname + '.png', dpi=300)
+    # tikzplotlib.save(figname + '.tex', encoding='utf-8')
     # pyplot.show()
     # end = time.time()
     # print(F"The Time Required for simulation is {end - start} Seconds")
@@ -503,34 +481,7 @@ def experimental_runs(sim, setting):
     #     print(F"We are unstable")
     # end = time.time()
     # print(F"The Time Required for simulation is {end - start} Seconds")
-    # ______________________ New Approeach Gated ________________________________________
-    # start = time.time()
-    # k_array = [1, 5, 10, 15, 30, 50,100]
-    # min_bound = []
-    # for k in k_array:
-    #     sim.sim_param.K = k
-    #     alpha_array = []
-    #     for n in range(k+1, k+100):
-    #         length = TheoreticalPlots().qarylen(n, sim.sim_param)
-    #         alpha_array.append(((length+1)*k)/n)
-    #     max_alpha = max(alpha_array)
-    #     min_alpha = min(alpha_array)
-    #     print(F"K = {k}")
-    #     #print(F"Max Aplha is {max_alpha}")
-    #     #print(F"Min Aplha is {min_alpha}")
-    #     print(F"Max Lambda is {1/min_alpha}")
-    #     # print(F"Min Lambda is {1/max_alpha}")
-    #     #pyplot.plot(range(k+1, 500), alpha_array, label=F"K = {k}")
-    #     min_bound.append(1/min_alpha)
-    # pyplot.plot(k_array, min_bound)
-    # pyplot.xlabel('K')
-    # pyplot.ylabel('Max Lambda')
-    # pyplot.title('SIC')
-    # pyplot.savefig('Max_lambda_SIC.png', dpi=300)
-    # pyplot.show()
-    # end = time.time()
-    # print(F"The Time Required for simulation is {end - start} Seconds")
-    # _________________________ aplha plots ______________________________________________
+    # _________________________ aplha plots Gated ______________________________________________
     # start = time.time()
     # k_array = [1, 5, 10]
     # mylambda = 0.70
@@ -548,18 +499,46 @@ def experimental_runs(sim, setting):
     # pyplot.hlines(0, 2, 100)
     # pyplot.title(F"Lambda = {mylambda}")
     # pyplot.legend()
-    # pyplot.savefig('BoundsPlots.png', dpi=300)
+    # figname = date_time_folder + 'BoundsPlots'
+    # pyplot.savefig(fingame + '.png', dpi=300)
     # pyplot.show()
     # end = time.time()
     # print(F"Time for simulation is {end-start}")
 
-    # --------------------- Another Approach ---------------
 
+def make_result_folder():
+    today = date.today()
+    today_string = today.strftime("%b-%d-%Y")
+    date_time_folder = 'Results/' + today_string + "Tests/"
+    if not os.path.exists(date_time_folder):
+        os.makedirs(date_time_folder)
+    return date_time_folder
+
+
+def make_result_txt(date_time_folder):
+    orig_stdout = sys.stdout
+    txt_file = open(date_time_folder + 'Output.txt', 'w+')
+    sys.stdout = txt_file
+    return txt_file, orig_stdout
+
+
+def close_txt_file(txt_context):
+    txt_file = txt_context[0]
+    orig_stdout = txt_context[1]
+    sys.stdout = orig_stdout
+    txt_file.close()
+
+def still_print(date_time_folder):
+    txt_file = open(date_time_folder + 'Output.txt', 'r')
+    contents = txt_file.read()
+    print(contents)
 
 
 
 
 if __name__ == '__main__':
+    date_time_folder = make_result_folder()
+    txt_context = make_result_txt(date_time_folder)
     # This array basically just has the functions, one of which is run by the GUI
     test_array = [simulate_tree_branching, simulate_simple_tree_static_multiple_runs, simulate_users,
                   simulate_simple_tree_dynamic_multiple_runs, simulate_simple_tree_dynamic_multiple_runs_gated,
@@ -568,7 +547,7 @@ if __name__ == '__main__':
     # Seed for reproducibility
     # np.random.seed(setting.seed)
     if sum(setting.secondwindow.test_values) > 1:
-        print("Multiple Tests should be done by running the scrip multiple times")
+        print("Multiple Tests should be done by running the script multiple times")
         exit()
     sim = Simulation(setting)
     sim.sim_param.print_settings()
@@ -578,5 +557,9 @@ if __name__ == '__main__':
     else:
         for test in test_array:
             if setting.secondwindow.test_values[test_array.index(test)]:
+                print("-----------------------------------------------")
+                print("Test Name : - " + setting.secondwindow.test_names[test_array.index(test)])
                 sim.reset(setting)
-                test(sim, setting)
+                test(sim, setting, date_time_folder, txt_context)
+                close_txt_file(txt_context)
+                still_print(date_time_folder)
