@@ -83,12 +83,14 @@ def simulate_simple_tree_static_multiple_runs(sim, setting, date_time_folder, tx
     # Plots start here
     # First the throughput histogram
     make_histogram_cont(throughput, sim, xlabel='Throughput', conf_ints=(conf_min, conf_max),
-                        theoretical_mean=theoretical_throughput, save_fig=True)
+                        theoretical_mean=theoretical_throughput, save_fig=True,folder=date_time_folder)
     # Then the Packet in a slot distribuiton
     number_in_slot = np.asarray(number_in_slot) / sim.sim_param.K
-    make_histogram_discrete(number_in_slot, sim, setting, xlabel='Packets in a Slot', save_fig=False)
+    make_histogram_discrete(number_in_slot, sim, setting, xlabel='Packets in a Slot', save_fig=False,
+                            folder=date_time_folder)
     # Then the retransmission Distribution
-    make_histogram_discrete(tx_stat_array, sim, setting, xlabel='Transmissions per Packet', save_fig=False)
+    make_histogram_discrete(tx_stat_array, sim, setting, xlabel='Transmissions per Packet', save_fig=False,
+                            folder=date_time_folder)
     end = time.time()
     print("Time for simulation: " + str(end - start))
     pyplot.show()
@@ -301,13 +303,16 @@ def static_grid_run(sim, setting, date_time_folder, txt_context):
         aggregate_retx_array.append(mean_retx_dist)
         aggregate_delay_array.append(mean_delay_dist)
 
+    figname = date_time_folder + 'SlotDegreeDistribution'
     make_multiplot(k_array, aggregate_slot_array, user_array, ylabel='K normalized mean Packets per slot', xlabel='K',
-                   save_fig=True, figname='SlotDegreeDistribution')
+                   save_fig=True, figname=figname)
+    figname = date_time_folder + 'RetxDegreeDistribution'
     make_multiplot(k_array, aggregate_retx_array, user_array, ylabel='Mean No of Retransmissions per Packet',
                    xlabel='K',
-                   save_fig=True, figname='RetxDegreeDistribution')
+                   save_fig=True, figname=figname)
+    figname = date_time_folder + 'DelayDegreeDistribution'
     make_multiplot(k_array, aggregate_delay_array, user_array, ylabel='Mean Packet Delay', xlabel='K',
-                   save_fig=True, figname='DelayDegreeDistribution')
+                   save_fig=True, figname=figname)
     end = time.time()
     print(F"Time for Simulaiton is {end - start} seconds")
 
