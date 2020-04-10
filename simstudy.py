@@ -1,6 +1,5 @@
 import time
 from datetime import date
-from datetime import time
 import numpy as np
 from matplotlib import pyplot
 from scipy.stats import skew
@@ -14,6 +13,7 @@ from theoretical_plots import TheoreticalPlots
 import tikzplotlib
 import os
 import sys
+from scipy.special import comb
 import math
 
 
@@ -326,11 +326,11 @@ def experimental_runs(sim, setting, date_time_folder, txt_context):
 
     # ------------------------------------ For the Large Oscillation Plot -----------------------------------
     # start = time.time()
-    # k_array = [1, 5, 10]
+    # k_array = [1, 2, 6, 8, 10]
     # multiple_theoretical = []
     # maximum_array = []
     # n_array = []
-    #n_stop = 1000
+    # n_stop = 1000
     # for k in k_array:
     #     sim.sim_param.K = k
     #     user_array = np.arange(sim.sim_param.K + 1, n_stop)
@@ -347,7 +347,7 @@ def experimental_runs(sim, setting, date_time_folder, txt_context):
     # pyplot.legend()
     # pyplot.xlabel('Users')
     # pyplot.ylabel('Throughput')
-    # figname = date_time_folder +  f"Q{sim.sim_param.SPLIT}allKplotsp"
+    # figname = date_time_folder + f"Q{sim.sim_param.SPLIT}allKplotsp"
     # pyplot.savefig(figname + '.png', dpi=300)
     # tikzplotlib.save(figname + '.tex')
     #
@@ -404,88 +404,6 @@ def experimental_runs(sim, setting, date_time_folder, txt_context):
     # end = time.time()
     # print(F"Time for Simulation is {end-start} seconds")
 
-    # _____________ Single lambda ____________
-    # length_array = np.arange(1, 10, 0.1)
-    # my_lambda = 0.69
-    # length = TheoreticalPlots().gated_sic(sim.sim_param, my_lambda, length_array)
-    # print(length)
-    # ______________ Try Recursive Gated Access _____________
-
-    # start = time.time()
-    # k_array = [1, 5, 10]
-    # k_lambda_array = [np.arange(0.58, 0.72, 0.01), np.arange(0.60, 0.75, 0.01), np.arange(0.60, 0.75, 0.01)]
-    # for k, lambda_array in zip(k_array, k_lambda_array):
-    #     sim.sim_param.K = k
-    #     new_lambda_array = k * lambda_array
-    #     full_length_array = []
-    #     for fixed_lambda in new_lambda_array:
-    #         # Initialise the length of the 0th CRI to 0
-    #         prev_length = 0
-    #         length_array = []
-    #         # Taking the values for 6 CRI's
-    #         for j in range(0, 60):
-    #             # Get the length of the CRI depending on prev length and var_lambda
-    #             length = TheoreticalPlots().rec_gated(sim.sim_param, fixed_lambda, prev_length)
-    #             # Add to the array of lengths, this array just holds the lengths for different CRI's
-    #             length_array.append(length)
-    #             # Update the prev length for the next iteration
-    #             prev_length = length
-    #         full_length_array.append(length_array[-1] - length_array[-2])
-    #     pyplot.plot(lambda_array, full_length_array, label=F"K = {k}")
-    # pyplot.xlabel('Arrival Rate Lambda')
-    # pyplot.ylabel('Delta CRI')
-    # pyplot.legend()
-    # figname = date_time_folder + 'Gated_Access_CRI_SIC'
-    # pyplot.savefig(figname + '.png', dpi=300)
-    # tikzplotlib.save(figname + '.tex', encoding='utf-8')
-    # pyplot.show()
-    # end = time.time()
-    # print(F"The Time Required for simulation is {end - start} Seconds")
-
-    # _____________---Single Recursive -- _______
-    start = time.time()
-    k_array = [1, 5, 10]
-    lambda_array = np.arange(0.40, 0.60, 0.01)
-    for k in k_array:
-        print(F"-----------------Starting Simulation for K = {k}...")
-        sim.sim_param.K = k
-        for fixed_lambda in lambda_array:
-            print(F"----For lambda {fixed_lambda}...")
-            fixed_lambda = fixed_lambda * k
-            prev_length = 0
-            length_array = []
-            counter = 0
-            while True:
-                length = TheoreticalPlots().rec_gated(sim.sim_param, fixed_lambda, prev_length)
-                length_array.append(length)
-                if float(length) + 0.0000001 > float(prev_length) > float(length) - 0.0000001 or counter > 100:
-                    break
-                prev_length = length
-                counter += 1
-            if counter >= 100:
-                print(F"The instability rate for K = {k} BTA is {fixed_lambda}")
-                break
-            else:
-                print(F"Passed! at the no of CRI {counter}")
-    end = time.time()
-    print(F"The Time Required for simulation is {end - start} Seconds")
-    # ________________________ Single Recursive single Delta value ___________________
-    # start = time.time()
-    # k = 1
-    # sim.sim_param.K = k
-    # fixed_lambda = 0.4
-    # prev_length = 1000
-    # length_array = []
-    # for j in range(0, 100):
-    #     length = TheoreticalPlots().rec_gated(sim.sim_param, fixed_lambda, prev_length)
-    #     length_array.append(length)
-    #     prev_length = length
-    # delta_value = length_array[-1] - length_array[-2]
-    # print(F"Delta Value is {delta_value}")
-    # if delta_value > 0:
-    #     print(F"We are unstable")
-    # end = time.time()
-    # print(F"The Time Required for simulation is {end - start} Seconds")
     # _________________________ aplha plots Gated ______________________________________________
     # start = time.time()
     # k_array = [1, 5, 10]
@@ -509,7 +427,25 @@ def experimental_runs(sim, setting, date_time_folder, txt_context):
     # pyplot.show()
     # end = time.time()
     # print(F"Time for simulation is {end-start}")
+    # _______________________ Bound Plots ____________________________________________
 
+    m = 50
+    k = sim.sim_param.K
+    n_array = np.arange(m+1, m+30)
+    alpha_plot = []
+    for n in n_array:
+        numerator = 0
+        denominator = 0
+        for i in range(0, m):
+            li = TheoreticalPlots().qarylen(i, sim.sim_param)
+            comber = comb(n, i, exact=True)
+            numerator += comber * (li + 1)
+            denominator += comber * i
+        alpha_plot.append(float(numerator/denominator))
+    alpha_lb = min(alpha_plot)
+    alpha_ub = max(alpha_plot)
+
+    print(F"Lower Bound {alpha_lb*k} and Upper Bound {alpha_ub*k}")
 
 def make_result_folder():
     today = date.today()
