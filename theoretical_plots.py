@@ -55,7 +55,7 @@ class TheoreticalPlots(object):
         norm_throughput = throughput / t
         return norm_throughput
 
-    def windowed_sic(self, param, z_array):
+    def windowed(self, param, z_array):
         """
         Windowed access SIC test equation, work in progress....
         """
@@ -72,39 +72,19 @@ class TheoreticalPlots(object):
             fz_array.append(throughput)
         return fz_array
 
-    def gated_sic(self, param, my_lambda, length_array):
+    def windowed_bound(self, param, x, k, z):
         """
         Gated access SIC test equation, work in progress....
         """
 
-        for l in length_array:
-            ln = decimal.Decimal(0)
-            z = l * my_lambda
-            for k in range(0, 300):
-                pois_multiplier = poisson.pmf(k, z, loc=0)
-                tree_length = self.qarylen(k, param)
-                ln += decimal.Decimal(pois_multiplier) * decimal.Decimal(tree_length)
-            if ln + decimal.Decimal(0.05) >= decimal.Decimal(l) >= ln - decimal.Decimal(0.05):
-                print("BAM")
-                return l
-        return max(length_array)
-
-    def rec_gated(self, param, var_lambda, prev_length):
-        """
-        Trial of a recursive gated equation
-        """
-
-
-        ln = 0
-        if prev_length == 0:
-            z = var_lambda * 0
-        else:
-            z = var_lambda * float(prev_length)
-        for k in range(0, 300):
-            pois_multiplier = poisson.pmf(k, z, loc=0)
-            tree_length = self.qarylen(k, param)
-            ln += decimal.Decimal(pois_multiplier) * decimal.Decimal(tree_length)
-        return ln
+        first_term = (x*decimal.Decimal(z)) - 1
+        second_term = 0
+        for i in range(0, k + 1):
+            pois_multiplier = poisson.pmf(i, z, loc=0)
+            li = self.qarylen(i, param)
+            inside_term = li - decimal.Decimal(x*i) + 1
+            second_term += decimal.Decimal(inside_term) * decimal.Decimal(pois_multiplier)
+        return decimal.Decimal(first_term) + second_term
 
 
 

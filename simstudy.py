@@ -429,23 +429,58 @@ def experimental_runs(sim, setting, date_time_folder, txt_context):
     # print(F"Time for simulation is {end-start}")
     # _______________________ Bound Plots ____________________________________________
 
+    start = time.time()
+    k_array = [1, 2, 4, 8, 16]
     m = 50
-    k = sim.sim_param.K
-    n_array = np.arange(m+1, m+30)
-    alpha_plot = []
-    for n in n_array:
-        numerator = 0
-        denominator = 0
-        for i in range(0, m):
-            li = TheoreticalPlots().qarylen(i, sim.sim_param)
-            comber = comb(n, i, exact=True)
-            numerator += comber * (li + 1)
-            denominator += comber * i
-        alpha_plot.append(float(numerator/denominator))
-    alpha_lb = min(alpha_plot)
-    alpha_ub = max(alpha_plot)
-
-    print(F"Lower Bound {alpha_lb*k} and Upper Bound {alpha_ub*k}")
+    print(F"m = {m} ")
+    for k in k_array:
+        sim.sim_param.K = k
+        n_array = np.arange(m+k+1, m+k+200)
+        alpha_plot = []
+        for n in n_array:
+            numerator = 0
+            denominator = 0
+            for i in range(0, m):
+                li = TheoreticalPlots().qarylen(i, sim.sim_param)
+                comber = comb(n, i, exact=True)
+                numerator += comber * (li + 1)
+                denominator += comber * i
+            alpha_plot.append(numerator/denominator)
+        alpha_lb = min(alpha_plot)
+        alpha_ub = max(alpha_plot)
+        print(F"............................................................")
+        print(F"For k = {k} ")
+        print(F"Lower Bound {alpha_lb:.7f} and Upper Bound = {alpha_ub:.7f}")
+        print(F"Normalizing with K")
+        print(F"Lower Bound {alpha_lb*k:.7f} and Upper Bound {alpha_ub*k:.7f}")
+        # Now onto the Windowed Access Results
+        lambda_upper_array = []
+        lambda_lower_array = []
+        lambda_delta_array = np.linspace(0.1, 25, 2500)
+        for lambda_delta in lambda_delta_array:
+            lambda_upper_array.append(lambda_delta/float(TheoreticalPlots().windowed_bound(sim.sim_param, alpha_ub, m,
+                                                                                           lambda_delta)))
+            lambda_lower_array.append(lambda_delta/float(TheoreticalPlots().windowed_bound(sim.sim_param, alpha_lb, m,
+                                                                                           lambda_delta)))
+        lambda_upper_array = np.asarray(lambda_upper_array) / k
+        lambda_lower_array = np.asarray(lambda_lower_array) / k
+        lambda_upper = max(lambda_upper_array)
+        lambda_lower = max(lambda_lower_array)
+        arg_index = np.argmax(lambda_upper_array)
+        optimum_lambda_delta = lambda_delta_array[arg_index]
+        optimum_window = optimum_lambda_delta / lambda_upper
+        pyplot.plot(lambda_delta_array, lambda_upper_array, label=F"K{k}")
+        print(F"Lower Bound on Lambda is {lambda_lower:.7f} and upper bound is {lambda_upper:.7f}")
+        print(F"Optimum lambda-Delta is {optimum_lambda_delta} and optimum window size is {optimum_window}")
+    pyplot.xlabel("Lambda_Delta")
+    pyplot.ylabel("Lambda")
+    pyplot.legend()
+    figname = date_time_folder + f"WindowedAccessPLots"
+    pyplot.savefig(figname + '.png', dpi=300)
+    tikzplotlib.save(figname + '.tex', encoding='utf-8')
+    pyplot.show()
+    end = time.time()
+    print(F"Time for Simulation is {end-start}")
 
 def make_result_folder():
     today = date.today()
