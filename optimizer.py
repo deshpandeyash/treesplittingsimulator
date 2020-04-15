@@ -98,3 +98,15 @@ For now its just a scratch pad to try different optimizer functions, nothing imp
 # print(sum(d_array))
 # for i in range(1,len(d_array)):
 #     print((d_array[i]-d_array[i-1])*i*2)
+
+summer = 0
+mpr = 1
+m = 10
+n = 90
+outer = (1 - (2**(-m)))**n
+for k in range(mpr + 1, n + 1):
+    comber = comb(n, k, exact=True)
+    inner = 1 - (2**m)
+    summer += comber*(inner**(-k))
+print(summer)
+print(summer*outer)

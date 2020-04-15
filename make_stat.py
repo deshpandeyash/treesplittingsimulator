@@ -2,6 +2,7 @@ import numpy as np
 import scipy.stats
 from matplotlib import pyplot as plt
 import tikzplotlib
+from sklearn.linear_model import LinearRegression
 
 
 def mean_confidence_interval(data, confidence=0.95):
@@ -71,4 +72,18 @@ def make_multiplot(x_axis, y_axis, y_legend, ylabel='Not Given', xlabel='Not Giv
         plt.savefig(figname + '.png', dpi=300)
         tikzplotlib.save(figname + '.tex')
     plt.show()
+
+
+def create_ideal_by_regression(x_axis, y_axis):
+    # Refit for regression shape
+    refitted_x = np.reshape(x_axis, (-1, 1))
+    # Calculate regression
+    reg = LinearRegression().fit(refitted_x, y_axis)
+    # slope
+    ideal_slope = reg.coef_
+    # intercept
+    intercept = reg.intercept_
+    # Create Equation of Ideal Line
+    ideal_line = (ideal_slope * x_axis) + intercept
+    return ideal_slope
 

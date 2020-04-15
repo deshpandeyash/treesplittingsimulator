@@ -4,7 +4,7 @@ import numpy as np
 from matplotlib import pyplot
 from scipy.stats import skew
 import graphdisplay
-from make_stat import mean_confidence_interval, make_histogram_cont, make_histogram_discrete
+from make_stat import mean_confidence_interval, make_histogram_cont, make_histogram_discrete, create_ideal_by_regression
 from make_stat import make_multiplot, plot_conf_interval
 from simparam import SimParam
 from simsetting import SimSetting
@@ -327,27 +327,37 @@ def experimental_runs(sim, setting, date_time_folder, txt_context):
     """
 
     # ------------------------------------ For the Large Oscillation Plot -----------------------------------
-    start = time.time()
+    # This plots are getting complex, and also more useful. I will soon add them as a seperate thing on its own,
+    # for now please make the parameters on top here for easy access..
     k_array = [1, 2, 4, 8, 16]
+    n_stop = 1000
+    start = time.time()
+
     multiple_theoretical = []
     maximum_array = []
     n_array = []
-    n_stop = 1000
     for k in k_array:
         sim.sim_param.K = k
-        user_array = np.arange(sim.sim_param.K + 1, n_stop)
-        # user_array = np.arange(1, n_stop)
+        # user_array = np.arange(sim.sim_param.K + 1, n_stop)
+        user_array = np.arange(1, n_stop)
         theoretical = []
         for n in user_array:
-            theoretical.append(TheoreticalPlots().qarysic(n, sim.sim_param))
-            # theoretical.append(TheoreticalPlots().qarylen(n, sim.sim_param))
+            # theoretical.append(TheoreticalPlots().qarysic(n, sim.sim_param))
+            theoretical.append(TheoreticalPlots().qarylen(n, sim.sim_param))
         multiple_theoretical.append(theoretical)
         maximum_array.append(max(theoretical))
         n_array.append(user_array[theoretical.index(max(theoretical))])
+        #slope = (theoretical[-1] - theoretical[-10]) / 9
+        slope = create_ideal_by_regression(user_array, theoretical)
+        slope = slope[0]
         pyplot.plot(user_array, theoretical, label=f"K = {k}")
-    pyplot.plot(n_array, maximum_array, 'r--', label='Maximum')
+        l2 = np.array((float(user_array[-200]), float(theoretical[-200])))
+        trans_angle = pyplot.gca().transData.transform_angles(np.array((np.degrees(math.atan(slope)),)),
+                                                           l2.reshape((1, 2)))[0]
+        pyplot.text(l2[0], l2[1], F"Slope={slope:.3f}", rotation=trans_angle, rotation_mode='anchor')
+    #pyplot.plot(n_array, maximum_array, 'r--', label='Maximum')
     print(F"N array is {n_array}")
-    pyplot.xscale('log')
+    # pyplot.xscale('log')
     # pyplot.yscale('log')
     pyplot.legend()
     pyplot.xlabel('Users')
