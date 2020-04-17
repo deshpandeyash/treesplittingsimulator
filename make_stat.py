@@ -85,5 +85,5 @@ def create_ideal_by_regression(x_axis, y_axis):
     intercept = reg.intercept_
     # Create Equation of Ideal Line
     ideal_line = (ideal_slope * x_axis) + intercept
-    return ideal_slope
+    return ideal_slope, intercept
 

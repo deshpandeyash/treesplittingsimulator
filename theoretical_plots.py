@@ -1,10 +1,7 @@
 from scipy.special import comb
 from scipy.stats import poisson
 import decimal
-from math import log, e, pi , exp, factorial
 import numpy as np
-
-from simparam import SimParam
 
 
 class TheoreticalPlots(object):
@@ -57,7 +54,7 @@ class TheoreticalPlots(object):
 
     def windowed(self, param, z_array):
         """
-        Windowed access SIC test equation, work in progress....
+        Windowed access  test equation, work in progress....
         """
 
         t = param.K
@@ -85,9 +82,6 @@ class TheoreticalPlots(object):
             inside_term = li - decimal.Decimal(x*i) + 1
             second_term += decimal.Decimal(inside_term) * decimal.Decimal(pois_multiplier)
         return decimal.Decimal(first_term) + second_term
-
-
-
 
     def qsicta(self, n, param):
         """
@@ -192,7 +186,6 @@ class TheoreticalPlots(object):
             for i in range(0, n):
                 k += (self.mycomb(n, i) * (2 ** (-n))) * self.simpletreerecursive(i)
             return (1 + 2 * k) / (1 - (2 ** (-n + 1)))
-
 
     def simpletree(self, n):
         """

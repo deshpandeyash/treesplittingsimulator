@@ -1,22 +1,16 @@
 import time
-from datetime import date
 import numpy as np
 from matplotlib import pyplot
 from scipy.stats import skew
 import graphdisplay
 from make_stat import mean_confidence_interval, make_histogram_cont, make_histogram_discrete, create_ideal_by_regression
 from make_stat import make_multiplot, plot_conf_interval
-from simparam import SimParam
 from simsetting import SimSetting
 from simulation import Simulation
 from theoretical_plots import TheoreticalPlots
 import tikzplotlib
-import os
-import sys
-from scipy.special import comb
-import math
-import pandas as pd
-from decimal import Decimal
+from file_helper import make_result_txt, make_result_folder, close_txt_file, still_print
+import theorstudy
 
 
 def simulate_tree_branching(sim, setting, date_time_folder, txt_context):
@@ -25,7 +19,6 @@ def simulate_tree_branching(sim, setting, date_time_folder, txt_context):
     also prints the obtained throughput, tree progression, result progression and tree depth
     """
 
-    # os.environ["PATH"] += os.pathsep + r'C:\Users\Murat\Anaconda3\Library\bin\graphviz'
     sim.reset(setting)
     sim.do_simulation_simple_tree_static(setting.vizwindow.users)
     print("Results were: ")
@@ -39,7 +32,6 @@ def simulate_tree_branching(sim, setting, date_time_folder, txt_context):
     print("Magic Throughput " + str(sim.sim_result.magic_throughput))
     print("The Depth of the tree is: " + str(sim.sim_result.mean_tree_depth))
     graphdisplay.displaygraph(sim, date_time_folder)
-
 
 
 def simulate_simple_tree_static_multiple_runs(sim, setting, date_time_folder, txt_context):
@@ -213,56 +205,20 @@ def simulate_simple_tree_dynamic_multiple_runs_gated(sim, setting, date_time_fol
     print("Time for Simulation: " + str(end - start))
 
 
-def do_theoretical_iter(sim, setting, date_time_folder, txt_context):
+def do_theoretical(sim, setting, date_time_folder, txt_context):
     """
-    :param n_stop: till the end of number of users we want to sweep till
-    can be used to compare different formulas in different formulas in different papers.
-    plots the throughput vs number of users
-    :return:
+    These Tests do not make any simulations, rather are used to show the behaviour of the theoretical equations from
+    settings..
     """
+    if setting.theortest.test_values[0]:
+        theorstudy.compare_different_functions(sim, setting, date_time_folder)
+    elif setting.theortest.test_values[1]:
+        theorstudy.length_throughput_plot(sim, setting, date_time_folder)
+    elif setting.theortest.test_values[2]:
+        theorstudy.show_optimal_branchprob(sim, setting, date_time_folder)
+    elif setting.theortest.test_values[3]:
+        theorstudy.traffic_analysis(sim, setting, date_time_folder)
 
-    param = SimParam(setting)
-    users = range(param.K + 1, setting.theorsweep.n_stop + 1)
-    theoretical = []
-    theoretical1 = []
-    theoretical2 = []
-    theoretical3 = []
-    theoretical4 = []
-    theoretical5 = []
-    for n in users:
-        if setting.theorsweep.test_values[0]:
-            theoretical.append(TheoreticalPlots().qarysic(n, param))
-        if setting.theorsweep.test_values[1]:
-            theoretical1.append(TheoreticalPlots().sicta(n, param))
-        if setting.theorsweep.test_values[2]:
-            theoretical2.append(TheoreticalPlots().simpletree(n))
-        if setting.theorsweep.test_values[3]:
-            theoretical3.append(TheoreticalPlots().recsicta(n))
-        if setting.theorsweep.test_values[4]:
-            theoretical4.append(TheoreticalPlots().recquary(n, param))
-        if setting.theorsweep.test_values[5]:
-            theoretical5.append(TheoreticalPlots().qsicta(n, param))
-    if setting.theorsweep.test_values[0]:
-        pyplot.plot(users, theoretical, 'b-', label='Quary Sic')
-    if setting.theorsweep.test_values[1]:
-        pyplot.plot(users, theoretical1, 'g-', label='SICTA')
-    if setting.theorsweep.test_values[2]:
-        pyplot.plot(users, theoretical2, 'r-', label='Simple Tree')
-    if setting.theorsweep.test_values[3]:
-        pyplot.plot(users, theoretical3, 'c-', label='Recursive SICTA')
-    if setting.theorsweep.test_values[4]:
-        pyplot.plot(users, theoretical4, 'm-', label='Recursive Quary')
-    if setting.theorsweep.test_values[5]:
-        pyplot.plot(users, theoretical5, 'y-', label='QSICTA Giannakkis')
-    pyplot.xlabel('Users')
-    pyplot.ylabel('Throughput')
-    pyplot.legend()
-    pyplot.grid()
-    pyplot.xscale('log')
-    figname = close_txt_file(txt_context) + F"K{sim.sim_param.K}Q{sim.sim_param.SPLIT}TheoreticalCalc"
-    pyplot.savefig(figname + '.png', dpi=300)
-    tikzplotlib.save(figname + '.tex')
-    pyplot.show()
 
 
 def static_grid_run(sim, setting, date_time_folder, txt_context):
@@ -272,8 +228,8 @@ def static_grid_run(sim, setting, date_time_folder, txt_context):
 
     """
     start = time.time()
-    user_array = [10, 50, 100]
-    k_array = range(1, 9)
+    user_array = [setting.grid_test.n1, setting.grid_test.n2, setting.grid_test.n3]
+    k_array = range(setting.grid_test.k_start, setting.grid_test.k_stop + 1, setting.grid_test.k_step)
     aggregate_slot_array = []
     aggregate_retx_array = []
     aggregate_delay_array = []
@@ -286,7 +242,7 @@ def static_grid_run(sim, setting, date_time_folder, txt_context):
             tx_stat_array = []
             delay_array = []
             throughput = []
-            for _ in range(setting.statictreewindow.runs):
+            for _ in range(setting.grid_test.runs):
                 # Reset the simulation
                 sim.reset(setting)
                 sim.sim_param.K = k
@@ -325,239 +281,7 @@ def experimental_runs(sim, setting, date_time_folder, txt_context):
     All other parameters must be inputted by User, just the parameters from the tree will remain
 
     """
-
-    # ------------------------------------ For the Large Oscillation Plot -----------------------------------
-    # This plots are getting complex, and also more useful. I will soon add them as a seperate thing on its own,
-    # for now please make the parameters on top here for easy access..
-    k_array = [1, 2, 4, 8, 16]
-    n_stop = 1000
-    start = time.time()
-
-    multiple_theoretical = []
-    maximum_array = []
-    n_array = []
-    for k in k_array:
-        sim.sim_param.K = k
-        # user_array = np.arange(sim.sim_param.K + 1, n_stop)
-        user_array = np.arange(1, n_stop)
-        theoretical = []
-        for n in user_array:
-            # theoretical.append(TheoreticalPlots().qarysic(n, sim.sim_param))
-            theoretical.append(TheoreticalPlots().qarylen(n, sim.sim_param))
-        multiple_theoretical.append(theoretical)
-        maximum_array.append(max(theoretical))
-        n_array.append(user_array[theoretical.index(max(theoretical))])
-        #slope = (theoretical[-1] - theoretical[-10]) / 9
-        slope = create_ideal_by_regression(user_array, theoretical)
-        slope = slope[0]
-        pyplot.plot(user_array, theoretical, label=f"K = {k}")
-        l2 = np.array((float(user_array[-200]), float(theoretical[-200])))
-        trans_angle = pyplot.gca().transData.transform_angles(np.array((np.degrees(math.atan(slope)),)),
-                                                           l2.reshape((1, 2)))[0]
-        pyplot.text(l2[0], l2[1], F"Slope={slope:.3f}", rotation=trans_angle, rotation_mode='anchor')
-    #pyplot.plot(n_array, maximum_array, 'r--', label='Maximum')
-    print(F"N array is {n_array}")
-    # pyplot.xscale('log')
-    # pyplot.yscale('log')
-    pyplot.legend()
-    pyplot.xlabel('Users')
-    pyplot.ylabel('Throughput')
-    pyplot.grid()
-    figname = date_time_folder + f"Q{sim.sim_param.SPLIT}allKplotsp"
-    pyplot.savefig(figname + '.png', dpi=300)
-    tikzplotlib.save(figname + '.tex', encoding='utf-8')
-
-    pyplot.show()
-    end = time.time()
-    print("Time for Simulations = " + str(end-start))
-
-    # ----------------- For the plot that shows optimal pj --------------------------------------------------
-    # start = time.time()
-    # k_array = [1, 3, 5, 10]
-    # pj_array = [0.1, 0.2, 0.3,  0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-    # for k in k_array:
-    #     theoretical = []
-    #     sim.sim_param.K = k
-    #     for p in pj_array:
-    #         sim.sim_param.branchprob = p
-    #         theoretical.append(TheoreticalPlots().qarysic(100, sim.sim_param))
-    #     pyplot.plot(pj_array,theoretical, label=f"K = {k}")
-    # pyplot.legend()
-    # pyplot.xlabel("Probability to Choose 1st Slot")
-    # pyplot.ylabel("Throughput for 100 Users")
-    # figname = date_time_folder + f"unfairSplit"
-    # pyplot.savefig(figname + '.png', dpi=300)
-    # tikzplotlib.save(figname + '.tex')
-    # pyplot.show()
-    # end = time.time()
-    # print("Time for Simulations = " + str(end-start))
-
-    # -------------------------- Windowed Accesss ------------------------------------------------------
-    # start = time.time()
-    # k_array = [1, 5, 10]
-    # p_array = [0.7, 0.6, 0.5]
-    # for k in k_array:
-    # #for p in p_array:
-    #     #sim.sim_param.branchprob = p
-    #     sim.sim_param.K = k
-    #     z_array = np.arange(0.1, 20, 0.1)
-    #     fz_array = TheoreticalPlots().windowed_sic(sim.sim_param, z_array)
-    #     max_f = max(fz_array)
-    #     min_f = min(fz_array)
-    #     indexer = np.argmax(fz_array)
-    #     optimum_z = z_array[indexer]
-    #     pyplot.plot(z_array, fz_array, label=F"K = {k}")
-    #     #pyplot.vlines(optimum_z, min_f, max_f)
-    #     pyplot.xlabel('z')
-    #     pyplot.ylabel('fz')
-    #     print(F"For K = {k} : ")
-    #     print(F"Max Fz is {max_f:.4f} for Z = {optimum_z}")
-    # pyplot.legend()
-    # figname = date_time_folder + 'windowed_access'
-    # pyplot.savefig(figname + '.png', dpi=300)
-    # tikzplotlib.save(figname + '.tex', encoding='utf-8')
-    # pyplot.show()
-    # end = time.time()
-    # print(F"Time for Simulation is {end-start} seconds")
-
-    # _________________________ aplha plots Gated ______________________________________________
-    # start = time.time()
-    # k_array = [1, 5, 10]
-    # mylambda = 0.70
-    # alpha = 1 / mylambda
-    # for k in k_array:
-    #     sim.sim_param.K = k
-    #     n_array = np.arange(k+1, 100)
-    #     alpha_array = ((alpha*n_array)/k) + 1
-    #     length_array = []
-    #     for n in n_array:
-    #         length = TheoreticalPlots().qarylen(n, sim.sim_param)
-    #         length_array.append(float(length))
-    #     diff_array = np.subtract(length_array, alpha_array)
-    #     pyplot.plot(n_array, diff_array, label=F"K = {k}")
-    # pyplot.hlines(0, 2, 100)
-    # pyplot.title(F"Lambda = {mylambda}")
-    # pyplot.legend()
-    # figname = date_time_folder + 'BoundsPlots'
-    # pyplot.savefig(fingame + '.png', dpi=300)
-    # pyplot.show()
-    # end = time.time()
-    # print(F"Time for simulation is {end-start}")
-    # _______________________ Bound Plots ____________________________________________
-
-    # start = time.time()
-    # k_array = [1, 2, 4, 8, 16]
-    # m = 50
-    # bounds_table = pd.DataFrame()
-    # alpha_array_bound = []
-    # beta_array_bound = []
-    # alpha_k_array_bound = []
-    # beta_k_array_bound = []
-    # lambda_lower_array_bound = []
-    # lambda_upper_array_bound = []
-    # lambda_delta_array_bound = []
-    # delta_array_bound = []
-    #
-    # print(F"m = {m} ")
-    # for k in k_array:
-    #     sim.sim_param.K = k
-    #     n_array = np.arange(m+1, m+500)
-    #     alpha_plot = []
-    #     for n in n_array:
-    #         numerator = 0
-    #         denominator = 0
-    #         for i in range(0, m):
-    #             li = TheoreticalPlots().qarylen(i, sim.sim_param)
-    #             comber = comb(n, i, exact=True)
-    #             numerator += comber * (li + 1)
-    #             denominator += comber * i
-    #         alpha_plot.append(numerator/denominator)
-    #     alpha_lb = min(alpha_plot)
-    #     alpha_ub = max(alpha_plot)
-    #     print(F"............................................................")
-    #     print(F"For k = {k} ")
-    #     print(F"Lower Bound {alpha_lb:.7f} and Upper Bound = {alpha_ub:.7f}")
-    #     print(F"Normalizing with K")
-    #     print(F"Lower Bound {alpha_lb*k:.7f} and Upper Bound {alpha_ub*k:.7f}")
-    #
-    #     alpha_array_bound.append(round(float(alpha_lb), 6))
-    #     beta_array_bound.append(round(float(alpha_ub), 6))
-    #     alpha_k_array_bound.append(round(float(alpha_lb*k), 6))
-    #     beta_k_array_bound.append(round(float(alpha_ub*k), 6))
-    #
-    #     # Now onto the Windowed Access Results
-    #     lambda_upper_array = []
-    #     lambda_lower_array = []
-    #     lambda_delta_array = np.linspace(0.1, 25, 2500)
-    #     for lambda_delta in lambda_delta_array:
-    #         lambda_upper_array.append(lambda_delta/float(TheoreticalPlots().windowed_bound(sim.sim_param, alpha_ub, m,
-    #                                                                                        lambda_delta)))
-    #         lambda_lower_array.append(lambda_delta/float(TheoreticalPlots().windowed_bound(sim.sim_param, alpha_lb, m,
-    #                                                                                        lambda_delta)))
-    #     lambda_upper_array = np.asarray(lambda_upper_array) / k
-    #     lambda_lower_array = np.asarray(lambda_lower_array) / k
-    #     lambda_upper = max(lambda_upper_array)
-    #     lambda_lower = max(lambda_lower_array)
-    #     arg_index = np.argmax(lambda_upper_array)
-    #     optimum_lambda_delta = lambda_delta_array[arg_index]
-    #     optimum_window = optimum_lambda_delta / lambda_upper
-    #     pyplot.plot(lambda_delta_array, lambda_upper_array, label=F"K{k}")
-    #     print(F"Lower Bound on Lambda is {lambda_lower:.7f} and upper bound is {lambda_upper:.7f}")
-    #     print(F"Optimum lambda-Delta is {optimum_lambda_delta} and optimum window size is {optimum_window}")
-    #     lambda_lower_array_bound.append(round(float(lambda_lower), 6))
-    #     lambda_upper_array_bound.append(round(float(lambda_upper), 6))
-    #     lambda_delta_array_bound.append(round(float(optimum_lambda_delta), 6))
-    #     delta_array_bound.append(round(float(optimum_window), 6))
-    # pyplot.xlabel("Lambda_Delta")
-    # pyplot.ylabel("Lambda")
-    # pyplot.legend()
-    # pyplot.grid()
-    # figname = date_time_folder + f"WindowedAccessPLots"
-    # pyplot.savefig(figname + '.png', dpi=300)
-    # tikzplotlib.save(figname + '.tex', encoding='utf-8')
-    # pyplot.show()
-    # bounds_table['K'] = k_array
-    # bounds_table['alpha'] = alpha_array_bound
-    # bounds_table['beta'] = beta_array_bound
-    # bounds_table['alphaK'] = alpha_k_array_bound
-    # bounds_table['betaK'] = beta_k_array_bound
-    # bounds_table['lambdaUpper'] = lambda_upper_array_bound
-    # bounds_table['lambdaLower'] = lambda_lower_array_bound
-    # bounds_table['lambdaDelta'] = lambda_delta_array_bound
-    # bounds_table['Delta'] = delta_array_bound
-    # with open(figname + 'table.tex', 'w') as tf:
-    #     tf.write(bounds_table.to_latex())
-    # end = time.time()
-    # print(F"Time for Simulation is {end-start}")
-
-def make_result_folder():
-    today = date.today()
-    today_string = today.strftime("%b-%d-%Y")
-    date_time_folder = 'Results/' + today_string + "Tests/"
-    if not os.path.exists(date_time_folder):
-        os.makedirs(date_time_folder)
-    return date_time_folder
-
-
-def make_result_txt(date_time_folder):
-    orig_stdout = sys.stdout
-    txt_file = open(date_time_folder + 'Output.txt', 'w+')
-    sys.stdout = txt_file
-    return txt_file, orig_stdout
-
-
-def close_txt_file(txt_context):
-    txt_file = txt_context[0]
-    orig_stdout = txt_context[1]
-    sys.stdout = orig_stdout
-    txt_file.close()
-
-def still_print(date_time_folder):
-    txt_file = open(date_time_folder + 'Output.txt', 'r')
-    contents = txt_file.read()
-    print(contents)
-
-
+    pass
 
 
 if __name__ == '__main__':
@@ -566,7 +290,7 @@ if __name__ == '__main__':
     # This array basically just has the functions, one of which is run by the GUI
     test_array = [simulate_tree_branching, simulate_simple_tree_static_multiple_runs, simulate_users,
                   simulate_simple_tree_dynamic_multiple_runs, simulate_simple_tree_dynamic_multiple_runs_gated,
-                  do_theoretical_iter, experimental_runs, static_grid_run]
+                  do_theoretical, experimental_runs, static_grid_run]
     setting = SimSetting()
     # Seed for reproducibility
     # np.random.seed(setting.seed)
