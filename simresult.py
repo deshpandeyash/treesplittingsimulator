@@ -17,6 +17,7 @@ class SimResult(object):
         self.mean_tree_length = 0
         self.delta_cri = 0
         self.magic_throughput = 0
+        self.skipped_slots = 0
 
     def reset(self):
         self.throughput = 0
@@ -32,6 +33,7 @@ class SimResult(object):
         self.mean_tree_length = 0
         self.delta_cri = 0
         self.magic_throughput = 0
+        self.skipped_slots = 0
 
     def get_result(self, sim):
         # Throughput is the number of successful packets divided by the total number of slots, used for single tree
@@ -61,3 +63,5 @@ class SimResult(object):
             self.delta_cri = sim.sim_state.tree_length_array[-3] - sim.sim_state.tree_length_array[-4]
         # To show the error in d > 2 in SICTA
         self.magic_throughput = np.mean(sim.sim_state.magic_throughput)
+        # To see the 'gain' from skipped slots, its the difference between the normal tree and Ghost Tree
+        self.skipped_slots = np.mean(sim.sim_state.skipped_slots)
