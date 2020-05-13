@@ -73,7 +73,7 @@ class TheoreticalPlots(object):
         """
         Gated access SIC test equation, work in progress....
         """
-
+        x = decimal.Decimal(x)
         first_term = (x*decimal.Decimal(z)) - 1
         second_term = 0
         for i in range(0, k + 1):

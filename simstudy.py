@@ -11,6 +11,7 @@ from theoretical_plots import TheoreticalPlots
 import tikzplotlib
 from file_helper import make_result_txt, make_result_folder, close_txt_file, still_print
 import theorstudy
+import math
 
 
 def simulate_tree_branching(sim, setting, date_time_folder, txt_context):
@@ -326,6 +327,24 @@ def experimental_runs(sim, setting, date_time_folder, txt_context):
     All other parameters must be inputted by User, just the parameters from the tree will remain
 
     """
+
+    k_array = [1, 2, 4, 8, 10, 16, 20, 30, 40, 50, 100, 200, 500, 1000]
+    stability = [0.42951, 0.47068, 0.51751, 0.56779, 0.5850039, 0.62388, 0.6435351, 0.6802734,  0.7063453, 0.7262098,
+                 0.7835304, 0.8324254, 0.8832808,  0.9123721]
+    # a = 0.01
+    # fixed = 0.35
+    # theoretical_array = fixed +  (1 - math.e**(-a*np.asarray(k_array)))
+    pyplot.plot(k_array, stability)
+    # pyplot.plot(k_array, theoretical_array, label='Fit')
+    pyplot.xlabel("K")
+    pyplot.hlines(1.0, 0, 1000, colors='red', linestyles='dashed')
+    pyplot.ylabel("Normalized Optimum Stable Arrival Rate")
+    pyplot.title("BTA Windowed Access")
+    pyplot.legend()
+    figname = date_time_folder + F"Asymptotic_K"
+    pyplot.savefig(figname + '.png', dpi=300)
+    tikzplotlib.save(figname + '.tex', encoding='utf-8')
+    pyplot.show()
     pass
 
 

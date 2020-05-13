@@ -150,7 +150,6 @@ def traffic_analysis(sim, setting, date_time_folder):
     """
     Finds upper and lower bounds and also plots the optimal Stability arrival rate for windowed access
     """
-
     k_array = [setting.boundstest.k1, setting.boundstest.k2, setting.boundstest.k3, setting.boundstest.k4,
                setting.boundstest.k5]
     m = int(setting.boundsset.m)
