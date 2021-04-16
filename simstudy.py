@@ -10,6 +10,7 @@ from simsetting import SimSetting
 from simulation import Simulation
 from theoretical_plots import TheoreticalPlots
 import tikzplotlib
+import file_helpers
 
 
 def simulate_tree_branching(sim, setting):
@@ -49,7 +50,7 @@ def simulate_simple_tree_static_multiple_runs(sim, setting):
     for _ in range(setting.statictreewindow.runs):
         # Reset the simulation
         sim.reset(setting)
-        #users = np.random.poisson(setting.statictreewindow.users)
+        # users = np.random.poisson(setting.statictreewindow.users)
         users = setting.statictreewindow.users
         sim.do_simulation_simple_tree_static(users)
         throughput.append(sim.sim_result.throughput / sim.sim_param.K)
@@ -89,7 +90,6 @@ def simulate_simple_tree_static_multiple_runs(sim, setting):
     pyplot.show()
 
 
-
 def simulate_users(sim, setting):
     """
     Sweeps through number of users, taking an average over the runs defined in simsetting for each run.
@@ -120,13 +120,13 @@ def simulate_users(sim, setting):
     print(F"Max Theoretical throughput is {max(theoretical_out_array):.6f}"
           F" at Users {user_array[theoretical_out_array.index(max(theoretical_out_array))]}")
     print(F"Steady State Theoretical Value =   {theoretical_out:.6f}")
-    #pyplot.plot(user_array, magic_throughput_array, 'g', label='Right Skipped Simulation')
+    # pyplot.plot(user_array, magic_throughput_array, 'g', label='Right Skipped Simulation')
     pyplot.xlabel("Mean Users")
     pyplot.ylabel("Throughput")
     pyplot.legend()
-    figname = F"K{sim.sim_param.K}Q{sim.sim_param.SPLIT}UserSweep"
-    pyplot.savefig(figname + '.png', dpi=300)
-    tikzplotlib.save(figname + '.tex')
+    today_folder = file_helpers.create_today_folder(trial_no=1)
+    fig_name = F"{today_folder}K{sim.sim_param.K}Q{sim.sim_param.SPLIT}UserSweep"
+    file_helpers.save_and_close_fig(fig_name=fig_name)
     end = time.time()
     print(F"Time for simulation: {end - start} Seconds")
     pyplot.show()
@@ -247,7 +247,8 @@ def do_theoretical_iter(sim, setting):
     tikzplotlib.save(figname + '.tex')
     pyplot.show()
 
-def static_grid_run(sim,setting):
+
+def static_grid_run(sim, setting):
     """
     Static Grid Run Sweeps across k and and N to get slot distribution and other parameters as a function of n for
     different k
@@ -287,15 +288,15 @@ def static_grid_run(sim,setting):
         aggregate_retx_array.append(mean_retx_dist)
         aggregate_delay_array.append(mean_delay_dist)
 
-    make_multiplot(k_array,aggregate_slot_array,user_array,ylabel='K normalized mean Packets per slot', xlabel='K',
+    make_multiplot(k_array, aggregate_slot_array, user_array, ylabel='K normalized mean Packets per slot', xlabel='K',
                    save_fig=True, figname='SlotDegreeDistribution')
-    make_multiplot(k_array, aggregate_retx_array, user_array, ylabel='Mean No of Retransmissions per Packet', xlabel='K',
+    make_multiplot(k_array, aggregate_retx_array, user_array, ylabel='Mean No of Retransmissions per Packet',
+                   xlabel='K',
                    save_fig=True, figname='RetxDegreeDistribution')
     make_multiplot(k_array, aggregate_delay_array, user_array, ylabel='Mean Packet Delay', xlabel='K',
                    save_fig=True, figname='DelayDegreeDistribution')
     end = time.time()
-    print(F"Time for Simulaiton is {end-start} seconds")
-
+    print(F"Time for Simulaiton is {end - start} seconds")
 
 
 def experimental_runs(sim, setting):
@@ -333,7 +334,7 @@ def experimental_runs(sim, setting):
 
     pyplot.show()
     end = time.time()
-    print("Time for Simulations = " + str(end-start))
+    print("Time for Simulations = " + str(end - start))
 
     # start = time.time()
     # k_array = [1, 3, 5, 10]

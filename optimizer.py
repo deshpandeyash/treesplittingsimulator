@@ -1,18 +1,23 @@
 import numpy as np
+import math
 from matplotlib import pyplot as plt
 from decimal import Decimal as dc
 
-prob_array = np.arange(0.1, 1.0, 0.1)
-print(prob_array)
+k_array = np.arange(21)
+m = 1
 
-i = 30
-result_array = []
-d_sum = 0
-for p in prob_array:
-    for i in range(1,3):
-        d_sum += p ** i
-    result = 1 - power1 - power2
-    result_array.append(result)
-plt.plot(prob_array, result_array)
+def get_A(k,m):
+    complex_add = 2j*math.pi / math.log(2)
+    print(complex_add)
+    k_sum = []
+    for k_i in range(1,k+1):
+        prod_array = []
+        for i in range(k_i):
+            prod_array.append(complex((i - 1) + complex_add))
+        prod = np.prod(np.asarray(prod_array))
+        k_sum.append(prod/math.factorial(k_i))
+    return 1 + sum(k_sum)
+
+plot_array = [get_A(a,m) for a in k_array]
+plt.plot(k_array,plot_array)
 plt.show()
-
