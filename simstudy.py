@@ -77,14 +77,18 @@ def simulate_simple_tree_static_multiple_runs(sim, setting):
             print("This is the problem with the Giannakis Equation for d > 2 but, ")
             print(left_skipped_throughput)
     # Plots start here
+    today_folder = file_helpers.create_today_folder(trial_no=1)
+
     # First the throughput histogram
     make_histogram_cont(throughput, sim, xlabel='Throughput', conf_ints=(conf_min, conf_max),
-                        theoretical_mean=theoretical_throughput, save_fig=True)
+                        theoretical_mean=theoretical_throughput, save_fig=True, today_folder=today_folder)
     # Then the Packet in a slot distribuiton
     number_in_slot = np.asarray(number_in_slot) / sim.sim_param.K
-    make_histogram_discrete(number_in_slot, sim, setting, xlabel='Packets in a Slot', save_fig=False)
+    make_histogram_discrete(number_in_slot, sim, setting, xlabel='Packets in a Slot', save_fig=False,
+                            today_folder=today_folder)
     # Then the retransmission Distribution
-    make_histogram_discrete(tx_stat_array, sim, setting, xlabel='Transmissions per Packet', save_fig=False)
+    make_histogram_discrete(tx_stat_array, sim, setting, xlabel='Transmissions per Packet', save_fig=False,
+                            today_folder=today_folder)
     end = time.time()
     print("Time for simulation: " + str(end - start))
     pyplot.show()
