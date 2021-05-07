@@ -1,3 +1,4 @@
+import custom_logging
 import time
 import numpy as np
 from matplotlib import pyplot
@@ -11,6 +12,8 @@ from simulation import Simulation
 from theoretical_plots import TheoreticalPlots
 import tikzplotlib
 import file_helpers
+from custom_logging import Logger
+import sys
 
 
 def simulate_tree_branching(sim, setting):
@@ -40,6 +43,8 @@ def simulate_simple_tree_static_multiple_runs(sim, setting):
     Does a a number of runs with the same number of users, plots the distribution of throughput and prints out the
     theoretical throughput
     """
+    today_folder = file_helpers.create_today_folder(trial_no=1)
+    sys.stdout = Logger(today_folder=today_folder)
     print_result = True
     start = time.time()
     conf_intervals = []
@@ -74,11 +79,9 @@ def simulate_simple_tree_static_multiple_runs(sim, setting):
         print(mean_throughput)
         print(theoretical_mean_throughput)
         if sim.sim_param.sic and sim.sim_param.SPLIT > 2:
-            print("This is the problem with the Giannakis Equation for d > 2 but, ")
+            print("This is the problem with the Giannakis Equation for Q > 2 but, ")
             print(left_skipped_throughput)
     # Plots start here
-    today_folder = file_helpers.create_today_folder(trial_no=1)
-
     # First the throughput histogram
     make_histogram_cont(throughput, sim, xlabel='Throughput', conf_ints=(conf_min, conf_max),
                         theoretical_mean=theoretical_throughput, save_fig=True, today_folder=today_folder)
