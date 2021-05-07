@@ -74,8 +74,8 @@ def simulate_simple_tree_static_multiple_runs(sim, setting):
     theoretical_mean_throughput = F"Theoretical Throughput = {theoretical_throughput:.6f}"
     left_skipped_throughput = F"Left Skipped Throughput = {np.mean(magic_throughput)}"
     if print_result:
-        print(std_dev)
-        print(skewness)
+        # print(std_dev)
+        # print(skewness)
         print(mean_throughput)
         print(theoretical_mean_throughput)
         if sim.sim_param.sic and sim.sim_param.SPLIT > 2:
@@ -105,6 +105,8 @@ def simulate_users(sim, setting):
     """
     start = time.time()
     throughput_array = []
+    throughput_max = []
+    throughput_min = []
     theoretical_out_array = []
     magic_throughput_array = []
     user_array = np.arange(sim.sim_param.K + 1, setting.usersweep.n_stop)
@@ -118,15 +120,18 @@ def simulate_users(sim, setting):
             # sim.do_simulation_simple_tree_static(n)
             throughput.append(sim.sim_result.throughput / sim.sim_param.K)
             magic.append(sim.sim_result.magic_throughput / sim.sim_param.K)
+        throughput_max.append(np.max(throughput))
+        throughput_min.append(np.min(throughput))
         throughput_array.append(np.mean(throughput))
         magic_throughput_array.append(np.mean(magic))
-        theoretical_out_array.append(TheoreticalPlots().qarysic(n, sim.sim_param))
-    theoretical_out = TheoreticalPlots().qarysic(setting.usersweep.n_stop, sim.sim_param)
+        # theoretical_out_array.append(TheoreticalPlots().qarysic(n, sim.sim_param))
+    # theoretical_out = TheoreticalPlots().qarysic(setting.usersweep.n_stop, sim.sim_param)
     pyplot.plot(user_array, throughput_array, 'b-', label='simulation')
-    pyplot.plot(user_array, theoretical_out_array, 'r', label='theoretical')
-    print(F"Max Theoretical throughput is {max(theoretical_out_array):.6f}"
-          F" at Users {user_array[theoretical_out_array.index(max(theoretical_out_array))]}")
-    print(F"Steady State Theoretical Value =   {theoretical_out:.6f}")
+    pyplot.fill_between(user_array, throughput_max, throughput_min, facecolor='blue', alpha=0.5)
+    # pyplot.plot(user_array, theoretical_out_array, 'r', label='theoretical')
+    # print(F"Max Theoretical throughput is {max(theoretical_out_array):.6f}"
+    #       F" at Users {user_array[theoretical_out_array.index(max(theoretical_out_array))]}")
+    # print(F"Steady State Theoretical Value =   {theoretical_out:.6f}")
     # pyplot.plot(user_array, magic_throughput_array, 'g', label='Right Skipped Simulation')
     pyplot.xlabel("Mean Users")
     pyplot.ylabel("Throughput")
