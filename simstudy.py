@@ -128,7 +128,7 @@ def simulate_users(sim, setting):
     # theoretical_out = TheoreticalPlots().qarysic(setting.usersweep.n_stop, sim.sim_param)
     pyplot.plot(user_array, throughput_array, 'b-', label='simulation')
     pyplot.fill_between(user_array, throughput_max, throughput_min, facecolor='blue', alpha=0.5)
-    # pyplot.plot(user_array, theoretical_out_array, 'r', label='theoretical')
+    #compapyplot.plot(user_array, theoretical_out_array, 'r', label='theoretical')
     # print(F"Max Theoretical throughput is {max(theoretical_out_array):.6f}"
     #       F" at Users {user_array[theoretical_out_array.index(max(theoretical_out_array))]}")
     # print(F"Steady State Theoretical Value =   {theoretical_out:.6f}")
