@@ -16,12 +16,16 @@ class Simulation(object):
     def __init__(self, setting):
         # Load simulation parameters
         self.sim_param = SimParam(setting)
-        # Load simtime
-        if setting.dynamictest:
-            self.SIMTIME = setting.dynamictest.simtime
-        self.freeaccess = False
-        if setting.secondwindow.test_values[3]:
-            self.freeaccess = True
+        if setting is None:
+            # Load simtime
+            self.SIMTIME = 1000
+            self.freeaccess = False
+        else:
+            if setting.dynamictest:
+                self.SIMTIME = setting.dynamictest.simtime
+            self.freeaccess = False
+            if setting.secondwindow.test_values[3]:
+                self.freeaccess = True
         # Load the simulation state parameters
         self.sim_state = SimState()
         # Load the result parameters
@@ -45,12 +49,18 @@ class Simulation(object):
 
 
     def reset(self, setting):
+        # Load simulation parameters
         self.sim_param = SimParam(setting)
-        if setting.dynamictest:
-            self.SIMTIME = setting.dynamictest.simtime
-        self.freeaccess = False
-        if setting.secondwindow.test_values[3]:
-            self.freeaccess = True
+        if setting is None:
+            # Load simtime
+            self.SIMTIME = 1000
+            self.freeaccess = False
+        else:
+            if setting.dynamictest:
+                self.SIMTIME = setting.dynamictest.simtime
+            self.freeaccess = False
+            if setting.secondwindow.test_values[3]:
+                self.freeaccess = True
         self.sim_state = SimState()
         self.sim_result = SimResult()
         self.slot = TreeSlot()
@@ -97,7 +107,8 @@ class Simulation(object):
             while self.tree_state.gate_open:
                 # Increment the slot
                 self.slot_no += 1
-                # Simulate the processes that would happen in the tx and rx in one slot, update the active array accordingly
+                # Simulate the processes that would happen in the tx and rx in one slot, update the active array
+                # accordingly
                 self.slot.oneslotprocess(self)
                 # Update the simstate metrics according to the result of the simulation
                 self.tree_state.update_metrics(self)
@@ -109,8 +120,8 @@ class Simulation(object):
             # Update the results
             self.sim_result.get_result(self)
         else:
-            self.sim_result.throughput = 0
-            self.sim_result.magic_throughput = 0
+            self.sim_result.throughput = 1
+            self.sim_result.magic_throughput = 1
 
 
 

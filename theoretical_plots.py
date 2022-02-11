@@ -1,9 +1,7 @@
 from scipy.special import comb
+from scipy.stats import poisson
 import decimal
-from math import log
 import numpy as np
-
-from simparam import SimParam
 
 
 class TheoreticalPlots(object):
@@ -11,12 +9,10 @@ class TheoreticalPlots(object):
     decimal.getcontext().prec = 1000
 
     # Equation from quick template
-    def qarysic(self, n, param):
+
+    def qarylen(self, n, param):
         """
-        Final Equation from the paper published by H. Murat Gursu, Yash Deshpande etc.
-        Includes all parameters and additionaly a d parameter for a d-ary split which will be fixed after correction in
-        the old Giannakis paper.
-        Main addition in the K-MPR parameter.
+           Return the length according to the final equation according to the paper by H murat and Yash
         """
         param.branch_biased = np.full(param.SPLIT, (1 - param.branchprob) / (param.SPLIT - 1))
         param.branch_biased[0] = param.branchprob
@@ -24,23 +20,68 @@ class TheoreticalPlots(object):
         ln = decimal.Decimal(0)
         t = param.K
         d = param.SPLIT
-        to_sub = d
-        if param.sic:
-            to_sub -= 1
-        for i in range(1, n + 1):
-            d_sum = decimal.Decimal(0)
-            for u in range(1, d + 1):
-                d_sum += decimal.Decimal(decimal.Decimal(pj_array[u - 1]) ** decimal.Decimal((i + t)))
-            d_sum_sub = decimal.Decimal(1) - d_sum
-            ln += comb(n - t, i, exact=True) * ((-1) ** (i + 1)) * i / (d_sum_sub * (i + t))
-        ln = 1 + (ln * to_sub * comb(n, t, exact=True))
-        throughput = n / ln
-        if n > t:
-            return throughput / t
-        else:
+
+        if n == 0:
             return 1
+        elif 0 < n <= t:
+            return 1
+        else:
+            to_sub = d
+            if param.sic:
+                to_sub -= 1
+            for i in range(1, n + 1):
+                d_sum = decimal.Decimal(0)
+                for u in range(1, d + 1):
+                    d_sum += decimal.Decimal(decimal.Decimal(pj_array[u - 1]) ** decimal.Decimal((i + t)))
+                d_sum_sub = decimal.Decimal(1) - d_sum
+                ln += comb(n - t, i, exact=True) * ((-1) ** (i + 1)) * i / (d_sum_sub * (i + t))
+            ln = 1 + (ln * to_sub * comb(n, t, exact=True))
+            return ln
 
 
+    def qarysic(self, n, param):
+        """
+        Final Equation from the paper published by H. Murat Gursu, Yash Deshpande etc.
+        Includes all parameters and additionaly a d parameter for a d-ary split which will be fixed after correction in
+        the old Giannakis paper.
+        Main addition in the K-MPR parameter.
+        """
+        t = param.K
+        length = self.qarylen(n, param)
+        throughput = n / length
+        norm_throughput = throughput / t
+        return norm_throughput
+
+    def windowed(self, param, z_array):
+        """
+        Windowed access  test equation, work in progress....
+        """
+
+        t = param.K
+        fz_array = []
+        for z in z_array:
+            ln = 0
+            for k in range(0, 300):
+                pois_multiplier = poisson.pmf(k, z, loc=0)
+                tree_length = self.qarylen(k, param)
+                ln += decimal.Decimal(pois_multiplier) * decimal.Decimal(tree_length)
+            throughput = decimal.Decimal(z) / (ln * t)
+            fz_array.append(throughput)
+        return fz_array
+
+    def windowed_bound(self, param, x, k, z):
+        """
+        Gated access SIC test equation, work in progress....
+        """
+        x = decimal.Decimal(x)
+        first_term = (x*decimal.Decimal(z)) - 1
+        second_term = 0
+        for i in range(0, k + 1):
+            pois_multiplier = poisson.pmf(i, z, loc=0)
+            li = self.qarylen(i, param)
+            inside_term = li - decimal.Decimal(x*i) + 1
+            second_term += decimal.Decimal(inside_term) * decimal.Decimal(pois_multiplier)
+        return decimal.Decimal(first_term) + second_term
 
     def qsicta(self, n, param):
         """
@@ -145,7 +186,6 @@ class TheoreticalPlots(object):
             for i in range(0, n):
                 k += (self.mycomb(n, i) * (2 ** (-n))) * self.simpletreerecursive(i)
             return (1 + 2 * k) / (1 - (2 ** (-n + 1)))
-
 
     def simpletree(self, n):
         """
