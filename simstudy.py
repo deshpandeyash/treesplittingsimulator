@@ -1,8 +1,7 @@
 import time
 
-import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib import pyplot
+from matplotlib import pyplot as plt
 from scipy.stats import skew
 import graphdisplay
 from make_stat import mean_confidence_interval, make_histogram_cont, make_histogram_discrete, create_ideal_by_regression
@@ -43,26 +42,44 @@ def simulate_tree_branching(sim, setting, date_time_folder, txt_context):
 
 def simulate_simple_tree_satic_multiple_runs_over_p(sim, setting, date_time_folder, txt_context):
     start = time.time()
-    p_range = np.arange(0.28, 0.40, 0.01)
-    throughput = []
-    throughput_mean = []
-    for p in p_range:
-        tpt = []
-        for _ in range(100):
-            sim.reset(setting)
-            sim.sim_param.branchprob = p
-            # Set branching probability for a split
-            sim.sim_param.branch_biased = np.full(sim.sim_param.SPLIT, (1 - sim.sim_param.branchprob) / (sim.sim_param.SPLIT - 1))
-            sim.sim_param.branch_biased[0] = sim.sim_param.branchprob
-            users = 100
-            sim.do_simulation_simple_tree_static(users)
-            tpt.append(sim.sim_result.throughput / sim.sim_param.K)
-        throughput.append(tpt)
-        throughput_mean.append(np.mean(tpt))
-    pyplot.boxplot(throughput)
-    plt.show()
-    plt.plot(p_range, throughput_mean)
-    plt.show()
+    string1 = [F"-{i}" for i in range(1, 8)]
+    string1.reverse()
+    string1.append('0')
+    string2 = [F"+{i}" for i in range(1, 8)]
+    range_string = string1 + string2
+    split_range = [2, 3, 4, 5, 6]
+    for sp in split_range:
+        center_prob = round((1 / sp),2)
+        p_range = [round(center_prob-(0.01*i),2) for i in range(0, 8)]
+        q_range = [round(center_prob+(0.01*i),2) for i in range(1, 8)]
+        p_range.reverse()
+        p_range = p_range + q_range
+        throughput = []
+        throughput_mean = []
+        for p in p_range:
+            tpt = []
+            for _ in range(1000):
+                sim.reset(setting)
+                sim.sim_param.branchprob = p
+                sim.sim_param.SPLIT = sp
+                # Set branching probability for a split
+                sim.sim_param.branch_biased = np.full(sim.sim_param.SPLIT, (1 - sim.sim_param.branchprob) / (sim.sim_param.SPLIT - 1))
+                sim.sim_param.branch_biased[0] = sim.sim_param.branchprob
+                users = 10000
+                if sp > 2:
+                    print("I am here")
+                sim.do_simulation_simple_tree_static(users)
+                tpt.append(sim.sim_result.throughput / sim.sim_param.K)
+            throughput.append(tpt)
+            throughput_mean.append(np.mean(tpt))
+        plt.plot(range_string, throughput_mean, label=F"{sp}")
+    plt.grid()
+    plt.legend()
+    figname = date_time_folder + F"P_sweep"
+    plt.savefig(figname + '.png', dpi=300)
+    tikzplotlib.save(figname + '.tex')
+    end = time.time()
+    print("Time for Simulaiton: " + str(end - start))
     print(F"Time taken is {time.time()-start} seconds")
 
 
@@ -150,7 +167,7 @@ def simulate_simple_tree_static_multiple_runs(sim, setting, date_time_folder, tx
                             folder=date_time_folder)
     end = time.time()
     print("Time for simulation: " + str(end - start))
-    pyplot.show()
+    plt.show()
 
 
 def simulate_users(sim, setting, date_time_folder, txt_context):
@@ -185,22 +202,22 @@ def simulate_users(sim, setting, date_time_folder, txt_context):
         theoretical_out_array.append(TheoreticalPlots().qarysic(n, sim.sim_param))
     # Get the theoretical Value
     theoretical_out = TheoreticalPlots().qarysic(setting.usersweep.n_stop, sim.sim_param)
-    pyplot.plot(user_array, throughput_array, 'b-', label='simulation')
-    pyplot.plot(user_array, theoretical_out_array, 'r', label='theoretical')
+    plt.plot(user_array, throughput_array, 'b-', label='simulation')
+    plt.plot(user_array, theoretical_out_array, 'r', label='theoretical')
     print(F"Max Theoretical throughput is {max(theoretical_out_array):.6f}"
           F" at Users {user_array[theoretical_out_array.index(max(theoretical_out_array))]}")
     print(F"Steady State Theoretical Value =   {theoretical_out:.6f}")
     if sim.sim_param.sic and sim.sim_param.SPLIT > 2:
-        pyplot.plot(user_array, magic_throughput_array, 'g', label='Right Skipped Simulation')
-    pyplot.xlabel("N Users")
-    pyplot.ylabel("Throughput")
-    pyplot.legend()
+        plt.plot(user_array, magic_throughput_array, 'g', label='Right Skipped Simulation')
+    plt.xlabel("N Users")
+    plt.ylabel("Throughput")
+    plt.legend()
     figname = date_time_folder + F"K{sim.sim_param.K}Q{sim.sim_param.SPLIT}UserSweep"
-    pyplot.savefig(figname + '.png', dpi=300)
+    plt.savefig(figname + '.png', dpi=300)
     tikzplotlib.save(figname + '.tex')
     end = time.time()
     print(F"Time for simulation: {end - start} Seconds")
-    pyplot.show()
+    plt.show()
 
 
 def simulate_simple_tree_dynamic_multiple_runs(sim, setting, date_time_folder, txt_context):
@@ -227,16 +244,16 @@ def simulate_simple_tree_dynamic_multiple_runs(sim, setting, date_time_folder, t
         delay.append(np.mean(counter2))
     optimum_throughput = rate_array[delay.index(max(delay))]
     print("Optimum Throughput = " + str(optimum_throughput))
-    pyplot.plot(rate_array, succ_rate, color='red')
-    pyplot.xlabel('Arrival rate (packets/slot)')
-    pyplot.ylabel('Success rate')
-    pyplot.twinx()
-    pyplot.plot(rate_array, delay, color='blue')
-    pyplot.ylabel('Mean Packet Delay')
-    pyplot.show()
-    pyplot.grid()
+    plt.plot(rate_array, succ_rate, color='red')
+    plt.xlabel('Arrival rate (packets/slot)')
+    plt.ylabel('Success rate')
+    plt.twinx()
+    plt.plot(rate_array, delay, color='blue')
+    plt.ylabel('Mean Packet Delay')
+    plt.show()
+    plt.grid()
     figname = date_time_folder + F"K{sim.sim_param.K}Q{sim.sim_param.SPLIT}FreeArrivalSweep"
-    pyplot.savefig(figname + '.png', dpi=300)
+    plt.savefig(figname + '.png', dpi=300)
     tikzplotlib.save(figname + '.tex')
     end = time.time()
     print("Time for Simulaiton: " + str(end - start))
@@ -263,16 +280,16 @@ def simulate_simple_tree_dynamic_multiple_runs_gated(sim, setting, date_time_fol
             delta_length_counter.append(sim.sim_result.delta_cri)
         delay.append(np.mean(delay_counter))
         cri_length.append(np.mean(delta_length_counter))
-    pyplot.plot(rate_array, delay)
-    pyplot.xlabel('CRI')
-    pyplot.ylabel('Init Collision')
-    pyplot.title(F"Mean Packet Delay")
-    pyplot.legend()
-    pyplot.grid()
+    plt.plot(rate_array, delay)
+    plt.xlabel('CRI')
+    plt.ylabel('Init Collision')
+    plt.title(F"Mean Packet Delay")
+    plt.legend()
+    plt.grid()
     figname = date_time_folder + F"K{sim.sim_param.K}Q{sim.sim_param.SPLIT}GatedArrivalSweep"
-    pyplot.savefig(figname + '.png', dpi=300)
+    plt.savefig(figname + '.png', dpi=300)
     tikzplotlib.save(figname + '.tex', encoding='utf-8')
-    pyplot.show()
+    plt.show()
     end = time.time()
     print("Time for Simulation: " + str(end - start))
 
@@ -362,17 +379,17 @@ def experimental_runs(sim, setting, date_time_folder, txt_context):
     # a = 0.01
     # fixed = 0.35
     # theoretical_array = fixed +  (1 - math.e**(-a*np.asarray(k_array)))
-    pyplot.plot(k_array, stability)
-    # pyplot.plot(k_array, theoretical_array, label='Fit')
-    pyplot.xlabel("K")
-    pyplot.hlines(1.0, 0, 1000, colors='red', linestyles='dashed')
-    pyplot.ylabel("Normalized Optimum Stable Arrival Rate")
-    pyplot.title("BTA Windowed Access")
-    pyplot.legend()
+    plt.plot(k_array, stability)
+    # plt.plot(k_array, theoretical_array, label='Fit')
+    plt.xlabel("K")
+    plt.hlines(1.0, 0, 1000, colors='red', linestyles='dashed')
+    plt.ylabel("Normalized Optimum Stable Arrival Rate")
+    plt.title("BTA Windowed Access")
+    plt.legend()
     figname = date_time_folder + F"Asymptotic_K"
-    pyplot.savefig(figname + '.png', dpi=300)
+    plt.savefig(figname + '.png', dpi=300)
     tikzplotlib.save(figname + '.tex', encoding='utf-8')
-    pyplot.show()
+    plt.show()
     pass
 
 
