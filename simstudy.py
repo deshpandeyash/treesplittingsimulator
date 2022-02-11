@@ -1,4 +1,6 @@
 import time
+
+import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import pyplot
 from scipy.stats import skew
@@ -37,6 +39,32 @@ def simulate_tree_branching(sim, setting, date_time_folder, txt_context):
     print("The Depth of the tree is: " + str(sim.sim_result.mean_tree_depth))
     # Use Graphviz to Render the Tree
     graphdisplay.displaygraph(sim, date_time_folder)
+
+
+def simulate_simple_tree_satic_multiple_runs_over_p(sim, setting, date_time_folder, txt_context):
+    start = time.time()
+    p_range = np.arange(0.28, 0.40, 0.01)
+    throughput = []
+    throughput_mean = []
+    for p in p_range:
+        tpt = []
+        for _ in range(100):
+            sim.reset(setting)
+            sim.sim_param.branchprob = p
+            # Set branching probability for a split
+            sim.sim_param.branch_biased = np.full(sim.sim_param.SPLIT, (1 - sim.sim_param.branchprob) / (sim.sim_param.SPLIT - 1))
+            sim.sim_param.branch_biased[0] = sim.sim_param.branchprob
+            users = 100
+            sim.do_simulation_simple_tree_static(users)
+            tpt.append(sim.sim_result.throughput / sim.sim_param.K)
+        throughput.append(tpt)
+        throughput_mean.append(np.mean(tpt))
+    pyplot.boxplot(throughput)
+    plt.show()
+    plt.plot(p_range, throughput_mean)
+    plt.show()
+    print(F"Time taken is {time.time()-start} seconds")
+
 
 
 def simulate_simple_tree_static_multiple_runs(sim, setting, date_time_folder, txt_context):
@@ -264,7 +292,7 @@ def do_theoretical(sim, setting, date_time_folder, txt_context):
     elif setting.theortest.test_values[3]:
         theorstudy.traffic_analysis(sim, setting, date_time_folder)
     end = time.time()
-    print(F"Total time for Simulation is {end-start} Seconds")
+    print(F"Total time for Simulation is {end - start} Seconds")
 
 
 def static_grid_run(sim, setting, date_time_folder, txt_context):
@@ -329,8 +357,8 @@ def experimental_runs(sim, setting, date_time_folder, txt_context):
     """
 
     k_array = [1, 2, 4, 8, 10, 16, 20, 30, 40, 50, 100, 200, 500, 1000]
-    stability = [0.42951, 0.47068, 0.51751, 0.56779, 0.5850039, 0.62388, 0.6435351, 0.6802734,  0.7063453, 0.7262098,
-                 0.7835304, 0.8324254, 0.8832808,  0.9123721]
+    stability = [0.42951, 0.47068, 0.51751, 0.56779, 0.5850039, 0.62388, 0.6435351, 0.6802734, 0.7063453, 0.7262098,
+                 0.7835304, 0.8324254, 0.8832808, 0.9123721]
     # a = 0.01
     # fixed = 0.35
     # theoretical_array = fixed +  (1 - math.e**(-a*np.asarray(k_array)))
@@ -351,27 +379,30 @@ def experimental_runs(sim, setting, date_time_folder, txt_context):
 if __name__ == '__main__':
     date_time_folder = make_result_folder()
     txt_context = make_result_txt(date_time_folder)
-    # This array basically just has the functions, one of which is run by the GUI
-    test_array = [simulate_tree_branching, simulate_simple_tree_static_multiple_runs, simulate_users,
-                  simulate_simple_tree_dynamic_multiple_runs, simulate_simple_tree_dynamic_multiple_runs_gated,
-                  do_theoretical, experimental_runs, static_grid_run]
-    setting = SimSetting()
-    # Seed for reproducibility
-    # np.random.seed(setting.seed)
-    if sum(setting.secondwindow.test_values) > 1:
-        print("Multiple Tests should be done by running the script multiple times")
-        exit()
+    # # This array basically just has the functions, one of which is run by the GUI
+    # test_array = [simulate_tree_branching, simulate_simple_tree_static_multiple_runs, simulate_users,
+    #               simulate_simple_tree_dynamic_multiple_runs, simulate_simple_tree_dynamic_multiple_runs_gated,
+    #               do_theoretical, experimental_runs, static_grid_run]
+    # setting = SimSetting()
+    # # Seed for reproducibility
+    # # np.random.seed(setting.seed)
+    # if sum(setting.secondwindow.test_values) > 1:
+    #     print("Multiple Tests should be done by running the script multiple times")
+    #     exit()
+    # sim = Simulation(setting)
+    # sim.sim_param.print_settings()
+    # # Comment and uncomment the below methods as it suits
+    # if True not in setting.secondwindow.test_values:
+    #     print("No Test Selected")
+    # else:
+    #     for test in test_array:
+    #         if setting.secondwindow.test_values[test_array.index(test)]:
+    #             print("-----------------------------------------------")
+    #             print("Test Name : - " + setting.secondwindow.test_names[test_array.index(test)])
+    #             sim.reset(setting)
+    #             test(sim, setting, date_time_folder, txt_context)
+    #             close_txt_file(txt_context)
+    #             still_print(date_time_folder)
+    setting = None
     sim = Simulation(setting)
-    sim.sim_param.print_settings()
-    # Comment and uncomment the below methods as it suits
-    if True not in setting.secondwindow.test_values:
-        print("No Test Selected")
-    else:
-        for test in test_array:
-            if setting.secondwindow.test_values[test_array.index(test)]:
-                print("-----------------------------------------------")
-                print("Test Name : - " + setting.secondwindow.test_names[test_array.index(test)])
-                sim.reset(setting)
-                test(sim, setting, date_time_folder, txt_context)
-                close_txt_file(txt_context)
-                still_print(date_time_folder)
+    simulate_simple_tree_satic_multiple_runs_over_p(sim, setting, date_time_folder, txt_context)
