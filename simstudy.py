@@ -66,8 +66,6 @@ def simulate_simple_tree_satic_multiple_runs_over_p(sim, setting, date_time_fold
                 sim.sim_param.branch_biased = np.full(sim.sim_param.SPLIT, (1 - sim.sim_param.branchprob) / (sim.sim_param.SPLIT - 1))
                 sim.sim_param.branch_biased[0] = sim.sim_param.branchprob
                 users = 10000
-                if sp > 2:
-                    print("I am here")
                 sim.do_simulation_simple_tree_static(users)
                 tpt.append(sim.sim_result.throughput / sim.sim_param.K)
             throughput.append(tpt)
