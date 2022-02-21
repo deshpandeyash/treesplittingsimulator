@@ -41,33 +41,38 @@ def simulate_tree_branching(sim, setting, date_time_folder, txt_context):
 
 
 def simulate_simple_tree_satic_multiple_runs_over_p(sim, setting, date_time_folder, txt_context):
+    print(F"Starting Test")
     start = time.time()
     string1 = [F"-{i}" for i in range(1, 8)]
     string1.reverse()
     string1.append('0')
     string2 = [F"+{i}" for i in range(1, 8)]
     range_string = string1 + string2
-    split_range = [2, 3, 4, 5, 6]
+    split_range = [2, 3, 4]
+    runs = 10000
     for sp in split_range:
+        print(F"****** Testing for {sp}-ary split *********")
         center_prob = round((1 / sp),2)
-        p_range = [round(center_prob-(0.01*i),2) for i in range(0, 8)]
-        q_range = [round(center_prob+(0.01*i),2) for i in range(1, 8)]
+        p_range = [round(center_prob-(0.01*i),2) for i in range(0, 4)]
+        q_range = [round(center_prob+(0.01*i),2) for i in range(1, 12)]
         p_range.reverse()
         p_range = p_range + q_range
         throughput = []
         throughput_mean = []
         for p in p_range:
+            print(F"############ setting branch prob to {p}  #################### ")
             tpt = []
-            for _ in range(1000):
+            for _ in range(runs):
                 sim.reset(setting)
                 sim.sim_param.branchprob = p
                 sim.sim_param.SPLIT = sp
                 # Set branching probability for a split
                 sim.sim_param.branch_biased = np.full(sim.sim_param.SPLIT, (1 - sim.sim_param.branchprob) / (sim.sim_param.SPLIT - 1))
                 sim.sim_param.branch_biased[0] = sim.sim_param.branchprob
-                users = 10000
+                users = 1000
                 sim.do_simulation_simple_tree_static(users)
                 tpt.append(sim.sim_result.throughput / sim.sim_param.K)
+                print(F"_____________________________Round {_} of {runs}________________________________")
             throughput.append(tpt)
             throughput_mean.append(np.mean(tpt))
         plt.plot(range_string, throughput_mean, label=F"{sp}")
