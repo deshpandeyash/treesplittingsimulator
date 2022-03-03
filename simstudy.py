@@ -91,12 +91,17 @@ def simulate_simple_tree_satic_multiple_runs_over_p(sim, setting, date_time_fold
 def simluate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_time_folder, txt_context):
     print(F"Starting Test")
     start = time.time()
-    split_range = [2, 3, 4, 5, 6]
-    runs = 1000
+    split_range = [2, 3, 4, 5, 6, 7, 8, 9]
+    runs = 5
     throughput_d = []
+    delay_d = []
+    delay_distr = []
+    throughput_distr = []
     for sp in split_range:
         print(F"****** Testing for {sp}-ary split *********")
         throughput = []
+        delay = []
+        packet_delay_distribution = []
         for _ in range(runs):
             sim.reset(setting)
             sim.sim_param.biased_split = True
@@ -104,17 +109,55 @@ def simluate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_tim
             sim.sim_param.branch_biased = [0.5**p for p in range(1, sp+1)]
             sim.sim_param.branch_biased[-1] = sim.sim_param.branch_biased[-2]
             print(F"The branching Probabilities are: {sim.sim_param.branch_biased}")
-            users = 1000
+            users = 10
             sim.do_simulation_simple_tree_static(users)
             throughput.append(sim.sim_result.throughput / sim.sim_param.K)
+            delay.append(sim.sim_result.mean_packet_delay)
+            packet_delay_distribution.append(sim.sim_state.delay_stat_array)
             print(F"_____________________________Round {_} of {runs}________________________________")
-        throughput_d.append(np.mean(throughput))
-        print(F"Mean throughput for d= {sp} is {np.mean(throughput)}")
+        mean_tpt = np.mean(throughput)
+        mean_delay = np.mean(delay)
+        throughput_d.append(mean_tpt)
+        delay_d.append(mean_delay)
+        delay_distr.append(delay)
+        throughput_distr.append(throughput)
+        result = plt.hist(np.asarray(packet_delay_distribution).flatten(), density=True, color='green', alpha=0.65)
+        plt.axvline(mean_delay, color='k', linestyle='dashed', linewidth=1)
+        figname = date_time_folder + F"Delay Distribution d = {sp}"
+        plt.savefig(figname + '.png', dpi=300)
+        tikzplotlib.save(figname + '.tex')
+        plt.close()
+        print(F"Mean throughput for d= {sp} is {mean_tpt}")
+        print(F"Mean delay for d = {sp} is {mean_delay}")
+
+    # Plot Mean tpt
     plt.plot(split_range, throughput_d)
     plt.grid()
     figname = date_time_folder + F"Opt_TPT"
     plt.savefig(figname + '.png', dpi=300)
     tikzplotlib.save(figname + '.tex')
+    plt.close()
+    # Plot Mean Delay
+    plt.plot(split_range, delay_d)
+    plt.grid()
+    figname = date_time_folder + F"Opt_DELAY"
+    plt.savefig(figname + '.png', dpi=300)
+    tikzplotlib.save(figname + '.tex')
+    plt.close()
+    # Plot Delay Distr
+    plt.boxplot(delay_distr, positions=split_range)
+    plt.grid()
+    figname = date_time_folder + F"distr_delay"
+    plt.savefig(figname + '.png', dpi=300)
+    tikzplotlib.save(figname + '.tex')
+    plt.close()
+    # Throughput Distribution
+    plt.boxplot(throughput_distr, positions=split_range)
+    plt.grid()
+    figname = date_time_folder + F"distr_tpt"
+    plt.savefig(figname + '.png', dpi=300)
+    tikzplotlib.save(figname + '.tex')
+    plt.close()
     end = time.time()
     print("Time for Simulaiton: " + str(end - start))
     print(F"Time taken is {time.time() - start} seconds")
