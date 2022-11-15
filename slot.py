@@ -1,4 +1,5 @@
 import packetlist
+import numpy
 
 
 class TreeSlot(object):
@@ -16,9 +17,8 @@ class TreeSlot(object):
         self.result_array = []
         self.def_collision = False
         self.no_in_skipped_slot = 0
-
+        self.rng = numpy.random.RandomState()
         self.magic_counter = 0
-
 
     def oneslotprocess(self, sim):
         """
@@ -30,7 +30,7 @@ class TreeSlot(object):
         """
         # this parameter is changed to the result of the transmission feedback
         sim.result = 0
-        #self.magic_counter = 0
+        # self.magic_counter = 0
         if len(sim.active_array) > 0:
             # Sort the array in ascending order
             packetlist.sort_packet_array(sim)
@@ -65,7 +65,7 @@ class TreeSlot(object):
                 packetlist.inc_uncollided_packet_count(sim, sim.sim_param.SPLIT - 1)
                 # And split the packets which might collide in the next slot
                 packetlist.split_collided_packet_count(sim)
-                # Here we update the node of the of the tree according to the result,
+                # Here we update the node of the tree according to the result,
                 sim.branch_node.split(sim.sim_param.SPLIT)
             sim.result = feedback
         # If Idle
@@ -75,15 +75,15 @@ class TreeSlot(object):
             sim.branch_node.update_ghost()
             # On an idle slot, all packets reduce their count by 1 if its not a definite collision
             packetlist.dec_packet_count(sim, 1)
-            # To identify if the next slot after this idle slot is a definite collision, Modified tree Tree
+            # To identify if the next slot after this idle slot is a definite collision, Modified tree
             self.def_collision = False
             # If modified anf the Simple Tree Result Array has enough elements
             if sim.sim_param.modified and len(sim.tree_state.ST_result_array) >= (sim.sim_param.SPLIT - 1):
                 # If the Q-1th result was a collision
-                if sim.tree_state.ST_result_array[-(sim.sim_param.SPLIT-1)] == 2:
+                if sim.tree_state.ST_result_array[-(sim.sim_param.SPLIT - 1)] == 2:
                     self.def_collision = True
                 # And subsequent slots were not idle, then it NOT a definite collision, so we set the flag down again.
-                for k in range(1, sim.sim_param.SPLIT-1):
+                for k in range(1, sim.sim_param.SPLIT - 1):
                     if sim.tree_state.ST_result_array[-k] != 0:
                         self.def_collision = False
                 if sim.sim_param.sic:
@@ -105,6 +105,8 @@ class TreeSlot(object):
             sim.result = feedback
         # If Collision
         elif feedback == 2:
+            if sim.sim_param.combi:
+                sim.sim_param.SPLIT = sim.sim_param.combi_splits[self.rng.binomial(1, sim.sim_param.combi_split_ratio)]
             # increment the count for uncollided packets
             packetlist.inc_uncollided_packet_count(sim, sim.sim_param.SPLIT - 1)
             # If unisplit and if its the first collision
@@ -158,7 +160,7 @@ class TreeSlot(object):
                 # Save the collision packet IDs
                 self.collided_array.append(packetlist.extract_packet_id(self.tx_packet_array))
                 self.collided_node_array.append(sim.branch_node.branch_status)
-        # If anything else occurs, print immediately as its not expected.
+        # If anything else occurs, print immediately as it's not expected.
         else:
             print("Error, unexpected array")
         return feedback, resolved_packets
@@ -172,9 +174,9 @@ class TreeSlot(object):
         sim.tree_state.ST_result_array.append(1)
         sim.tree_state.ST_number_in_slot.append(len(single_packet))
         go_on = True
-        # While we can succesively Decode the packets from previous collisons
+        # While we can successively Decode the packets from previous collisions
         while go_on and len(self.collided_array) > 0:
-            # Load the last collison
+            # Load the last collision
             last_coll = self.collided_array[-1]
             # Remove all the packet IDS that have been resolved
             resolved_array = [x for x in last_coll if x not in self.packetID]
@@ -185,13 +187,11 @@ class TreeSlot(object):
                 last_node = self.collided_node_array[-1]
                 diff_node = resolved_node[len(last_node):]
                 red_count = sum(int(digit) for digit in diff_node)
-                ################## Check Code from Here
                 for _ in range(0, red_count):
                     sim.branch_node.next_leaf()
                     sim.branch_node.update_ghost()
                     sim.tree_state.ST_result_array.append(1)
                     sim.tree_state.ST_number_in_slot.append('x')
-                ###################### Until Here
                 self.magic_counter += red_count - 1
                 # Delete this collision
                 del self.collided_array[-1]

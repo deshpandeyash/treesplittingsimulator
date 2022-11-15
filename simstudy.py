@@ -21,7 +21,7 @@ def simulate_tree_branching(sim, setting, date_time_folder, txt_context):
     also prints the obtained throughput, tree progression, result progression and tree depth
     """
 
-    # Reset the simuations with the settings
+    # Reset the simulations with the settings
     sim.reset(setting)
     # Make a simulation with the given users, and Tree Parameters
     sim.do_simulation_simple_tree_static(setting.vizwindow.users)
@@ -40,36 +40,67 @@ def simulate_tree_branching(sim, setting, date_time_folder, txt_context):
     graphdisplay.displaygraph(sim, date_time_folder)
 
 
+def simulate_tree_branching_without_viz(sim, setting, date_time_folder, txt_context):
+    """
+    To get the vizualization of 1 tree for the given settings and number of users as defined by simsettings and simparam
+    also prints the obtained throughput, tree progression, result progression and tree depth
+    """
+
+    users = 10000
+
+    # Reset the simulations with the settings
+    sim.reset(setting)
+    # Make a simulation with the given users, and Tree Parameters
+    sim.do_simulation_simple_tree_static(users)
+    print(F"Throughput is = {(sim.sim_result.throughput / sim.sim_param.K)}")
+    one_no = sim.sim_param.combi_splits[0]
+    two_no = sim.sim_param.combi_splits[1]
+    counted_one_no = sim.tree_state.split_count.count(one_no)
+    counted_two_no = sim.tree_state.split_count.count(two_no)
+    print(F"The Split ratio of {one_no}/{two_no} is {counted_one_no/counted_two_no}")
+
+    if users > 100:
+        print(F"Theoretically it should be = {TheoreticalPlots().qarysic(100,sim.sim_param):.4f}")
+    # Use Graphviz to Render the Tree
+    if users < 10:
+        graphdisplay.displaygraph(sim, date_time_folder)
+
+
 def simulate_simple_tree_satic_multiple_runs_over_p(sim, setting, date_time_folder, txt_context):
+    print(F"Starting Test")
     start = time.time()
     string1 = [F"-{i}" for i in range(1, 8)]
     string1.reverse()
     string1.append('0')
     string2 = [F"+{i}" for i in range(1, 8)]
     range_string = string1 + string2
-    split_range = [2, 3, 4, 5, 6]
+    split_range = [3, 4]
+    runs = 10
     for sp in split_range:
-        center_prob = round((1 / sp),2)
-        p_range = [round(center_prob-(0.01*i),2) for i in range(0, 8)]
-        q_range = [round(center_prob+(0.01*i),2) for i in range(1, 8)]
+        print(F"****** Testing for {sp}-ary split *********")
+        center_prob = round((1 / sp), 2)
+        p_range = [round(center_prob - (0.01 * i), 2) for i in range(0, 4)]
+        q_range = [round(center_prob + (0.01 * i), 2) for i in range(1, 12)]
         p_range.reverse()
         p_range = p_range + q_range
         throughput = []
         throughput_mean = []
         for p in p_range:
+            print(F"############ setting branch prob to {p}  #################### ")
             tpt = []
-            for _ in range(1000):
+            for _ in range(runs):
                 sim.reset(setting)
                 sim.sim_param.branchprob = p
                 sim.sim_param.SPLIT = sp
                 # Set branching probability for a split
-                sim.sim_param.branch_biased = np.full(sim.sim_param.SPLIT, (1 - sim.sim_param.branchprob) / (sim.sim_param.SPLIT - 1))
+                sim.sim_param.branch_biased = np.full(sim.sim_param.SPLIT,
+                                                      (1 - sim.sim_param.branchprob) / (sim.sim_param.SPLIT - 1))
                 sim.sim_param.branch_biased[0] = sim.sim_param.branchprob
-                users = 10000
-                if sp > 2:
-                    print("I am here")
+                users = 10
                 sim.do_simulation_simple_tree_static(users)
                 tpt.append(sim.sim_result.throughput / sim.sim_param.K)
+                print(F"_____________________________Round {_} of {runs}________________________________")
+                print(sim.branch_node.branch_array)
             throughput.append(tpt)
             throughput_mean.append(np.mean(tpt))
         plt.plot(range_string, throughput_mean, label=F"{sp}")
@@ -80,13 +111,144 @@ def simulate_simple_tree_satic_multiple_runs_over_p(sim, setting, date_time_fold
     tikzplotlib.save(figname + '.tex')
     end = time.time()
     print("Time for Simulaiton: " + str(end - start))
-    print(F"Time taken is {time.time()-start} seconds")
+    print(F"Time taken is {time.time() - start} seconds")
 
+
+def simluate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_time_folder, txt_context):
+    print(F"Starting Test")
+    start = time.time()
+    split_range = [2, 3, 4, 5, 6, 7, 8, 9]
+    runs = 2000
+    throughput_d = []
+    idle_d = []
+    idle_distr = []
+    collisions_d = []
+    collisions_distr = []
+    succ_d = []
+    succ_distr = []
+    delay_d = []
+    delay_distr = []
+    throughput_distr = []
+    for sp in split_range:
+        print(F"****** Testing for {sp}-ary split *********")
+        throughput = []
+        delay = []
+        packet_delay_distribution = []
+        idles = []
+        collisions = []
+        successes = []
+        for _ in range(runs):
+            sim.reset(setting)
+            sim.sim_param.biased_split = True
+            sim.sim_param.SPLIT = sp
+            sim.sim_param.branch_biased = [0.5 ** p for p in range(1, sp + 1)]
+            sim.sim_param.branch_biased[-1] = sim.sim_param.branch_biased[-2]
+            print(F"The branching Probabilities are: {sim.sim_param.branch_biased}")
+            users = 1000
+            sim.do_simulation_simple_tree_static(users)
+            throughput.append(sim.sim_result.throughput / sim.sim_param.K)
+            delay.append(sim.sim_result.mean_packet_delay)
+            packet_delay_distribution.append(sim.sim_state.delay_stat_array)
+            idles.append(sim.sim_result.idle_rate)
+            collisions.append(sim.sim_result.collision_rate)
+            successes.append(sim.sim_result.succ_rate)
+            print(F"_____________________________Round {_} of {runs}________________________________")
+        mean_tpt = np.mean(throughput)
+        mean_delay = np.mean(delay)
+        mean_idle = np.mean(idles)
+        mean_collisions = np.mean(collisions)
+        mean_succ = np.mean(successes)
+        throughput_d.append(mean_tpt)
+        idle_d.append(mean_idle)
+        collisions_d.append(mean_collisions)
+        succ_d.append(mean_succ)
+        delay_d.append(mean_delay)
+        delay_distr.append(delay)
+        throughput_distr.append(throughput)
+        idle_distr.append(idles)
+        collisions_distr.append(collisions)
+        succ_distr.append(successes)
+        result = plt.hist(np.asarray(packet_delay_distribution).flatten(), density=True, color='green', alpha=0.65)
+        plt.axvline(mean_delay, color='k', linestyle='dashed', linewidth=1)
+        figname = date_time_folder + F"Delay Distribution d = {sp}"
+        plt.savefig(figname + '.png', dpi=300)
+        tikzplotlib.save(figname + '.tex')
+        plt.close()
+        print(F"Mean throughput for d= {sp} is {mean_tpt}")
+        print(F"Mean delay for d = {sp} is {mean_delay}")
+
+    # Plot a stacked bar graph
+    width = 0.30
+    plt.bar(split_range, succ_d, width, label='Successes')
+    plt.bar(split_range, idle_d, width, bottom=succ_d, label='Idle')
+    plt.bar(split_range, collisions_d, width, bottom=np.asarray(idle_d) + np.asarray(succ_d), label='Collisions')
+    plt.legend()
+    figname = date_time_folder + F"Opt_TX_PLOT"
+    plt.savefig(figname + '.png', dpi=300)
+    tikzplotlib.save(figname + '.tex')
+    plt.close()
+    # Plot Mean tpt
+    plt.plot(split_range, throughput_d)
+    plt.grid()
+    figname = date_time_folder + F"Opt_TPT"
+    plt.savefig(figname + '.png', dpi=300)
+    tikzplotlib.save(figname + '.tex')
+    plt.close()
+    # Plot Mean Delay
+    plt.plot(split_range, delay_d)
+    plt.grid()
+    figname = date_time_folder + F"Opt_DELAY"
+    plt.savefig(figname + '.png', dpi=300)
+    tikzplotlib.save(figname + '.tex')
+    plt.close()
+    # Plot Delay Distr
+    plt.boxplot(delay_distr, positions=split_range)
+    plt.grid()
+    figname = date_time_folder + F"distr_delay"
+    plt.savefig(figname + '.png', dpi=300)
+    tikzplotlib.save(figname + '.tex')
+    plt.close()
+    # Throughput Distribution
+    plt.boxplot(throughput_distr, positions=split_range)
+    plt.grid()
+    figname = date_time_folder + F"distr_tpt"
+    plt.savefig(figname + '.png', dpi=300)
+    tikzplotlib.save(figname + '.tex')
+    plt.close()
+    end = time.time()
+    print("Time for Simulaiton: " + str(end - start))
+    print(F"Time taken is {time.time() - start} seconds")
+
+
+def simulate_simple_tree_static_single_run_direct(sim, setting, date_time_folder, txt_context):
+    print(F"Starting Test")
+    start = time.time()
+    sim.reset(setting)
+    sim.sim_param.sic = False
+    sim.sim_param.biased_split = False
+    sim.sim_param.SPLIT = 2
+    sim.sim_param.branch_biased = [0.5 ** p for p in range(1, sim.sim_param.SPLIT + 1)]
+    sim.sim_param.branch_biased[-1] = sim.sim_param.branch_biased[-2]
+    print(F"The branching Probabilities are: {sim.sim_param.branch_biased}")
+    users = 100
+    sim.do_simulation_simple_tree_static(users)
+    print(F"Mean throughput {sim.sim_result.throughput}")
+    print(F"Mean delay is {sim.sim_result.mean_packet_delay}")
+    result = plt.hist(sim.sim_state.delay_stat_array, bins=max(sim.sim_state.delay_stat_array), density=True,
+                      color='red', alpha=0.65)
+    plt.axvline(sim.sim_result.mean_packet_delay, color='k', linestyle='dashed', linewidth=1)
+    figname = date_time_folder + F"Delay Distribution1"
+    plt.savefig(figname + '.png', dpi=300)
+    tikzplotlib.save(figname + '.tex')
+    plt.close()
+    end = time.time()
+    print("Time for Simulation: " + str(end - start))
+    print(F"Time taken is {time.time() - start} seconds")
 
 
 def simulate_simple_tree_static_multiple_runs(sim, setting, date_time_folder, txt_context):
     """
-    Does a a number of runs with the same number of users, plots the distribution of throughput and prints out the
+    Does a number of runs with the same number of users, plots the distribution of throughput and prints out the
     theoretical throughput, plots to see if the results are within confidence intervals
     """
 
@@ -422,4 +584,7 @@ if __name__ == '__main__':
     #             still_print(date_time_folder)
     setting = None
     sim = Simulation(setting)
-    simulate_simple_tree_satic_multiple_runs_over_p(sim, setting, date_time_folder, txt_context)
+    # simulate_simple_tree_satic_multiple_runs_over_p(sim, setting, date_time_folder, txt_context)
+    # simluate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_time_folder, txt_context)
+    # simulate_simple_tree_static_single_run_direct(sim, setting, date_time_folder, txt_context)
+    simulate_tree_branching_without_viz(sim, setting, date_time_folder, txt_context)

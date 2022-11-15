@@ -15,6 +15,7 @@ class TreeState(object):
         self.number_in_slot = []
         self.ST_number_in_slot = []
         self.magic_counter = 0
+        self.split_count = []
 
     def reset(self, sim):
         self.first_slot = sim.slot_no
@@ -27,11 +28,12 @@ class TreeState(object):
         self.number_in_slot = []
         self.ST_number_in_slot = []
         self.magic_counter = 0
+        self.split_count = []
 
     def update_metrics(self, sim):
         """
-        Here we update the results of a the ongoing tree and remove successful packets, update results
-        in the simulation state according to the the packets statistics
+        Here we update the results of the ongoing tree and remove successful packets, update results
+        in the simulation state according to the packets statistics
 
         :param sim: the simulation object instance
         """
@@ -40,6 +42,7 @@ class TreeState(object):
         self.ST_result_array.append(sim.result)
         self.number_in_slot.append(sim.slot.no_collided_packets)
         self.ST_number_in_slot.append(sim.slot.no_collided_packets)
+        self.split_count.append(sim.sim_param.SPLIT)
         # Add the number of packets to statistical array for diagnosis
         sim.sim_state.arrival_stat_array.append(sim.packets_gen)
         if sim.result == 1:

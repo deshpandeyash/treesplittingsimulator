@@ -17,7 +17,7 @@ class SimParam(object):
 
             # The branching split i,e Q
             self.SPLIT = 3
-            self.biased_split = True
+            self.biased_split = False
             if self.biased_split:
                 # set branching probability for binary split
                 self.branchprob = 0.5
@@ -33,7 +33,10 @@ class SimParam(object):
             # The type of Resolution Algorithm
             self.modified = False
             self.unisplit = False
-            self.sic = True
+            self.sic = False
+            self.combi = True
+            self.combi_splits = [3, 4]
+            self.combi_split_ratio = 0.33
 
         else:
             # current buffer spaces and minimal buffer spaces
