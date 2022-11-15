@@ -19,6 +19,7 @@ class SimState(object):
         self.magic_throughput = []
         self.skipped_slots = []
 
+
     def reset(self):
         self.delay_stat_array = []
         self.arrival_stat_array = []
@@ -33,6 +34,7 @@ class SimState(object):
         self.tree_length_array = []
         self.magic_throughput = []
         self.skipped_slots = []
+
 
     def update_metrics(self, sim):
         success_slots = sim.tree_state.result_array.count(1)

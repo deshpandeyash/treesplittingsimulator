@@ -75,7 +75,7 @@ class TreeSlot(object):
             sim.branch_node.update_ghost()
             # On an idle slot, all packets reduce their count by 1 if its not a definite collision
             packetlist.dec_packet_count(sim, 1)
-            # To identify if the next slot after this idle slot is a definite collision, Modified tree Tree
+            # To identify if the next slot after this idle slot is a definite collision, Modified tree
             self.def_collision = False
             # If modified anf the Simple Tree Result Array has enough elements
             if sim.sim_param.modified and len(sim.tree_state.ST_result_array) >= (sim.sim_param.SPLIT - 1):
@@ -106,7 +106,7 @@ class TreeSlot(object):
         # If Collision
         elif feedback == 2:
             if sim.sim_param.combi:
-                sim.sim_param.SPLIT = sim.sim_param.combi_splits[self.rng.binomial(1, 0.50)]
+                sim.sim_param.SPLIT = sim.sim_param.combi_splits[self.rng.binomial(1, sim.sim_param.combi_split_ratio)]
             # increment the count for uncollided packets
             packetlist.inc_uncollided_packet_count(sim, sim.sim_param.SPLIT - 1)
             # If unisplit and if its the first collision

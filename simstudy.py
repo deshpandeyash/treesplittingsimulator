@@ -46,15 +46,24 @@ def simulate_tree_branching_without_viz(sim, setting, date_time_folder, txt_cont
     also prints the obtained throughput, tree progression, result progression and tree depth
     """
 
+    users = 10000
+
     # Reset the simulations with the settings
     sim.reset(setting)
     # Make a simulation with the given users, and Tree Parameters
-    sim.do_simulation_simple_tree_static(10)
-    print("Throughput is = " + str(sim.sim_result.throughput / sim.sim_param.K))
+    sim.do_simulation_simple_tree_static(users)
+    print(F"Throughput is = {(sim.sim_result.throughput / sim.sim_param.K)}")
+    one_no = sim.sim_param.combi_splits[0]
+    two_no = sim.sim_param.combi_splits[1]
+    counted_one_no = sim.tree_state.split_count.count(one_no)
+    counted_two_no = sim.tree_state.split_count.count(two_no)
+    print(F"The Split ratio of {one_no}/{two_no} is {counted_one_no/counted_two_no}")
 
-    print(F"Theoretically it should be = {TheoreticalPlots().qarysic(100,sim.sim_param)}")
+    if users > 100:
+        print(F"Theoretically it should be = {TheoreticalPlots().qarysic(100,sim.sim_param):.4f}")
     # Use Graphviz to Render the Tree
-    #graphdisplay.displaygraph(sim, date_time_folder)
+    if users < 10:
+        graphdisplay.displaygraph(sim, date_time_folder)
 
 
 def simulate_simple_tree_satic_multiple_runs_over_p(sim, setting, date_time_folder, txt_context):
