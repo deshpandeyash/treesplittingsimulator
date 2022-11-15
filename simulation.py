@@ -104,6 +104,7 @@ class Simulation(object):
             packetlist.add_packets_to_tree(self)
             self.tree_state.reset(self)
             # Run the simulation as long as all packets are processed and tree is over
+            # This gate is not the gate of gated access. Just a flag to check the tree state
             while self.tree_state.gate_open:
                 # Increment the slot
                 self.slot_no += 1

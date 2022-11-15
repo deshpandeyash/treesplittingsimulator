@@ -1,4 +1,5 @@
 import packetlist
+import numpy
 
 
 class TreeSlot(object):
@@ -16,7 +17,7 @@ class TreeSlot(object):
         self.result_array = []
         self.def_collision = False
         self.no_in_skipped_slot = 0
-
+        self.rng = numpy.random.RandomState()
         self.magic_counter = 0
 
     def oneslotprocess(self, sim):
@@ -57,8 +58,7 @@ class TreeSlot(object):
             # On a success, all other packets reduce their count
             packetlist.dec_packet_count(sim, self.resolved_packets)
             # If SIC process is used, then
-            if sim.sim_param.sic and len(sim.branch_node.branch_status) > 0 and sim.branch_node.branch_status[
-                -1] == '0':
+            if sim.sim_param.sic and len(sim.branch_node.branch_status) > 0 and sim.branch_node.branch_status[-1] == '0':
                 self.def_collision = True
                 self.no_in_skipped_slot = (len(packetlist.extract_tx_packets(sim)))
                 # We increment the count of the uncollided packets
@@ -105,6 +105,8 @@ class TreeSlot(object):
             sim.result = feedback
         # If Collision
         elif feedback == 2:
+            if sim.sim_param.combi:
+                sim.sim_param.SPLIT = sim.sim_param.combi_splits[self.rng.binomial(1, 0.50)]
             # increment the count for uncollided packets
             packetlist.inc_uncollided_packet_count(sim, sim.sim_param.SPLIT - 1)
             # If unisplit and if its the first collision

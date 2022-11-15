@@ -30,8 +30,8 @@ class TreeState(object):
 
     def update_metrics(self, sim):
         """
-        Here we update the results of a the ongoing tree and remove successful packets, update results
-        in the simulation state according to the the packets statistics
+        Here we update the results of the ongoing tree and remove successful packets, update results
+        in the simulation state according to the packets statistics
 
         :param sim: the simulation object instance
         """

@@ -21,7 +21,7 @@ def simulate_tree_branching(sim, setting, date_time_folder, txt_context):
     also prints the obtained throughput, tree progression, result progression and tree depth
     """
 
-    # Reset the simuations with the settings
+    # Reset the simulations with the settings
     sim.reset(setting)
     # Make a simulation with the given users, and Tree Parameters
     sim.do_simulation_simple_tree_static(setting.vizwindow.users)
@@ -38,6 +38,23 @@ def simulate_tree_branching(sim, setting, date_time_folder, txt_context):
     print("The Depth of the tree is: " + str(sim.sim_result.mean_tree_depth))
     # Use Graphviz to Render the Tree
     graphdisplay.displaygraph(sim, date_time_folder)
+
+
+def simulate_tree_branching_without_viz(sim, setting, date_time_folder, txt_context):
+    """
+    To get the vizualization of 1 tree for the given settings and number of users as defined by simsettings and simparam
+    also prints the obtained throughput, tree progression, result progression and tree depth
+    """
+
+    # Reset the simulations with the settings
+    sim.reset(setting)
+    # Make a simulation with the given users, and Tree Parameters
+    sim.do_simulation_simple_tree_static(10)
+    print("Throughput is = " + str(sim.sim_result.throughput / sim.sim_param.K))
+
+    print(F"Theoretically it should be = {TheoreticalPlots().qarysic(100,sim.sim_param)}")
+    # Use Graphviz to Render the Tree
+    #graphdisplay.displaygraph(sim, date_time_folder)
 
 
 def simulate_simple_tree_satic_multiple_runs_over_p(sim, setting, date_time_folder, txt_context):
@@ -155,7 +172,7 @@ def simluate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_tim
     width = 0.30
     plt.bar(split_range, succ_d, width, label='Successes')
     plt.bar(split_range, idle_d, width, bottom=succ_d, label='Idle')
-    plt.bar(split_range, collisions_d, width, bottom=np.asarray(idle_d)+np.asarray(succ_d),label='Collisions')
+    plt.bar(split_range, collisions_d, width, bottom=np.asarray(idle_d) + np.asarray(succ_d), label='Collisions')
     plt.legend()
     figname = date_time_folder + F"Opt_TX_PLOT"
     plt.savefig(figname + '.png', dpi=300)
@@ -208,7 +225,8 @@ def simulate_simple_tree_static_single_run_direct(sim, setting, date_time_folder
     sim.do_simulation_simple_tree_static(users)
     print(F"Mean throughput {sim.sim_result.throughput}")
     print(F"Mean delay is {sim.sim_result.mean_packet_delay}")
-    result = plt.hist(sim.sim_state.delay_stat_array, bins=max(sim.sim_state.delay_stat_array), density=True, color='red', alpha=0.65)
+    result = plt.hist(sim.sim_state.delay_stat_array, bins=max(sim.sim_state.delay_stat_array), density=True,
+                      color='red', alpha=0.65)
     plt.axvline(sim.sim_result.mean_packet_delay, color='k', linestyle='dashed', linewidth=1)
     figname = date_time_folder + F"Delay Distribution1"
     plt.savefig(figname + '.png', dpi=300)
@@ -558,5 +576,6 @@ if __name__ == '__main__':
     setting = None
     sim = Simulation(setting)
     # simulate_simple_tree_satic_multiple_runs_over_p(sim, setting, date_time_folder, txt_context)
-    simluate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_time_folder, txt_context)
+    # simluate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_time_folder, txt_context)
     # simulate_simple_tree_static_single_run_direct(sim, setting, date_time_folder, txt_context)
+    simulate_tree_branching_without_viz(sim, setting, date_time_folder, txt_context)
