@@ -52,6 +52,7 @@ class TreeSlot(object):
             self.no_collided_packets = 0
             self.no_active_packets = 0
             self.no_waiting_packets = 0
+        # Transmission over
         # If Success
         if feedback == 1:
             self.def_collision = False

@@ -10,7 +10,7 @@ class SimState(object):
         self.tx_stat_array = []
         self.successes_array = []
         self.collision_array = []
-        self.inti_collision_array = []
+        self.init_collision_array = []
         self.idle_array = []
         self.slot_len_array = []
         self.throughput_array = []
@@ -18,7 +18,6 @@ class SimState(object):
         self.tree_length_array = []
         self.magic_throughput = []
         self.skipped_slots = []
-
 
     def reset(self):
         self.delay_stat_array = []
@@ -26,7 +25,7 @@ class SimState(object):
         self.tx_stat_array = []
         self.successes_array = []
         self.collision_array = []
-        self.inti_collision_array = []
+        self.init_collision_array = []
         self.idle_array = []
         self.slot_len_array = []
         self.throughput_array = []
@@ -34,7 +33,6 @@ class SimState(object):
         self.tree_length_array = []
         self.magic_throughput = []
         self.skipped_slots = []
-
 
     def update_metrics(self, sim):
         success_slots = sim.tree_state.result_array.count(1)
@@ -47,7 +45,7 @@ class SimState(object):
             (sim.tree_state.total_successes / (sim.slot_no - sim.tree_state.first_slot + sim.tree_state.magic_counter)))
         self.collision_array.append(collision_slots / (sim.slot_no - sim.tree_state.first_slot))
         self.idle_array.append(idle_slots / (sim.slot_no - sim.tree_state.first_slot))
-        self.inti_collision_array.append(sim.tree_state.init_collided)
+        self.init_collision_array.append(sim.tree_state.init_collided)
         self.slot_len_array.append(sim.slot_no - sim.tree_state.first_slot)
         self.tree_length_array.append(len(sim.tree_state.result_array))
         self.skipped_slots.append(len(sim.tree_state.ST_result_array) - len(sim.tree_state.result_array))

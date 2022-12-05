@@ -46,21 +46,21 @@ def simulate_tree_branching_without_viz(sim, setting, date_time_folder, txt_cont
     also prints the obtained throughput, tree progression, result progression and tree depth
     """
 
-    users = 10000
+    users = 1000
 
     # Reset the simulations with the settings
     sim.reset(setting)
     # Make a simulation with the given users, and Tree Parameters
     sim.do_simulation_simple_tree_static(users)
+    # Results
     print(F"Throughput is = {(sim.sim_result.throughput / sim.sim_param.K)}")
-    one_no = sim.sim_param.combi_splits[0]
-    two_no = sim.sim_param.combi_splits[1]
-    counted_one_no = sim.tree_state.split_count.count(one_no)
-    counted_two_no = sim.tree_state.split_count.count(two_no)
-    print(F"The Split ratio of {one_no}/{two_no} is {counted_one_no/counted_two_no}")
-
-    if users > 100:
-        print(F"Theoretically it should be = {TheoreticalPlots().qarysic(100,sim.sim_param):.4f}")
+    print(F"Successes {sim.tree_state.result_array.count(1)}")
+    print(F"Idles {sim.tree_state.result_array.count(0)}")
+    print(F"Collisions {sim.tree_state.result_array.count(2)}")
+    print(F"Mean Delay {sim.sim_result.mean_packet_delay}")
+    print(F"Theoretically it should be = {TheoreticalPlots().qarysic(100,sim.sim_param):.4f}")
+    # skipped_result_array = list(set(sim.branch_node.ghost_array) - set(sim.branch_node.branch_array))
+    # print(skipped_result_array)
     # Use Graphviz to Render the Tree
     if users < 10:
         graphdisplay.displaygraph(sim, date_time_folder)
