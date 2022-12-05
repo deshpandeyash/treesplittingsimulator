@@ -18,7 +18,7 @@ class Simulation(object):
         self.sim_param = SimParam(setting)
         if setting is None:
             # Load simtime
-            self.SIMTIME = 1000
+            self.SIMTIME = 10000
             self.freeaccess = False
         else:
             if setting.dynamictest:
@@ -46,7 +46,6 @@ class Simulation(object):
         self.slot_no = 0
         # Load the parameters for single tree resolution
         self.tree_state = TreeState(self)
-
 
     def reset(self, setting):
         # Load simulation parameters
@@ -123,8 +122,6 @@ class Simulation(object):
         else:
             self.sim_result.throughput = 1
             self.sim_result.magic_throughput = 1
-
-
 
     def do_simulation_gated_access(self):
         """

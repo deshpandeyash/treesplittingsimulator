@@ -389,14 +389,20 @@ def simulate_simple_tree_dynamic_multiple_runs(sim, setting, date_time_folder, t
 
     """
     start = time.time()
-    rate_array = np.arange(setting.dynamictest.start, setting.dynamictest.stop + setting.dynamictest.step,
+    if setting is None:
+        rate_array = np.arange(0.60, 0.75, 0.2)*sim.sim_param.K
+        runs = 1
+    else:
+        rate_array = np.arange(setting.dynamictest.start, setting.dynamictest.stop + setting.dynamictest.step,
                            setting.dynamictest.step)
+        runs = setting.dynamictest.runs
     succ_rate = []
     delay = []
     for p in rate_array:
         counter1 = []
         counter2 = []
-        for _ in range(setting.dynamictest.runs):
+
+        for _ in range(runs):
             sim.reset(setting)
             sim.sim_param.lmbda = p
             sim.do_simulation_simple_tree_dynamic()
@@ -426,25 +432,32 @@ def simulate_simple_tree_dynamic_multiple_runs_gated(sim, setting, date_time_fol
     GATED ACCESS SIMULATION - plots cri length and mean packet delay should add a k sweep
     """
     start = time.time()
-    rate_array = np.arange(setting.dynamictest.start, setting.dynamictest.stop + setting.dynamictest.step,
-                           setting.dynamictest.step)
-
-    delay = []
-    cri_length = []
-    for p in rate_array:
-        delay_counter = []
-        delta_length_counter = []
-        for j in range(setting.dynamictest.runs):
-            sim.reset(setting)
-            sim.sim_param.lmbda = p * sim.sim_param.K
-            sim.do_simulation_gated_access()
-            delay_counter.append(sim.sim_result.mean_packet_delay)
-            delta_length_counter.append(sim.sim_result.delta_cri)
-        delay.append(np.mean(delay_counter))
-        cri_length.append(np.mean(delta_length_counter))
-    plt.plot(rate_array, delay)
-    plt.xlabel('CRI')
-    plt.ylabel('Init Collision')
+    if setting is None:
+        rate_array = np.arange(0.60, 0.75, 0.005)
+        runs = 1000
+    else:
+        rate_array = np.arange(setting.dynamictest.start, setting.dynamictest.stop + setting.dynamictest.step,
+                               setting.dynamictest.step)
+        runs = setting.dynamictest.runs
+    k_range = [1, 2, 4, 8, 16, 32]
+    for k in k_range:
+        delay = []
+        cri_length = []
+        for p in rate_array:
+            delay_counter = []
+            delta_length_counter = []
+            for j in range(runs):
+                sim.reset(setting)
+                sim.sim_param.K = k
+                sim.sim_param.lmbda = p * sim.sim_param.K
+                sim.do_simulation_gated_access()
+                delay_counter.append(sim.sim_result.mean_packet_delay)
+                delta_length_counter.append(sim.sim_result.delta_cri)
+            delay.append(np.mean(delay_counter))
+            cri_length.append(np.mean(delta_length_counter))
+        plt.plot(rate_array, delay, label=F"K={k}")
+    plt.xlabel('Lambda/K')
+    plt.ylabel('Delay in Slots')
     plt.title(F"Mean Packet Delay")
     plt.legend()
     plt.grid()
@@ -587,4 +600,5 @@ if __name__ == '__main__':
     # simulate_simple_tree_satic_multiple_runs_over_p(sim, setting, date_time_folder, txt_context)
     # simluate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_time_folder, txt_context)
     # simulate_simple_tree_static_single_run_direct(sim, setting, date_time_folder, txt_context)
-    simulate_tree_branching_without_viz(sim, setting, date_time_folder, txt_context)
+    # simulate_tree_branching_without_viz(sim, setting, date_time_folder, txt_context)
+    simulate_simple_tree_dynamic_multiple_runs_gated(sim, setting, date_time_folder, txt_context)

@@ -16,7 +16,7 @@ class SimParam(object):
             # set seed for random number generation
 
             # The branching split i,e Q
-            self.SPLIT = 9
+            self.SPLIT = 2
             self.biased_split = False
             if self.biased_split:
                 # set branching probability for binary split
@@ -33,7 +33,7 @@ class SimParam(object):
             # The type of Resolution Algorithm
             self.modified = False
             self.unisplit = False
-            self.sic = False
+            self.sic = True
             self.combi = False
             self.combi_splits = [3, 4]
             self.combi_split_ratio = 0.33
