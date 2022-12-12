@@ -38,6 +38,9 @@ class SimParam(object):
             self.combi_splits = [3, 4]
             self.combi_split_ratio = 0.33
 
+            self.windowed_access = False
+            self.window_size_delta = 17
+
         else:
             # current buffer spaces and minimal buffer spaces
             self.lmbda = 0.34

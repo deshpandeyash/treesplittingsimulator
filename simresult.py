@@ -58,9 +58,8 @@ class SimResult(object):
         self.mean_tree_depth = np.mean(sim.sim_state.tree_depth_array)
         # Average tree length
         self.mean_tree_length = np.mean(sim.sim_state.tree_length_array)
-        # Delta CRI is the difference between the CRI of the last and second last tree
-        if len(sim.sim_state.tree_length_array) > 5:
-            self.delta_cri = sim.sim_state.tree_length_array[-3] - sim.sim_state.tree_length_array[-4]
+        # Delta CRI is the difference between consecutive CRIs
+        self.delta_cri = np.ediff1d(sim.sim_state.tree_length_array)
         # To show the error in d > 2 in SICTA
         self.magic_throughput = np.mean(sim.sim_state.magic_throughput)
         # To see the 'gain' from skipped slots, its the difference between the normal tree and Ghost Tree

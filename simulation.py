@@ -47,6 +47,9 @@ class Simulation(object):
         # Load the parameters for single tree resolution
         self.tree_state = TreeState(self)
 
+        # For windowed access keep the start of the window ready
+        self.current_window_end = self.sim_param.window_size_delta
+
     def reset(self, setting):
         # Load simulation parameters
         self.sim_param = SimParam(setting)
@@ -70,6 +73,9 @@ class Simulation(object):
         self.slot_no = 0
         self.tree_state = TreeState(self)
         self.branch_node.reset()
+
+        # For windowed access keep the start of the window ready
+        self.current_window_end = self.sim_param.window_size_delta
 
     def do_simulation_simple_tree_dynamic(self):
         """
@@ -142,8 +148,6 @@ class Simulation(object):
                     self.sim_state.update_metrics(self)
                 # Transfer the queue to the active array
                 packetlist.copy_queue_to_active(self)
-                # Clear the queue
-                self.queue_array = []
                 # Reset all the parameters as we start a new tree
                 self.tree_state.reset(self)
                 # Reset the branches of the tree

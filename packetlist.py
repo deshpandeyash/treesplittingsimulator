@@ -127,12 +127,18 @@ def remove_successful_packet(sim):
 
 
 def copy_queue_to_active(sim):
-    for j in sim.queue_array:
-        if len(sim.branch_node.branch_status) == 0:
-            j.selected_branch = sim.branch_node.branch_status
-        else:
-            j.selected_branch = sim.branch_node.branch_status[-1]
-    sim.active_array = sim.queue_array
+    if sim.sim_param.windowed_access:
+        pass
+        # TODO : Implement windowed access.
+    else:
+        for j in sim.queue_array:
+            if len(sim.branch_node.branch_status) == 0:
+                j.selected_branch = sim.branch_node.branch_status
+            else:
+                j.selected_branch = sim.branch_node.branch_status[-1]
+        sim.active_array = sim.queue_array
+        # clear the queue array
+        sim.queue_array = []
 
 
 def update_transmissions(sim):

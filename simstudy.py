@@ -118,7 +118,7 @@ def simluate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_tim
     print(F"Starting Test")
     start = time.time()
     split_range = [2, 3, 4, 5, 6, 7, 8, 9]
-    runs = 2000
+    runs = 10
     throughput_d = []
     idle_d = []
     idle_distr = []
@@ -144,7 +144,7 @@ def simluate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_tim
             sim.sim_param.branch_biased = [0.5 ** p for p in range(1, sp + 1)]
             sim.sim_param.branch_biased[-1] = sim.sim_param.branch_biased[-2]
             print(F"The branching Probabilities are: {sim.sim_param.branch_biased}")
-            users = 1000
+            users = 100
             sim.do_simulation_simple_tree_static(users)
             throughput.append(sim.sim_result.throughput / sim.sim_param.K)
             delay.append(sim.sim_result.mean_packet_delay)
@@ -179,6 +179,9 @@ def simluate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_tim
 
     # Plot a stacked bar graph
     width = 0.30
+    print(succ_d)
+    print(idle_d)
+    print(collisions_d)
     plt.bar(split_range, succ_d, width, label='Successes')
     plt.bar(split_range, idle_d, width, bottom=succ_d, label='Idle')
     plt.bar(split_range, collisions_d, width, bottom=np.asarray(idle_d) + np.asarray(succ_d), label='Collisions')
@@ -433,38 +436,54 @@ def simulate_simple_tree_dynamic_multiple_runs_gated(sim, setting, date_time_fol
     """
     start = time.time()
     if setting is None:
-        rate_array = np.arange(0.60, 0.75, 0.005)
-        runs = 1000
+        rate_array = np.arange(0.60, 0.75, 0.05)
+        runs = 10
     else:
         rate_array = np.arange(setting.dynamictest.start, setting.dynamictest.stop + setting.dynamictest.step,
                                setting.dynamictest.step)
         runs = setting.dynamictest.runs
-    k_range = [1, 2, 4, 8, 16, 32]
+    # k_range = [1, 2, 4, 8, 16, 32]
+    k_range = [1, 2, 4]
+
+    delay_across_k = []
     for k in k_range:
         delay = []
-        cri_length = []
         for p in rate_array:
             delay_counter = []
             delta_length_counter = []
+            init_collided = []
+            cri_lengths = []
             for j in range(runs):
                 sim.reset(setting)
                 sim.sim_param.K = k
                 sim.sim_param.lmbda = p * sim.sim_param.K
                 sim.do_simulation_gated_access()
                 delay_counter.append(sim.sim_result.mean_packet_delay)
-                delta_length_counter.append(sim.sim_result.delta_cri)
+                cri_lengths.append(sim.sim_state.tree_length_array)
+                init_collided.append(sim.sim_state.init_collision_array)
             delay.append(np.mean(delay_counter))
-            cri_length.append(np.mean(delta_length_counter))
-        plt.plot(rate_array, delay, label=F"K={k}")
+            # Plot the Distribution of CRI Lengths for each K and Rate
+            cri_length = np.hstack(cri_lengths)
+            plt.hist(cri_length, bins=np.unique(cri_length))
+            figname = date_time_folder + F"K{k}lambda{p:.2f}cri_lengths"
+            plt.savefig(figname + '.png', dpi=300)
+            plt.clf()
+            init_collided_dist = np.hstack(init_collided)
+            plt.hist(init_collided_dist, bins=np.unique(cri_length))
+            figname = date_time_folder + F"K{k}lambda{p:.2f}init_collided"
+            plt.savefig(figname + '.png', dpi=300)
+            plt.clf()
+        delay_across_k.append(delay)
+    for count, the_delay in enumerate(delay_across_k):
+        plt.plot(rate_array, the_delay, label=F"K={k_range[count]}")
     plt.xlabel('Lambda/K')
     plt.ylabel('Delay in Slots')
     plt.title(F"Mean Packet Delay")
     plt.legend()
     plt.grid()
-    figname = date_time_folder + F"K{sim.sim_param.K}Q{sim.sim_param.SPLIT}GatedArrivalSweep"
+    figname = date_time_folder + F"K{k_range[count]}Q{sim.sim_param.SPLIT}GatedArrivalSweep"
     plt.savefig(figname + '.png', dpi=300)
     tikzplotlib.save(figname + '.tex', encoding='utf-8')
-    plt.show()
     end = time.time()
     print("Time for Simulation: " + str(end - start))
 
@@ -489,7 +508,7 @@ def do_theoretical(sim, setting, date_time_folder, txt_context):
 
 def static_grid_run(sim, setting, date_time_folder, txt_context):
     """
-    Static Grid Run Sweeps across k and and N to get slot distribution and other parameters as a function of n for
+    Static Grid Run Sweeps across k and N to get slot distribution and other parameters as a function of n for
     different k
 
     """
