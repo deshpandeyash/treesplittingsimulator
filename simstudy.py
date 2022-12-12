@@ -137,13 +137,14 @@ def simluate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_tim
         idles = []
         collisions = []
         successes = []
+        slot_degree = []
         for _ in range(runs):
             sim.reset(setting)
             sim.sim_param.biased_split = True
             sim.sim_param.SPLIT = sp
             sim.sim_param.branch_biased = [0.5 ** p for p in range(1, sp + 1)]
             sim.sim_param.branch_biased[-1] = sim.sim_param.branch_biased[-2]
-            print(F"The branching Probabilities are: {sim.sim_param.branch_biased}")
+            # print(F"The branching Probabilities are: {sim.sim_param.branch_biased}")
             users = 100
             sim.do_simulation_simple_tree_static(users)
             throughput.append(sim.sim_result.throughput / sim.sim_param.K)
@@ -152,7 +153,9 @@ def simluate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_tim
             idles.append(sim.tree_state.result_array.count(0)/len(sim.tree_state.result_array))
             collisions.append(sim.tree_state.result_array.count(2)/len(sim.tree_state.result_array))
             successes.append(sim.tree_state.result_array.count(1)/len(sim.tree_state.result_array))
-            print(F"_____________________________Round {_} of {runs}________________________________")
+            slot_degree.append(sim.tree_state.number_in_slot)
+            # print(F"_____________________________Round {_} of {runs}________________________________")
+        mean_degree = np.hstack(slot_degree)
         mean_tpt = np.mean(throughput)
         mean_delay = np.mean(delay)
         mean_idle = np.mean(idles)
@@ -174,8 +177,15 @@ def simluate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_tim
         plt.savefig(figname + '.png', dpi=300)
         tikzplotlib.save(figname + '.tex')
         plt.close()
+        result = plt.hist(mean_degree, density=True, color='green', alpha=0.65, bins=max(mean_degree))
+        figname = date_time_folder + F"Degreee Distribution d = {sp}"
+        plt.savefig(figname + '.png', dpi=300)
+        tikzplotlib.save(figname + '.tex')
+        plt.close()
         print(F"Mean throughput for d= {sp} is {mean_tpt}")
         print(F"Mean delay for d = {sp} is {mean_delay}")
+        print(F"Median Degree is {np.median(np.hstack(slot_degree))}")
+        print(F"Mean Degree is {np.mean(np.hstack(slot_degree))}")
 
     # Plot a stacked bar graph
     width = 0.30
@@ -617,7 +627,7 @@ if __name__ == '__main__':
     setting = None
     sim = Simulation(setting)
     # simulate_simple_tree_satic_multiple_runs_over_p(sim, setting, date_time_folder, txt_context)
-    # simluate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_time_folder, txt_context)
+    simluate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_time_folder, txt_context)
     # simulate_simple_tree_static_single_run_direct(sim, setting, date_time_folder, txt_context)
     # simulate_tree_branching_without_viz(sim, setting, date_time_folder, txt_context)
-    simulate_simple_tree_dynamic_multiple_runs_gated(sim, setting, date_time_folder, txt_context)
+    # simulate_simple_tree_dynamic_multiple_runs_gated(sim, setting, date_time_folder, txt_context)
