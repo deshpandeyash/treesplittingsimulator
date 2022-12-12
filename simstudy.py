@@ -118,7 +118,7 @@ def simluate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_tim
     print(F"Starting Test")
     start = time.time()
     split_range = [2, 3, 4, 5, 6, 7, 8, 9]
-    runs = 10
+    runs = 1000
     throughput_d = []
     idle_d = []
     idle_distr = []
@@ -138,6 +138,7 @@ def simluate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_tim
         collisions = []
         successes = []
         slot_degree = []
+        mean_degree = []
         for _ in range(runs):
             sim.reset(setting)
             sim.sim_param.biased_split = True
@@ -145,7 +146,7 @@ def simluate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_tim
             sim.sim_param.branch_biased = [0.5 ** p for p in range(1, sp + 1)]
             sim.sim_param.branch_biased[-1] = sim.sim_param.branch_biased[-2]
             # print(F"The branching Probabilities are: {sim.sim_param.branch_biased}")
-            users = 100
+            users = 1000
             sim.do_simulation_simple_tree_static(users)
             throughput.append(sim.sim_result.throughput / sim.sim_param.K)
             delay.append(sim.sim_result.mean_packet_delay)
@@ -156,6 +157,8 @@ def simluate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_tim
             slot_degree.append(sim.tree_state.number_in_slot)
             # print(F"_____________________________Round {_} of {runs}________________________________")
         mean_degree = np.hstack(slot_degree)
+        mean_degree = [value for value in mean_degree if value != 1]
+        mean_degree = [value for value in mean_degree if value != 0]
         mean_tpt = np.mean(throughput)
         mean_delay = np.mean(delay)
         mean_idle = np.mean(idles)
@@ -184,8 +187,8 @@ def simluate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_tim
         plt.close()
         print(F"Mean throughput for d= {sp} is {mean_tpt}")
         print(F"Mean delay for d = {sp} is {mean_delay}")
-        print(F"Median Degree is {np.median(np.hstack(slot_degree))}")
-        print(F"Mean Degree is {np.mean(np.hstack(slot_degree))}")
+        print(F"Median Degree is {np.median(mean_degree)}")
+        print(F"Mean Degree is {np.mean(mean_degree)}")
 
     # Plot a stacked bar graph
     width = 0.30
