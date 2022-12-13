@@ -150,9 +150,16 @@ def traffic_analysis(sim, setting, date_time_folder):
     """
     Finds upper and lower bounds and also plots the optimal Stability arrival rate for windowed access
     """
-    k_array = [setting.boundstest.k1, setting.boundstest.k2, setting.boundstest.k3, setting.boundstest.k4,
-               setting.boundstest.k5]
-    m = int(setting.boundsset.m)
+    if setting is None:
+        k_array = [1, 2, 4, 8, 16, 32, 64]
+        m = 100
+        lambda_delta_array = np.linspace(0, 60, 1000)
+    else:
+        k_array = [setting.boundstest.k1, setting.boundstest.k2, setting.boundstest.k3, setting.boundstest.k4,
+                   setting.boundstest.k5]
+        m = int(setting.boundsset.m)
+        lambda_delta_array = np.linspace(setting.boundsset.start, setting.boundsset.stop,
+                                         setting.boundsset.no_of_readings)
     bounds_table = pd.DataFrame()
     alpha_array_bound = []
     beta_array_bound = []
@@ -193,7 +200,7 @@ def traffic_analysis(sim, setting, date_time_folder):
         # Now onto the Windowed Access Results
         lambda_upper_array = []
         lambda_lower_array = []
-        lambda_delta_array = np.linspace(setting.boundsset.start, setting.boundsset.stop, setting.boundsset.no_of_readings)
+
         for lambda_delta in lambda_delta_array:
             lambda_upper_array.append(lambda_delta / float(TheoreticalPlots().windowed_bound(sim.sim_param, alpha_ub, m,
                                                                                              lambda_delta)))
@@ -212,7 +219,7 @@ def traffic_analysis(sim, setting, date_time_folder):
         lambda_lower_array_bound.append(round(float(lambda_lower), 6))
         lambda_upper_array_bound.append(round(float(lambda_upper), 6))
         lambda_delta_array_bound.append(round(float(optimum_lambda_delta), 6))
-        delta_array_bound.append(round(float(optimum_window), 6))
+        delta_array_bound.append(round(float(optimum_window), 6)/k)
     pyplot.xlabel("Lambda_Delta")
     pyplot.ylabel("Lambda")
     pyplot.legend()

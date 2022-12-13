@@ -58,7 +58,7 @@ def simulate_tree_branching_without_viz(sim, setting, date_time_folder, txt_cont
     print(F"Idles {sim.tree_state.result_array.count(0)}")
     print(F"Collisions {sim.tree_state.result_array.count(2)}")
     print(F"Mean Delay {sim.sim_result.mean_packet_delay}")
-    print(F"Theoretically it should be = {TheoreticalPlots().qarysic(100,sim.sim_param):.4f}")
+    print(F"Theoretically it should be = {TheoreticalPlots().qarysic(100, sim.sim_param):.4f}")
     # skipped_result_array = list(set(sim.branch_node.ghost_array) - set(sim.branch_node.branch_array))
     # print(skipped_result_array)
     # Use Graphviz to Render the Tree
@@ -151,9 +151,9 @@ def simluate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_tim
             throughput.append(sim.sim_result.throughput / sim.sim_param.K)
             delay.append(sim.sim_result.mean_packet_delay)
             packet_delay_distribution.append(sim.sim_state.delay_stat_array)
-            idles.append(sim.tree_state.result_array.count(0)/len(sim.tree_state.result_array))
-            collisions.append(sim.tree_state.result_array.count(2)/len(sim.tree_state.result_array))
-            successes.append(sim.tree_state.result_array.count(1)/len(sim.tree_state.result_array))
+            idles.append(sim.tree_state.result_array.count(0) / len(sim.tree_state.result_array))
+            collisions.append(sim.tree_state.result_array.count(2) / len(sim.tree_state.result_array))
+            successes.append(sim.tree_state.result_array.count(1) / len(sim.tree_state.result_array))
             slot_degree.append(sim.tree_state.number_in_slot)
             # print(F"_____________________________Round {_} of {runs}________________________________")
         mean_degree = np.hstack(slot_degree)
@@ -406,11 +406,11 @@ def simulate_simple_tree_dynamic_multiple_runs(sim, setting, date_time_folder, t
     """
     start = time.time()
     if setting is None:
-        rate_array = np.arange(0.60, 0.75, 0.2)*sim.sim_param.K
+        rate_array = np.arange(0.60, 0.75, 0.2) * sim.sim_param.K
         runs = 1
     else:
         rate_array = np.arange(setting.dynamictest.start, setting.dynamictest.stop + setting.dynamictest.step,
-                           setting.dynamictest.step)
+                               setting.dynamictest.step)
         runs = setting.dynamictest.runs
     succ_rate = []
     delay = []
@@ -600,6 +600,13 @@ def experimental_runs(sim, setting, date_time_folder, txt_context):
     pass
 
 
+def experimental_run_1(sim, setting, date_time_folder):
+    start = time.time()
+    theorstudy.traffic_analysis(sim, setting, date_time_folder)
+    end = time.time()
+    print(F"Time for Simulaiton is {end - start} seconds")
+
+
 if __name__ == '__main__':
     date_time_folder = make_result_folder()
     txt_context = make_result_txt(date_time_folder)
@@ -630,7 +637,9 @@ if __name__ == '__main__':
     setting = None
     sim = Simulation(setting)
     # simulate_simple_tree_satic_multiple_runs_over_p(sim, setting, date_time_folder, txt_context)
-    simluate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_time_folder, txt_context)
+    # simluate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_time_folder, txt_context)
+
     # simulate_simple_tree_static_single_run_direct(sim, setting, date_time_folder, txt_context)
     # simulate_tree_branching_without_viz(sim, setting, date_time_folder, txt_context)
     # simulate_simple_tree_dynamic_multiple_runs_gated(sim, setting, date_time_folder, txt_context)
+    experimental_run_1(sim, setting, date_time_folder)

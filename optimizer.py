@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 from matplotlib import pyplot as plt
 import decimal
@@ -11,19 +13,13 @@ For now its just a scratch pad to try different optimizer functions, nothing imp
 """
 # decimal.getcontext().prec = 1000
 
-d = 3
-n = 100
-
-p = 1/d
-q = 1/d
-r = 1/d
-
+lmbda = 0.69
+k = 4
+i = 1
+muxer = lmbda*i*k
+mux = math.e ** (-muxer)
 summer = 0
-for i in range(2, (n+1)):
-    first_term = ((-1)**i)*comb(n,i)
-    second_term_numerator = (i-1)*(((1-p)**i)+(r**i))
-    second_term_denominator = 1 - ((p**i)*(q**i)*(r**i))
-    second_term = second_term_numerator / second_term_denominator
-    summer += (first_term * second_term)
-
-print(F"Throughput = {n/((summer*2)+1)}")
+for j in range(k):
+    summer += (muxer ** j)/math.factorial(j)
+final = mux * summer
+print(final)

@@ -33,7 +33,7 @@ class SimParam(object):
             # The type of Resolution Algorithm
             self.modified = False
             self.unisplit = False
-            self.sic = True
+            self.sic = False
             self.combi = False
             self.combi_splits = [3, 4]
             self.combi_split_ratio = 0.33

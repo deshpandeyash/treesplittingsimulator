@@ -5,8 +5,7 @@ import numpy as np
 
 
 class TheoreticalPlots(object):
-
-    decimal.getcontext().prec = 1000
+    decimal.getcontext().prec = 10000
 
     # Equation from quick template
 
@@ -37,7 +36,6 @@ class TheoreticalPlots(object):
                 ln += comb(n - t, i, exact=True) * ((-1) ** (i + 1)) * i / (d_sum_sub * (i + t))
             ln = 1 + (ln * to_sub * comb(n, t, exact=True))
             return ln
-
 
     def qarysic(self, n, param):
         """
@@ -74,12 +72,12 @@ class TheoreticalPlots(object):
         Gated access SIC test equation, work in progress....
         """
         x = decimal.Decimal(x)
-        first_term = (x*decimal.Decimal(z)) - 1
+        first_term = (x * decimal.Decimal(z)) - 1
         second_term = 0
         for i in range(0, k + 1):
             pois_multiplier = poisson.pmf(i, z, loc=0)
             li = self.qarylen(i, param)
-            inside_term = li - decimal.Decimal(x*i) + 1
+            inside_term = li - decimal.Decimal(x * i) + 1
             second_term += decimal.Decimal(inside_term) * decimal.Decimal(pois_multiplier)
         return decimal.Decimal(first_term) + second_term
 
