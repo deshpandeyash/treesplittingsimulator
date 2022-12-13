@@ -71,13 +71,17 @@ class TheoreticalPlots(object):
         """
         Gated access SIC test equation, work in progress....
         """
+        if param.sic:
+            extra_sic_add = 0
+        else:
+            extra_sic_add = 1
         x = decimal.Decimal(x)
-        first_term = (x * decimal.Decimal(z)) - 1
+        first_term = (x * decimal.Decimal(z)) - extra_sic_add
         second_term = 0
         for i in range(0, k + 1):
             pois_multiplier = poisson.pmf(i, z, loc=0)
             li = self.qarylen(i, param)
-            inside_term = li - decimal.Decimal(x * i) + 1
+            inside_term = li - decimal.Decimal(x * i) + extra_sic_add
             second_term += decimal.Decimal(inside_term) * decimal.Decimal(pois_multiplier)
         return decimal.Decimal(first_term) + second_term
 
