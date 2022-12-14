@@ -72,9 +72,9 @@ class TheoreticalPlots(object):
         Gated access SIC test equation, work in progress....
         """
         if param.sic:
-            extra_sic_add = 0
+            extra_sic_add = decimal.Decimal(0)
         else:
-            extra_sic_add = 1
+            extra_sic_add = decimal.Decimal(1)
         x = decimal.Decimal(x)
         first_term = (x * decimal.Decimal(z)) - extra_sic_add
         second_term = 0

@@ -219,15 +219,8 @@ def traffic_analysis(sim, setting, date_time_folder):
         lambda_lower_array_bound.append(round(float(lambda_lower), 6))
         lambda_upper_array_bound.append(round(float(lambda_upper), 6))
         lambda_delta_array_bound.append(round(float(optimum_lambda_delta), 6))
-        delta_array_bound.append(round(float(optimum_window), 6)/k)
-    pyplot.xlabel("Lambda_Delta")
-    pyplot.ylabel("Lambda")
-    pyplot.legend()
-    pyplot.grid()
+        delta_array_bound.append(round(float(optimum_window), 6))
     figname = date_time_folder + f"WindowedAccessPLots"
-    pyplot.savefig(figname + '.png', dpi=300)
-    tikzplotlib.save(figname + '.tex', encoding='utf-8')
-    pyplot.show()
     bounds_table['K'] = k_array
     bounds_table['alpha'] = alpha_array_bound
     bounds_table['beta'] = beta_array_bound
@@ -239,3 +232,11 @@ def traffic_analysis(sim, setting, date_time_folder):
     bounds_table['Delta'] = delta_array_bound
     with open(figname + 'table.tex', 'w') as tf:
         tf.write(bounds_table.to_latex())
+    pyplot.xlabel("Lambda_Delta")
+    pyplot.ylabel("Lambda")
+    pyplot.legend()
+    pyplot.grid()
+
+    pyplot.savefig(figname + '.png', dpi=300)
+    tikzplotlib.save(figname + '.tex', encoding='utf-8')
+    # pyplot.show()
