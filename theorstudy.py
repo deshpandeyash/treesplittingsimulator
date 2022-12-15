@@ -152,8 +152,8 @@ def traffic_analysis(sim, setting, date_time_folder):
     """
     if setting is None:
         k_array = [1, 2, 4, 8, 16, 32, 64]
-        m = 100
-        lambda_delta_array = np.linspace(0, 60, 1000)
+        m = 50
+        lambda_delta_array = np.linspace(0, 65, 200)
     else:
         k_array = [setting.boundstest.k1, setting.boundstest.k2, setting.boundstest.k3, setting.boundstest.k4,
                    setting.boundstest.k5]
@@ -170,6 +170,11 @@ def traffic_analysis(sim, setting, date_time_folder):
     lambda_delta_array_bound = []
     delta_array_bound = []
 
+    if sim.sim_param.sic:
+        to_add = 0
+    else:
+        to_add = 1
+
     print(F"m = {m} ")
     for k in k_array:
         sim.sim_param.K = k
@@ -181,7 +186,7 @@ def traffic_analysis(sim, setting, date_time_folder):
             for i in range(0, m):
                 li = TheoreticalPlots().qarylen(i, sim.sim_param)
                 comber = comb(n, i, exact=True)
-                numerator += comber * (li + 1)
+                numerator += comber * (li + to_add)
                 denominator += comber * i
             alpha_plot.append(numerator / denominator)
         alpha_lb = min(alpha_plot)

@@ -11,7 +11,7 @@ class TheoreticalPlots(object):
 
     def qarylen(self, n, param):
         """
-           Return the length according to the final equation according to the paper by H murat and Yash
+           Return the length according to the final equation according to the paper by H Murat Gürsu and Yash
         """
         param.branch_biased = np.full(param.SPLIT, (1 - param.branchprob) / (param.SPLIT - 1))
         param.branch_biased[0] = param.branchprob
@@ -35,6 +35,32 @@ class TheoreticalPlots(object):
                 d_sum_sub = decimal.Decimal(1) - d_sum
                 ln += comb(n - t, i, exact=True) * ((-1) ** (i + 1)) * i / (d_sum_sub * (i + t))
             ln = 1 + (ln * to_sub * comb(n, t, exact=True))
+            return ln
+
+    def qary_perfect(self, n, param):
+        """
+        Return the length according to the final equation according to the paper by Quirin Vogel Yash
+        This is no KMPR for now.
+        """
+
+        pj_array = param.branch_biased
+        ln = decimal.Decimal(0)
+        d = param.SPLIT
+
+        if n <= 1:
+            return 1
+        else:
+            for i in range(2, n + 1):
+                d_sum = decimal.Decimal(0)
+                for u in range(1, d + 1):
+                    d_sum += decimal.Decimal(pj_array[u-1]) ** decimal.Decimal(i)
+                k_sum = decimal.Decimal(0)
+                for k in range(1, d - 1):
+                    k_sum += ((decimal.Decimal(1) - decimal.Decimal(sum([pj_array[j-1]for j in range(1, k + 1)]))) ** i)
+                d_sum_sub = decimal.Decimal(1) - d_sum
+                k_sum_sub = decimal.Decimal(1) + k_sum
+                ln += (comb(n, i, exact=True) * ((-1) ** i) * (i-1) * k_sum_sub) / d_sum_sub
+            ln = decimal.Decimal(1) + ln
             return ln
 
     def qarysic(self, n, param):
