@@ -152,8 +152,8 @@ def traffic_analysis(sim, setting, date_time_folder):
     """
     if setting is None:
         k_array = [1, 2, 4, 8, 16, 32, 64]
-        m = 200
-        lambda_delta_array = np.linspace(0, 60, 1000)
+        m = 50
+        lambda_delta_array = np.linspace(0, 65, 200)
     else:
         k_array = [setting.boundstest.k1, setting.boundstest.k2, setting.boundstest.k3, setting.boundstest.k4,
                    setting.boundstest.k5]
@@ -170,6 +170,11 @@ def traffic_analysis(sim, setting, date_time_folder):
     lambda_delta_array_bound = []
     delta_array_bound = []
 
+    if sim.sim_param.sic:
+        to_add = 0
+    else:
+        to_add = 1
+
     print(F"m = {m} ")
     for k in k_array:
         sim.sim_param.K = k
@@ -181,7 +186,7 @@ def traffic_analysis(sim, setting, date_time_folder):
             for i in range(0, m):
                 li = TheoreticalPlots().qarylen(i, sim.sim_param)
                 comber = comb(n, i, exact=True)
-                numerator += comber * (li + 1)
+                numerator += comber * (li + to_add)
                 denominator += comber * i
             alpha_plot.append(numerator / denominator)
         alpha_lb = min(alpha_plot)
@@ -219,15 +224,8 @@ def traffic_analysis(sim, setting, date_time_folder):
         lambda_lower_array_bound.append(round(float(lambda_lower), 6))
         lambda_upper_array_bound.append(round(float(lambda_upper), 6))
         lambda_delta_array_bound.append(round(float(optimum_lambda_delta), 6))
-        delta_array_bound.append(round(float(optimum_window), 6)/k)
-    pyplot.xlabel("Lambda_Delta")
-    pyplot.ylabel("Lambda")
-    pyplot.legend()
-    pyplot.grid()
+        delta_array_bound.append(round(float(optimum_window), 6))
     figname = date_time_folder + f"WindowedAccessPLots"
-    pyplot.savefig(figname + '.png', dpi=300)
-    tikzplotlib.save(figname + '.tex', encoding='utf-8')
-    pyplot.show()
     bounds_table['K'] = k_array
     bounds_table['alpha'] = alpha_array_bound
     bounds_table['beta'] = beta_array_bound
@@ -239,3 +237,11 @@ def traffic_analysis(sim, setting, date_time_folder):
     bounds_table['Delta'] = delta_array_bound
     with open(figname + 'table.tex', 'w') as tf:
         tf.write(bounds_table.to_latex())
+    pyplot.xlabel("Lambda_Delta")
+    pyplot.ylabel("Lambda")
+    pyplot.legend()
+    pyplot.grid()
+
+    pyplot.savefig(figname + '.png', dpi=300)
+    tikzplotlib.save(figname + '.tex', encoding='utf-8')
+    # pyplot.show()

@@ -4,6 +4,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy.stats import skew
 import graphdisplay
+import theoretical_plots
 from make_stat import mean_confidence_interval, make_histogram_cont, make_histogram_discrete, create_ideal_by_regression
 from make_stat import make_multiplot, plot_conf_interval
 from simsetting import SimSetting

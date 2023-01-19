@@ -185,7 +185,7 @@ class Second(Frame):
                                               onvalue=True,
                                               offvalue=False)
             self.checkbutton[i].place(x=0, y=50 * i)
-        self.checkbutton[0].select()
+        self.checkbutton[1].select()
         # creating a button instance
         quitButton = Button(self, text="Next", command=lambda: [self.first_box(), self.master.destroy()])
         quitButton.place(x=0, y=450)
@@ -225,8 +225,8 @@ class Fourth(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
         self.master = master
-        self.users = 1000
-        self.runs = 100
+        self.users = 100
+        self.runs = 1000
         self.init_window()
 
     def init_window(self):
@@ -239,10 +239,10 @@ class Fourth(Frame):
         l2.place(x=0, y=100)
 
         self.e1 = Entry(self.master)
-        self.e1.insert(0, '100')
+        self.e1.insert(0, '500')
         self.e1.place(x=250, y=0)
         self.e2 = Entry(self.master)
-        self.e2.insert(0, '100')
+        self.e2.insert(0, '1000')
         self.e2.place(x=250, y=100)
         NextButton = Button(self, text="Done", command=lambda: [self.first_box(), self.master.destroy()])
         NextButton.place(x=0, y=250)
