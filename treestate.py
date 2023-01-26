@@ -8,6 +8,7 @@ class TreeState(object):
         self.total_successes = 0
         self.last_slot = 0
         self.result_array = []
+        self.k_feedback = []
         # IF it was a simple tree, this would have been a result array. Its useful when we have to look for definite
         # collisions
         self.ST_result_array = []
@@ -22,6 +23,7 @@ class TreeState(object):
         self.init_collided = len(sim.active_array)
         self.total_successes = 0
         self.result_array = []
+        self.k_feedback = []
         self.ST_result_array = []
         self.last_slot = 0
         self.gate_open = True
@@ -43,6 +45,7 @@ class TreeState(object):
         self.number_in_slot.append(sim.slot.no_collided_packets)
         self.ST_number_in_slot.append(sim.slot.no_collided_packets)
         self.split_count.append(sim.sim_param.SPLIT)
+        self.k_feedback.append(sim.slot.resolved_packets)
         # Add the number of packets to statistical array for diagnosis
         sim.sim_state.arrival_stat_array.append(sim.packets_gen)
         if sim.result == 1:

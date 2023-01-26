@@ -67,7 +67,7 @@ def simulate_tree_branching_without_viz(sim, setting, date_time_folder, txt_cont
         graphdisplay.displaygraph(sim, date_time_folder)
 
 
-def simulate_simple_tree_satic_multiple_runs_over_p(sim, setting, date_time_folder, txt_context):
+def simulate_simple_tree_static_multiple_runs_over_p(sim, setting, date_time_folder, txt_context):
     print(F"Starting Test")
     start = time.time()
     string1 = [F"-{i}" for i in range(1, 8)]
@@ -115,7 +115,7 @@ def simulate_simple_tree_satic_multiple_runs_over_p(sim, setting, date_time_fold
     print(F"Time taken is {time.time() - start} seconds")
 
 
-def simluate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_time_folder, txt_context):
+def simulate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_time_folder, txt_context):
     print(F"Starting Test")
     start = time.time()
     split_range = [2, 3, 4, 5, 6, 7, 8, 9]
@@ -241,9 +241,9 @@ def simulate_simple_tree_static_single_run_direct(sim, setting, date_time_folder
     print(F"Starting Test")
     start = time.time()
     sim.reset(setting)
-    sim.sim_param.sic = False
+    sim.sim_param.sic = True
     sim.sim_param.biased_split = False
-    sim.sim_param.SPLIT = 2
+    sim.sim_param.SPLIT = 9
     sim.sim_param.branch_biased = [0.5 ** p for p in range(1, sim.sim_param.SPLIT + 1)]
     sim.sim_param.branch_biased[-1] = sim.sim_param.branch_biased[-2]
     print(F"The branching Probabilities are: {sim.sim_param.branch_biased}")
@@ -258,6 +258,9 @@ def simulate_simple_tree_static_single_run_direct(sim, setting, date_time_folder
     plt.savefig(figname + '.png', dpi=300)
     tikzplotlib.save(figname + '.tex')
     plt.close()
+    b = [item for sublist in sim.sim_state.k_feedback for item in sublist if item != 0]
+    plt.hist(b, bins=max(b))
+    plt.show()
     end = time.time()
     print("Time for Simulation: " + str(end - start))
     print(F"Time taken is {time.time() - start} seconds")
@@ -394,9 +397,9 @@ def simulate_users(sim, setting, date_time_folder, txt_context):
     figname = date_time_folder + F"K{sim.sim_param.K}Q{sim.sim_param.SPLIT}UserSweep"
     plt.savefig(figname + '.png', dpi=300)
     tikzplotlib.save(figname + '.tex')
+    plt.show()
     end = time.time()
     print(F"Time for simulation: {end - start} Seconds")
-    plt.show()
 
 
 def simulate_simple_tree_dynamic_multiple_runs(sim, setting, date_time_folder, txt_context):
@@ -450,14 +453,14 @@ def simulate_simple_tree_dynamic_multiple_runs_gated(sim, setting, date_time_fol
     """
     start = time.time()
     if setting is None:
-        rate_array = np.arange(0.60, 0.75, 0.05)
+        rate_array = np.arange(0.60, 0.70, 0.05)
         runs = 10
     else:
         rate_array = np.arange(setting.dynamictest.start, setting.dynamictest.stop + setting.dynamictest.step,
                                setting.dynamictest.step)
         runs = setting.dynamictest.runs
     # k_range = [1, 2, 4, 8, 16, 32]
-    k_range = [1, 2, 4]
+    k_range = [1]
 
     delay_across_k = []
     for k in k_range:
@@ -603,8 +606,21 @@ def experimental_runs(sim, setting, date_time_folder, txt_context):
 
 def experimental_run_1(sim, setting, date_time_folder):
     start = time.time()
-    theorstudy.traffic_analysis(sim, setting, date_time_folder)
+    # theorstudy.traffic_analysis(sim, setting, date_time_folder)
+    l_n_array = []
+    n_array = np.arange(1, 25)
+    for n in n_array:
+        l_n_array.append(n / TheoreticalPlots().double_sicta(n, sim.sim_param))
     end = time.time()
+    plt.plot(n_array, l_n_array)
+    plt.xlabel("n")
+    plt.ylabel("TPT")
+    plt.hlines(0.924, 0, 25, colors='red', linestyles='dashed', label="Asymptotic Limit")
+    figname = date_time_folder + F"Throughput"
+    plt.legend()
+    plt.savefig(figname + '.png', dpi=300)
+    tikzplotlib.save(figname + '.tex', encoding='utf-8')
+    plt.show()
     print(F"Time for Simulaiton is {end - start} seconds")
 
 

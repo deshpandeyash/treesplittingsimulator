@@ -5,7 +5,7 @@ import numpy as np
 
 
 class TheoreticalPlots(object):
-    decimal.getcontext().prec = 10000
+    decimal.getcontext().prec = 100000
 
     # Equation from quick template
 
@@ -37,6 +37,37 @@ class TheoreticalPlots(object):
             ln = 1 + (ln * to_sub * comb(n, t, exact=True))
             return ln
 
+    def double_sicta(self, n, param):
+        """
+        Return according to the results from double SICTA
+        """
+
+        pj_array = param.branch_biased
+        ln = decimal.Decimal(0)
+        d = param.SPLIT
+
+        if d > 2:
+            raise NotImplementedError(F"Double SICTA Equations are now ready only for binary trees")
+
+        p = param.branch_biased[0]
+        q = param.branch_biased[1]
+
+        r = 2 - 4 * p * q - 3 * (p ** 2 + q ** 2)
+
+        if n <= 1:
+            return 1
+        elif n == 2:
+            return 2
+        else:
+            for i in range(3, n + 1):
+                first_term = decimal.Decimal((-1) ** i)
+                second_term = decimal.Decimal((i - 1 + (r * i * (i - 1) / 2)))
+                denominator = decimal.Decimal(1) - decimal.Decimal(p) ** decimal.Decimal(i) - decimal.Decimal(
+                    q) ** decimal.Decimal(i)
+                ln += (comb(n, i, exact=True) * first_term * second_term) / denominator
+            ln = decimal.Decimal(1 + (n * (n - 1) / 2)) + ln
+            return ln
+
     def qary_perfect(self, n, param):
         """
         Return the length according to the final equation according to the paper by Quirin Vogel Yash
@@ -53,13 +84,14 @@ class TheoreticalPlots(object):
             for i in range(2, n + 1):
                 d_sum = decimal.Decimal(0)
                 for u in range(1, d + 1):
-                    d_sum += decimal.Decimal(pj_array[u-1]) ** decimal.Decimal(i)
+                    d_sum += decimal.Decimal(pj_array[u - 1]) ** decimal.Decimal(i)
                 k_sum = decimal.Decimal(0)
                 for k in range(1, d - 1):
-                    k_sum += ((decimal.Decimal(1) - decimal.Decimal(sum([pj_array[j-1]for j in range(1, k + 1)]))) ** i)
+                    k_sum += ((decimal.Decimal(1) - decimal.Decimal(
+                        sum([pj_array[j - 1] for j in range(1, k + 1)]))) ** i)
                 d_sum_sub = decimal.Decimal(1) - d_sum
                 k_sum_sub = decimal.Decimal(1) + k_sum
-                ln += (comb(n, i, exact=True) * ((-1) ** i) * (i-1) * k_sum_sub) / d_sum_sub
+                ln += (comb(n, i, exact=True) * ((-1) ** i) * (i - 1) * k_sum_sub) / d_sum_sub
             ln = decimal.Decimal(1) + ln
             return ln
 

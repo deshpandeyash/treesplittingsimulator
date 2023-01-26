@@ -110,7 +110,7 @@ class TreeSlot(object):
                 sim.sim_param.SPLIT = sim.sim_param.combi_splits[self.rng.binomial(1, sim.sim_param.combi_split_ratio)]
             # increment the count for uncollided packets
             packetlist.inc_uncollided_packet_count(sim, sim.sim_param.SPLIT - 1)
-            # If unisplit and if its the first collision
+            # If unisplit and if it's the first collision
             if sim.sim_param.unisplit and len(sim.tree_state.result_array) == 0:
                 packetlist.unisplit_collided_packet_count(sim)
                 # Split the tree with no of collided packets

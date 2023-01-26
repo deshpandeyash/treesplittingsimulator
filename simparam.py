@@ -16,7 +16,7 @@ class SimParam(object):
             # set seed for random number generation
 
             # The branching split i,e Q
-            self.SPLIT = 3
+            self.SPLIT = 2
             self.biased_split = False
             if self.biased_split:
                 # set branching probability for binary split

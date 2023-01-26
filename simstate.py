@@ -18,6 +18,7 @@ class SimState(object):
         self.tree_length_array = []
         self.magic_throughput = []
         self.skipped_slots = []
+        self.k_feedback = []
 
     def reset(self):
         self.delay_stat_array = []
@@ -33,11 +34,13 @@ class SimState(object):
         self.tree_length_array = []
         self.magic_throughput = []
         self.skipped_slots = []
+        self.k_feedback = []
 
     def update_metrics(self, sim):
         success_slots = sim.tree_state.result_array.count(1)
         idle_slots = sim.tree_state.result_array.count(0)
         collision_slots = sim.tree_state.result_array.count(2)
+        self.k_feedback.append(sim.tree_state.k_feedback)
         # Append all the parameters from tree state to the arrays in this class
         self.successes_array.append(sim.tree_state.total_successes)
         self.throughput_array.append((sim.tree_state.total_successes / (sim.slot_no - sim.tree_state.first_slot)))
