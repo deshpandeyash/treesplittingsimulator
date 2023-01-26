@@ -359,39 +359,48 @@ def simulate_users(sim, setting, date_time_folder, txt_context):
     :param n_stop: Till the number of users we wish to plot.
     """
     start = time.time()
+    if setting is None:
+        user_array = np.arange(sim.sim_param.K+1, 100, 1)
+        runs = 10
+    else:
+        user_array = np.arange(sim.sim_param.K + 1, setting.usersweep.n_stop)
+        runs = setting.usersweep.runs
+
     # The array across users
     throughput_array = []
     # The theoretical (ideal) throughput
     theoretical_out_array = []
-    # Magic Throughput until the Giannakis problem is solved
-    magic_throughput_array = []
     # Create USer Array, starting from K + 1 till the stop value inputted from the GUI
-    user_array = np.arange(sim.sim_param.K + 1, setting.usersweep.n_stop)
+    transmissions_array = []
+
     for n in user_array:
         # Array to take mean from
         throughput = []
-        magic = []
-        for _ in range(setting.usersweep.runs):
+        txs = []
+        for _ in range(runs):
             # Reset the simulation
             sim.reset(setting)
             # Make simulation and append throughputs
             sim.do_simulation_simple_tree_static(n)
             throughput.append(sim.sim_result.throughput / sim.sim_param.K)
-            magic.append(sim.sim_result.magic_throughput / sim.sim_param.K)
+            txs.append(sim.sim_result.mean_no_tx)
         # Append the mean to the actual plot array
         throughput_array.append(np.mean(throughput))
-        magic_throughput_array.append(np.mean(magic))
-        theoretical_out_array.append(TheoreticalPlots().qarysic(n, sim.sim_param))
+        transmissions_array.append(np.mean(txs))
+        # theoretical_out_array.append(TheoreticalPlots().qarysic(n, sim.sim_param))
     # Get the theoretical Value
-    theoretical_out = TheoreticalPlots().qarysic(setting.usersweep.n_stop, sim.sim_param)
-    plt.plot(user_array, throughput_array, 'b-', label='simulation')
-    plt.plot(user_array, theoretical_out_array, 'r', label='theoretical')
-    print(F"Max Theoretical throughput is {max(theoretical_out_array):.6f}"
-          F" at Users {user_array[theoretical_out_array.index(max(theoretical_out_array))]}")
-    print(F"Steady State Theoretical Value =   {theoretical_out:.6f}")
-    if sim.sim_param.sic and sim.sim_param.SPLIT > 2:
-        plt.plot(user_array, magic_throughput_array, 'g', label='Right Skipped Simulation')
+    theoretical_out = TheoreticalPlots().qarysic(100, sim.sim_param)
+    # plt.plot(user_array, throughput_array, 'b-', label='simulation')
+    plt.plot(user_array, transmissions_array, 'b-')
+    print(transmissions_array)
+    # plt.plot(user_array, theoretical_out_array, 'r', label='theoretical')
+    # print(F"Max Theoretical throughput is {max(theoretical_out_array):.6f}"
+    #       F" at Users {user_array[theoretical_out_array.index(max(theoretical_out_array))]}")
+    # print(F"Steady State Theoretical Value =   {theoretical_out:.6f}")
     plt.xlabel("N Users")
+    plt.ylabel("Transmissions")
+    plt.twinx()
+    plt.plot(user_array, throughput_array, 'r-')
     plt.ylabel("Throughput")
     plt.legend()
     figname = date_time_folder + F"K{sim.sim_param.K}Q{sim.sim_param.SPLIT}UserSweep"

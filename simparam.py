@@ -27,6 +27,10 @@ class SimParam(object):
             self.branch_biased = np.full(self.SPLIT, (1 - self.branchprob) / (self.SPLIT - 1))
             self.branch_biased[0] = self.branchprob
 
+            if self.optimim_sic_split:
+                self.branch_biased = [0.5 ** p for p in range(1, self.SPLIT + 1)]
+                self.branch_biased[-1] = self.branch_biased[-2]
+
             # The number of packets that can be resolved in a multipacekt reception system in one slot.
             self.K = 1
 

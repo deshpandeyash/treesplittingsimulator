@@ -96,10 +96,10 @@ def length_throughput_plot(sim, setting, date_time_folder):
             intercept = slope_intercept[1]
             print(F"----------------K = {k} ---------------------------------")
             print(F"First order Linear Approximation: of the line.. Slope = {slope} intercept = {intercept}")
-            index_to_text = int(n_stop/5)
+            index_to_text = int(n_stop / 5)
             l2 = np.array((float(user_array[-index_to_text]), float(theoretical[-index_to_text])))
             trans_angle = pyplot.gca().transData.transform_angles(np.array((np.degrees(math.atan(slope)),)),
-                                                               l2.reshape((1, 2)))[0]
+                                                                  l2.reshape((1, 2)))[0]
             pyplot.text(l2[0], l2[1], F"Slope={slope:.3f}", rotation=trans_angle, rotation_mode='anchor')
     if plot_max:
         pyplot.plot(n_array, maximum_array, 'r--', label='Maximum')
@@ -152,8 +152,12 @@ def traffic_analysis(sim, setting, date_time_folder):
     """
     if setting is None:
         k_array = [1, 2, 4, 8, 16, 32, 64]
+        alpha_opt = [1.4427, 0.7214, 0.3607, 0.1808, 0.0919, 0.0480, 0.0254]
+        beta_opt = [1.4427, 0.7213, 0.3606, 0.1799, 0.0884, 0.0421, 0.0199]
+        m_array = [50, 100, 200, 400, 400, 400, 500]
+        ld_array_end_points = [20, 20, 20, 20, 15, 30, 60]
         m = 50
-        lambda_delta_array = np.linspace(0, 65, 200)
+        lambda_delta_array = np.linspace(0.00, 400, 2000)
     else:
         k_array = [setting.boundstest.k1, setting.boundstest.k2, setting.boundstest.k3, setting.boundstest.k4,
                    setting.boundstest.k5]
@@ -174,9 +178,10 @@ def traffic_analysis(sim, setting, date_time_folder):
         to_add = 0
     else:
         to_add = 1
-
+    df = pd.read_csv('SIC_K_d_2')
     print(F"m = {m} ")
-    for k in k_array:
+    for item in range(len(k_array)):
+        k = k_array[item]
         sim.sim_param.K = k
         n_array = np.arange(m + 1, m + 500)
         alpha_plot = []
@@ -184,13 +189,16 @@ def traffic_analysis(sim, setting, date_time_folder):
             numerator = 0
             denominator = 0
             for i in range(0, m):
-                li = TheoreticalPlots().qarylen(i, sim.sim_param)
+                # li_p = TheoreticalPlots().qarylen(i, sim.sim_param)
+                li = df[F"{k}"][i]
                 comber = comb(n, i, exact=True)
-                numerator += comber * (li + to_add)
+                numerator += comber * (float(li) + to_add)
                 denominator += comber * i
             alpha_plot.append(numerator / denominator)
-        alpha_lb = min(alpha_plot)
-        alpha_ub = max(alpha_plot)
+        # alpha_lb = min(alpha_plot)
+        # alpha_ub = max(alpha_plot)
+        alpha_lb = alpha_opt[item]
+        alpha_ub = beta_opt[item]
         print(F"............................................................")
         print(F"For k = {k} ")
         print(F"Lower Bound {alpha_lb:.7f} and Upper Bound = {alpha_ub:.7f}")
@@ -206,11 +214,17 @@ def traffic_analysis(sim, setting, date_time_folder):
         lambda_upper_array = []
         lambda_lower_array = []
 
+        m_item = m_array[item]
+
+        t_plots = TheoreticalPlots(csv_name='SIC_K_d_2')
+
+        lambda_delta_array = np.arange(0, ld_array_end_points[item], 0.001)
+
         for lambda_delta in lambda_delta_array:
-            lambda_upper_array.append(lambda_delta / float(TheoreticalPlots().windowed_bound(sim.sim_param, alpha_ub, m,
-                                                                                             lambda_delta)))
-            lambda_lower_array.append(lambda_delta / float(TheoreticalPlots().windowed_bound(sim.sim_param, alpha_lb, m,
-                                                                                             lambda_delta)))
+            f_upper = t_plots.windowed_bound(sim.sim_param, alpha_ub, m_item, lambda_delta)
+            lambda_upper_array.append(lambda_delta / float(f_upper))
+            f_lower = t_plots.windowed_bound(sim.sim_param, alpha_lb, m_item, lambda_delta)
+            lambda_lower_array.append(lambda_delta / float(f_lower))
         lambda_upper_array = np.asarray(lambda_upper_array) / k
         lambda_lower_array = np.asarray(lambda_lower_array) / k
         lambda_upper = max(lambda_upper_array)

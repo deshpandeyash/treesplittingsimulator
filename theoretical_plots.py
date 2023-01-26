@@ -13,8 +13,7 @@ class TheoreticalPlots(object):
         """
            Return the length according to the final equation according to the paper by H Murat Gürsu and Yash
         """
-        param.branch_biased = np.full(param.SPLIT, (1 - param.branchprob) / (param.SPLIT - 1))
-        param.branch_biased[0] = param.branchprob
+
         pj_array = param.branch_biased
         ln = decimal.Decimal(0)
         t = param.K
@@ -133,13 +132,15 @@ class TheoreticalPlots(object):
             extra_sic_add = decimal.Decimal(0)
         else:
             extra_sic_add = decimal.Decimal(1)
+        t = param.K
         x = decimal.Decimal(x)
         first_term = (x * decimal.Decimal(z)) - extra_sic_add
-        second_term = 0
+        second_term = decimal.Decimal(0)
         for i in range(0, k + 1):
             pois_multiplier = poisson.pmf(i, z, loc=0)
-            li = self.qarylen(i, param)
-            inside_term = li - decimal.Decimal(x * i) + extra_sic_add
+            # li = self.qarylen(i, param)
+            li = self.df[F"{t}"][i]
+            inside_term = decimal.Decimal(li) - decimal.Decimal(x * i) + extra_sic_add
             second_term += decimal.Decimal(inside_term) * decimal.Decimal(pois_multiplier)
         return decimal.Decimal(first_term) + second_term
 
@@ -170,7 +171,7 @@ class TheoreticalPlots(object):
         else:
             return 1
 
-    # Non Recursive Equation from SICTA paper
+    # Non-Recursive Equation from SICTA paper
     def sicta(self, n, param):
         """
         Equation for the binary SICTA which also first appeared in the Giannakis paper
@@ -262,3 +263,28 @@ class TheoreticalPlots(object):
         for i in range(0, k):
             out = out * (n - i) / (k - i)
         return out
+
+    def save_lns(self, sim):
+        """
+        In this function we put in a csv the lengths for n in a table and save it. The function below this should read the
+        table and return the corresponding values of L_n for a given n. This Look-Up-table method will help in reducing
+        the computation time drastically for many plots. A structured directory structure must be maintained.
+        """
+
+        csv_name = 'SIC_K_d_2'
+
+        k_array = [1, 2, 4, 8, 16, 32, 64]
+        df = pd.DataFrame()
+        n_array = np.arange(0, 650, 1)
+        df["N"] = n_array
+        for k in k_array:
+            sim.sim_param.K = k
+            l_array = []
+            for n in n_array:
+                l_array.append(TheoreticalPlots().qarylen(n, sim.sim_param))
+            df[F"{k}"] = l_array
+        df.to_csv(csv_name)
+
+    def select_lns_k(self, csv_name, n, k):
+        df = pd.read_csv(csv_name)
+        return df[F"{k}"][n]
