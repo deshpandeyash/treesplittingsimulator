@@ -2,12 +2,19 @@ from scipy.special import comb
 from scipy.stats import poisson
 import decimal
 import numpy as np
+import pandas as pd
 
 
 class TheoreticalPlots(object):
     decimal.getcontext().prec = 100000
 
-    # Equation from quick template
+    def __init__(self, csv_name=None):
+
+        if csv_name is None:
+            self.df = None
+        else:
+            self.df = pd.read_csv('Double_SICTA')
+
 
     def qarylen(self, n, param):
         """
@@ -271,17 +278,18 @@ class TheoreticalPlots(object):
         the computation time drastically for many plots. A structured directory structure must be maintained.
         """
 
-        csv_name = 'SIC_K_d_2'
+        csv_name = 'Double_SICTA'
 
-        k_array = [1, 2, 4, 8, 16, 32, 64]
+        # k_array = [1, 2, 4, 8, 16, 32, 64]
+        k_array = [1]
         df = pd.DataFrame()
-        n_array = np.arange(0, 650, 1)
+        n_array = np.arange(0, 1000, 1)
         df["N"] = n_array
         for k in k_array:
             sim.sim_param.K = k
             l_array = []
             for n in n_array:
-                l_array.append(TheoreticalPlots().qarylen(n, sim.sim_param))
+                l_array.append(TheoreticalPlots().double_sicta(n, sim.sim_param))
             df[F"{k}"] = l_array
         df.to_csv(csv_name)
 

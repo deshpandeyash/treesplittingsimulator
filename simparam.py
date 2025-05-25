@@ -18,6 +18,7 @@ class SimParam(object):
             # The branching split i,e Q
             self.SPLIT = 2
             self.biased_split = False
+            self.optimum_sic_split = False
             if self.biased_split:
                 # set branching probability for binary split
                 self.branchprob = 0.5
@@ -27,7 +28,7 @@ class SimParam(object):
             self.branch_biased = np.full(self.SPLIT, (1 - self.branchprob) / (self.SPLIT - 1))
             self.branch_biased[0] = self.branchprob
 
-            if self.optimim_sic_split:
+            if self.optimum_sic_split:
                 self.branch_biased = [0.5 ** p for p in range(1, self.SPLIT + 1)]
                 self.branch_biased[-1] = self.branch_biased[-2]
 

@@ -360,7 +360,7 @@ def simulate_users(sim, setting, date_time_folder, txt_context):
     """
     start = time.time()
     if setting is None:
-        user_array = np.arange(sim.sim_param.K+1, 100, 1)
+        user_array = np.arange(sim.sim_param.K + 1, 100, 1)
         runs = 10
     else:
         user_array = np.arange(sim.sim_param.K + 1, setting.usersweep.n_stop)
@@ -419,7 +419,7 @@ def simulate_simple_tree_dynamic_multiple_runs(sim, setting, date_time_folder, t
     """
     start = time.time()
     if setting is None:
-        rate_array = np.arange(0.60, 0.75, 0.2) * sim.sim_param.K
+        rate_array = np.arange(0.60, 0.75, 0.02) * sim.sim_param.K
         runs = 1
     else:
         rate_array = np.arange(setting.dynamictest.start, setting.dynamictest.stop + setting.dynamictest.step,
@@ -433,6 +433,7 @@ def simulate_simple_tree_dynamic_multiple_runs(sim, setting, date_time_folder, t
 
         for _ in range(runs):
             sim.reset(setting)
+            sim.freeaccess = True
             sim.sim_param.lmbda = p
             sim.do_simulation_simple_tree_dynamic()
             counter1.append(sim.sim_result.succ_rate)
@@ -633,6 +634,14 @@ def experimental_run_1(sim, setting, date_time_folder):
     print(F"Time for Simulaiton is {end - start} seconds")
 
 
+def experimental_run_2(sim, setting, date_time_folder):
+    start = time.time()
+    #TheoreticalPlots().save_lns(sim)
+    theorstudy.traffic_analysis(sim, setting, date_time_folder)
+    end = time.time()
+    print(F"Time for Simulaiton is {end - start} seconds")
+
+
 if __name__ == '__main__':
     date_time_folder = make_result_folder()
     txt_context = make_result_txt(date_time_folder)
@@ -664,8 +673,8 @@ if __name__ == '__main__':
     sim = Simulation(setting)
     # simulate_simple_tree_satic_multiple_runs_over_p(sim, setting, date_time_folder, txt_context)
     # simluate_simple_tree_static_multiple_runs_branch_prob(sim, setting, date_time_folder, txt_context)
-
+    simulate_simple_tree_dynamic_multiple_runs(sim, setting, date_time_folder, txt_context)
     # simulate_simple_tree_static_single_run_direct(sim, setting, date_time_folder, txt_context)
     # simulate_tree_branching_without_viz(sim, setting, date_time_folder, txt_context)
     # simulate_simple_tree_dynamic_multiple_runs_gated(sim, setting, date_time_folder, txt_context)
-    experimental_run_1(sim, setting, date_time_folder)
+    # experimental_run_2(sim, setting, date_time_folder)

@@ -160,7 +160,9 @@ class TreeSlot(object):
             if sim.sim_param.sic:
                 # Save the collision packet IDs
                 self.collided_array.append(packetlist.extract_packet_id(self.tx_packet_array))
+                print("Collision array: ", self.collided_array)
                 self.collided_node_array.append(sim.branch_node.branch_status)
+                print("Collision node array: ", self.collided_node_array)
         # If anything else occurs, print immediately as it's not expected.
         else:
             print("Error, unexpected array")

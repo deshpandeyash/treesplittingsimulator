@@ -151,13 +151,14 @@ def traffic_analysis(sim, setting, date_time_folder):
     Finds upper and lower bounds and also plots the optimal Stability arrival rate for windowed access
     """
     if setting is None:
-        k_array = [1, 2, 4, 8, 16, 32, 64]
-        alpha_opt = [1.4427, 0.7214, 0.3607, 0.1808, 0.0919, 0.0480, 0.0254]
-        beta_opt = [1.4427, 0.7213, 0.3606, 0.1799, 0.0884, 0.0421, 0.0199]
-        m_array = [50, 100, 200, 400, 400, 400, 500]
-        ld_array_end_points = [20, 20, 20, 20, 15, 30, 60]
+        # k_array = [1, 2, 4, 8, 16, 32, 64]
+        k_array = [1]
+        #alpha_opt = [1.4427, 0.7214, 0.3607, 0.1808, 0.0919, 0.0480, 0.0254]
+        #beta_opt = [1.4427, 0.7213, 0.3606, 0.1799, 0.0884, 0.0421, 0.0199]
+        #m_array = [50, 100, 200, 400, 400, 400, 500]
+        #ld_array_end_points = [20, 20, 20, 20, 15, 30, 60]
         m = 50
-        lambda_delta_array = np.linspace(0.00, 400, 2000)
+        lambda_delta_array = np.linspace(0.00, 10, 2000)
     else:
         k_array = [setting.boundstest.k1, setting.boundstest.k2, setting.boundstest.k3, setting.boundstest.k4,
                    setting.boundstest.k5]
@@ -178,12 +179,12 @@ def traffic_analysis(sim, setting, date_time_folder):
         to_add = 0
     else:
         to_add = 1
-    df = pd.read_csv('SIC_K_d_2')
+    df = pd.read_csv('Double_SICTA')
     print(F"m = {m} ")
     for item in range(len(k_array)):
         k = k_array[item]
         sim.sim_param.K = k
-        n_array = np.arange(m + 1, m + 500)
+        n_array = np.arange(m + 1, m + 100)
         alpha_plot = []
         for n in n_array:
             numerator = 0
@@ -195,10 +196,10 @@ def traffic_analysis(sim, setting, date_time_folder):
                 numerator += comber * (float(li) + to_add)
                 denominator += comber * i
             alpha_plot.append(numerator / denominator)
-        # alpha_lb = min(alpha_plot)
-        # alpha_ub = max(alpha_plot)
-        alpha_lb = alpha_opt[item]
-        alpha_ub = beta_opt[item]
+        alpha_lb = min(alpha_plot)
+        alpha_ub = max(alpha_plot)
+        # alpha_lb = alpha_opt[item]
+        # alpha_ub = beta_opt[item]
         print(F"............................................................")
         print(F"For k = {k} ")
         print(F"Lower Bound {alpha_lb:.7f} and Upper Bound = {alpha_ub:.7f}")
@@ -214,16 +215,16 @@ def traffic_analysis(sim, setting, date_time_folder):
         lambda_upper_array = []
         lambda_lower_array = []
 
-        m_item = m_array[item]
+        # m_item = m_array[item]
 
-        t_plots = TheoreticalPlots(csv_name='SIC_K_d_2')
+        t_plots = TheoreticalPlots(csv_name='Double_SICTA')
 
-        lambda_delta_array = np.arange(0, ld_array_end_points[item], 0.001)
+        #lambda_delta_array = np.arange(0, ld_array_end_points[item], 0.001)
 
         for lambda_delta in lambda_delta_array:
-            f_upper = t_plots.windowed_bound(sim.sim_param, alpha_ub, m_item, lambda_delta)
+            f_upper = t_plots.windowed_bound(sim.sim_param, alpha_ub, 50, lambda_delta)
             lambda_upper_array.append(lambda_delta / float(f_upper))
-            f_lower = t_plots.windowed_bound(sim.sim_param, alpha_lb, m_item, lambda_delta)
+            f_lower = t_plots.windowed_bound(sim.sim_param, alpha_lb, 50, lambda_delta)
             lambda_lower_array.append(lambda_delta / float(f_lower))
         lambda_upper_array = np.asarray(lambda_upper_array) / k
         lambda_lower_array = np.asarray(lambda_lower_array) / k
