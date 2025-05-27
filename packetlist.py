@@ -149,3 +149,17 @@ def update_transmissions(sim):
     for j in sim.active_array:
         if j.packet_count == 0:
             j.transmissions += 1
+
+def remove_packet_by_id(sim, packet_id):
+    """
+    Removes a packet from the active array by its ID
+    :param sim: the simulation object instance
+    :param packet_id: the ID of the packet to be removed
+    """
+    for j in sim.active_array:
+        if j.packetID == packet_id:
+            sim.sim_state.delay_stat_array.append(j.life_time)
+            sim.sim_state.tx_stat_array.append(j.transmissions)
+            sim.active_array.remove(j)
+            return j
+    return None  # If no packet with that ID is found

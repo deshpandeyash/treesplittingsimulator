@@ -18,7 +18,7 @@ class Simulation(object):
         self.sim_param = SimParam(setting)
         if setting is None:
             # Load simtime
-            self.SIMTIME = 10000
+            self.SIMTIME = 10
             self.freeaccess = False
         else:
             if setting.dynamictest:
@@ -55,7 +55,7 @@ class Simulation(object):
         self.sim_param = SimParam(setting)
         if setting is None:
             # Load simtime
-            self.SIMTIME = 10000
+            self.SIMTIME = 100
             self.freeaccess = False
         else:
             if setting.dynamictest:

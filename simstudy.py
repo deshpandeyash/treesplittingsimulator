@@ -419,7 +419,7 @@ def simulate_simple_tree_dynamic_multiple_runs(sim, setting, date_time_folder, t
     """
     start = time.time()
     if setting is None:
-        rate_array = np.arange(0.60, 0.75, 0.02) * sim.sim_param.K
+        rate_array = np.arange(0.60, 0.75, 0.1) * sim.sim_param.K
         runs = 1
     else:
         rate_array = np.arange(setting.dynamictest.start, setting.dynamictest.stop + setting.dynamictest.step,
@@ -438,6 +438,8 @@ def simulate_simple_tree_dynamic_multiple_runs(sim, setting, date_time_folder, t
             sim.do_simulation_simple_tree_dynamic()
             counter1.append(sim.sim_result.succ_rate)
             counter2.append(sim.sim_result.mean_packet_delay)
+            # Use Graphviz to Render the Tree
+            graphdisplay.displaygraph(sim, date_time_folder)
         succ_rate.append(np.mean(counter1))
         delay.append(np.mean(counter2))
     optimum_throughput = rate_array[delay.index(max(delay))]

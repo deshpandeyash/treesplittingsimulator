@@ -57,7 +57,7 @@ class TreeState(object):
                 self.ST_result_array.append(2)
             go_on = True
             while go_on:
-                # If the 0 th element of the active array is less than 0, it mans that packet is resolved, hence remove
+                # If the 0 th element of the active array is less than 0, it means that packet is resolved, hence remove
                 if sim.active_array[0].packet_count < 0:
                     # Update the total successes
                     self.total_successes += 1
@@ -77,6 +77,7 @@ class TreeState(object):
                 # And update the simple tree result as a collision
                 self.ST_result_array.append(2)
                 self.ST_number_in_slot.append(sim.slot.no_in_skipped_slot)
+
         self.magic_counter = sim.slot.magic_counter
         if sim.sim_param.SPLIT == 2 and self.magic_counter > 0:
             print("Magic Counter error")

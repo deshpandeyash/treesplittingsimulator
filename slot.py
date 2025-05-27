@@ -131,8 +131,9 @@ class TreeSlot(object):
         depending on the active packet array length and the count in each of its packets, this process decides whether
         there was in idle slot, collision or success after which it provides feedback,
 
-        :param
-        :return: feedback , 0 = Idle; 1 = Success; 2 = collision; 9 = Error
+        
+        :return: feedback , 0 = Idle; 1 = Success; 2 = collision; 9 = Error, List of resolved packets
+        :param sim: the simulation parameters
         """
         # This parameter is initialized to a 9, to make sure it is changed by the process. i.e the feedback is one of
         # the expected values
@@ -162,11 +163,38 @@ class TreeSlot(object):
                 self.collided_array.append(packetlist.extract_packet_id(self.tx_packet_array))
                 print("Collision array: ", self.collided_array)
                 self.collided_node_array.append(sim.branch_node.branch_status)
-                print("Collision node array: ", self.collided_node_array)
+                #print("Collision node array: ", self.collided_node_array)
+                # Perform Type 1 Forward SIC process
+                sic_resolved_packets = self.type_1_sic_forward_sic_process(sim)
+                if sic_resolved_packets is not None:
+                    for packet in sic_resolved_packets:
+                        packetlist.remove_packet_by_id(sim, packet)
+                        self.collided_array[-1].remove(packet)
+                        sim.tree_state.total_successes += 1 
         # If anything else occurs, print immediately as it's not expected.
         else:
             print("Error, unexpected array")
         return feedback, resolved_packets
+    
+    def type_1_sic_forward_sic_process(self, sim):
+        """
+        Here we subtract and try the type1 forward
+        :param sim: the simulation object instance
+        :return: the number of resolved packets
+        """ 
+        if len(self.collided_array) > 2:
+            if len(self.collided_array[-1]) > len(self.collided_array[-2]):
+                # Using list comprehension
+                diff = [item for item in self.collided_array[-1] if item not in self.collided_array[-2]]
+                if len(diff) > 0 and len(diff) <= sim.sim_param.K:
+                    print("Type 1 SIC Forward applied, resolved packets: ", diff)
+                    # If the difference is less than or equal to K, we can resolve it
+                    return diff 
+            else:
+                return None
+        else:
+            return None    
+
 
     def sic_process(self, sim):
         # The single packet that is decoded, we take its ID
